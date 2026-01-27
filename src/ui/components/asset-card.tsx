@@ -1,5 +1,6 @@
 import { useState, memo, useCallback } from 'react'
 import { FileIcon, getFileTypeColor } from './file-icon'
+import { VideoCardPreview, FontCardPreview } from './card-previews'
 import { CopyIcon, CheckIcon } from '@phosphor-icons/react'
 import type { Asset } from '../types'
 
@@ -78,6 +79,10 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
             loading="lazy"
             onError={handleImageError}
           />
+        ) : asset.type === 'video' ? (
+          <VideoCardPreview asset={asset} />
+        ) : asset.type === 'font' ? (
+          <FontCardPreview asset={asset} />
         ) : (
           <div className="relative w-full h-full flex items-center justify-center bg-card">
             <FileIcon extension={asset.extension} className="w-16 h-16" />

@@ -12,7 +12,8 @@ import {
   FileCssIcon,
   FileIcon as FileIconPhosphor,
   TableIcon,
-  ArticleIcon
+  ArticleIcon,
+  TextTIcon
 } from '@phosphor-icons/react'
 
 interface FileIconProps {
@@ -56,6 +57,12 @@ const iconMap = new Map<string, IconConfig>([
   ['ppt', { icon: FilePptIcon, color: 'text-orange-400' }],
   ['pptx', { icon: FilePptIcon, color: 'text-orange-400' }],
   ['txt', { icon: FileTextIcon, color: 'text-zinc-400' }],
+  // Fonts
+  ['woff', { icon: TextTIcon, color: 'text-rose-400' }],
+  ['woff2', { icon: TextTIcon, color: 'text-rose-400' }],
+  ['ttf', { icon: TextTIcon, color: 'text-rose-400' }],
+  ['otf', { icon: TextTIcon, color: 'text-rose-400' }],
+  ['eot', { icon: TextTIcon, color: 'text-rose-400' }],
   // Code/Data
   ['json', { icon: FileCodeIcon, color: 'text-amber-400' }],
   ['md', { icon: ArticleIcon, color: 'text-purple-400' }],

@@ -81,6 +81,7 @@ export default [
         HTMLInputElement: 'readonly',
         HTMLButtonElement: 'readonly',
         HTMLDivElement: 'readonly',
+        HTMLVideoElement: 'readonly',
         HTMLImageElement: 'readonly',
         Event: 'readonly',
         KeyboardEvent: 'readonly',
