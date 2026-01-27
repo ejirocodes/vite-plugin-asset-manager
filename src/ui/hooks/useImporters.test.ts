@@ -31,7 +31,7 @@ describe('useImporters', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         importers: mockImporters,
@@ -67,7 +67,7 @@ describe('useImporters', () => {
   })
 
   it('should handle fetch errors', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 500
     })
@@ -82,7 +82,7 @@ describe('useImporters', () => {
   })
 
   it('should handle network errors', async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
 
     const { result } = renderHook(() => useImporters('src/logo.png'))
 
@@ -115,7 +115,7 @@ describe('useImporters', () => {
 
   describe('openInEditor', () => {
     it('should open file in editor', async () => {
-      global.fetch = vi
+      globalThis.fetch = vi
         .fn()
         .mockResolvedValueOnce({
           ok: true,
@@ -143,7 +143,7 @@ describe('useImporters', () => {
     })
 
     it('should show toast on editor error', async () => {
-      global.fetch = vi
+      globalThis.fetch = vi
         .fn()
         .mockResolvedValueOnce({
           ok: true,
@@ -168,7 +168,7 @@ describe('useImporters', () => {
     })
 
     it('should show toast on network error', async () => {
-      global.fetch = vi
+      globalThis.fetch = vi
         .fn()
         .mockResolvedValueOnce({
           ok: true,
@@ -191,7 +191,7 @@ describe('useImporters', () => {
   })
 
   it('should return correct initial state', () => {
-    global.fetch = vi.fn().mockImplementation(() => new Promise(() => {})) // Never resolves
+    globalThis.fetch = vi.fn().mockImplementation(() => new Promise(() => {})) // Never resolves
 
     const { result } = renderHook(() => useImporters('src/logo.png'))
 
