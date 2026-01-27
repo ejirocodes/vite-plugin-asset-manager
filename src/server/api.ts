@@ -10,6 +10,9 @@ import type { AssetStats, AssetType, EditorType } from '../shared/types.js'
 
 type NextFunction = () => void
 
+// SSE clients for real-time updates
+const sseClients = new Set<ServerResponse>()
+
 const MIME_TYPES: Record<string, string> = {
   /**
    * Images:
@@ -94,6 +97,8 @@ export function createApiRouter(
           return handleGetImporters(res, importerScanner, query)
         case '/open-in-editor':
           return handleOpenInEditor(req, res, root, editor, query)
+        case '/events':
+          return handleSSE(res)
         default:
           next()
       }
@@ -239,6 +244,37 @@ async function handleGetStats(res: ServerResponse, scanner: AssetScanner) {
 function sendJson(res: ServerResponse, data: unknown) {
   res.setHeader('Content-Type', 'application/json')
   res.end(JSON.stringify(data))
+}
+
+// SSE endpoint handler
+function handleSSE(res: ServerResponse) {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive',
+    'Access-Control-Allow-Origin': '*'
+  })
+
+  // Send initial connection message
+  res.write(`data: ${JSON.stringify({ type: 'connected' })}\n\n`)
+
+  sseClients.add(res)
+  console.log('[Asset Manager SSE] Client connected, total:', sseClients.size)
+
+  // Handle client disconnect
+  res.on('close', () => {
+    sseClients.delete(res)
+    console.log('[Asset Manager SSE] Client disconnected, total:', sseClients.size)
+  })
+}
+
+// Broadcast event to all SSE clients
+export function broadcastSSE(event: string, data: unknown) {
+  const message = JSON.stringify({ event, data })
+  console.log('[Asset Manager SSE] Broadcasting:', event, 'to', sseClients.size, 'client(s)')
+  for (const client of sseClients) {
+    client.write(`data: ${message}\n\n`)
+  }
 }
 
 async function handleGetImporters(

@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { AssetGroup, UseAssetsResult } from '../types'
+import { useViteWebSocket } from './useViteWebSocket'
 
 export function useAssets(): UseAssetsResult {
   const [groups, setGroups] = useState<AssetGroup[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { subscribe } = useViteWebSocket()
 
   const fetchAssets = useCallback(async () => {
     try {
@@ -26,12 +28,13 @@ export function useAssets(): UseAssetsResult {
   useEffect(() => {
     fetchAssets()
 
-    if (import.meta.hot) {
-      import.meta.hot.on('asset-manager:update', () => {
-        fetchAssets()
-      })
-    }
-  }, [fetchAssets])
+    // Subscribe to asset updates via direct WebSocket connection
+    const unsubscribe = subscribe('asset-manager:update', () => {
+      fetchAssets()
+    })
+
+    return unsubscribe
+  }, [fetchAssets, subscribe])
 
   return { groups, total, loading, error, refetch: fetchAssets }
 }

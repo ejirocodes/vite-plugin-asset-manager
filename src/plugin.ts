@@ -4,6 +4,7 @@ import { setupMiddleware } from './server/index.js'
 import { AssetScanner } from './server/scanner.js'
 import { ImporterScanner } from './server/importer-scanner.js'
 import { ThumbnailService } from './server/thumbnail.js'
+import { broadcastSSE } from './server/api.js'
 import { resolveOptions, type AssetManagerOptions } from './shared/types.js'
 
 const FLOATING_ICON_SCRIPT = (base: string) => `
@@ -267,15 +268,17 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
         )
       }
 
-      return () => {
-        if (resolvedOptions.watch) {
-          scanner.on('change', event => {
-            server.ws.send('asset-manager:update', event)
-          })
-          importerScanner.on('change', event => {
-            server.ws.send('asset-manager:importers-update', event)
-          })
-        }
+      // Set up SSE broadcasting for file changes
+      if (resolvedOptions.watch) {
+        console.log(colors.magenta('[Asset Manager]'), 'Registering scanner event listeners for SSE')
+        scanner.on('change', event => {
+          console.log(colors.magenta('[Asset Manager]'), 'Broadcasting SSE update:', event)
+          broadcastSSE('asset-manager:update', event)
+        })
+        importerScanner.on('change', event => {
+          console.log(colors.magenta('[Asset Manager]'), 'Broadcasting importers SSE update:', event)
+          broadcastSSE('asset-manager:importers-update', event)
+        })
       }
     },
 

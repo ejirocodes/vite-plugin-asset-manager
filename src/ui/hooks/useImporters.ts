@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { toast } from 'sonner'
 import type { Importer, UseImportersResult } from '../types'
+import { useViteWebSocket } from './useViteWebSocket'
 
 export function useImporters(assetPath: string): UseImportersResult {
   const [importers, setImporters] = useState<Importer[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { subscribe } = useViteWebSocket()
 
   const fetchImporters = useCallback(async () => {
     if (!assetPath) {
@@ -52,19 +54,19 @@ export function useImporters(assetPath: string): UseImportersResult {
   useEffect(() => {
     fetchImporters()
 
-    if (import.meta.hot) {
-      const handler = (data: { affectedAssets?: string[] }) => {
-        if (data.affectedAssets?.includes(assetPath)) {
+    // Subscribe to importer updates via direct WebSocket connection
+    const unsubscribe = subscribe(
+      'asset-manager:importers-update',
+      (data: unknown) => {
+        const updateData = data as { affectedAssets?: string[] }
+        if (updateData.affectedAssets?.includes(assetPath)) {
           fetchImporters()
         }
       }
-      import.meta.hot.on('asset-manager:importers-update', handler)
+    )
 
-      return () => {
-        // Note: Vite HMR doesn't have an off method, cleanup happens on module reload
-      }
-    }
-  }, [assetPath, fetchImporters])
+    return unsubscribe
+  }, [assetPath, fetchImporters, subscribe])
 
   return { importers, loading, error, openInEditor }
 }
