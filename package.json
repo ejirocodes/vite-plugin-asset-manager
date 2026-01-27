@@ -1,0 +1,68 @@
+{
+  "name": "vite-plugin-asset-manager",
+  "version": "0.1.0",
+  "description": "Visual asset management dashboard for Vite projects",
+  "keywords": [
+    "vite",
+    "plugin",
+    "assets",
+    "images",
+    "manager",
+    "dashboard",
+    "react"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "vite": "^5.0.0 || ^6.0.0"
+  },
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "fast-glob": "^3.3.2",
+    "sharp": "^0.33.2",
+    "sirv": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.4.1",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vite": "^6.0.0"
+  },
+  "scripts": {
+    "build:ui": "vite build --config vite.config.ui.ts",
+    "build:plugin": "tsup",
+    "build": "npm run build:ui && npm run build:plugin",
+    "dev": "tsup --watch",
+    "prepublishOnly": "npm run build"
+  }
+}
