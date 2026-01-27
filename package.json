@@ -1,19 +1,33 @@
 {
   "name": "vite-plugin-asset-manager",
   "version": "0.0.1",
-  "description": "Visual asset management dashboard for Vite projects",
+  "type": "module",
+  "description": "Visual asset management for Vite",
+  "author": "Ejiro Asiuwhu <ejiroasiuwhu10@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/ejirocodes/vite-plugin-asset-manager#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ejirocodes/vite-plugin-asset-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ejirocodes/vite-plugin-asset-manager/issues"
+  },
   "keywords": [
     "vite",
     "plugin",
     "assets",
-    "images",
     "manager",
-    "dashboard",
-    "react"
+    "vite-plugin",
+    "react-vite-plugin"
   ],
-  "author": "",
-  "license": "MIT",
-  "type": "module",
+  "scripts": {
+    "build:ui": "vite build --config vite.config.ui.ts",
+    "build:plugin": "tsup",
+    "build": "npm run build:ui && npm run build:plugin",
+    "dev": "tsup --watch",
+    "prepublishOnly": "npm run build"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -33,7 +47,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22"
   },
   "peerDependencies": {
     "vite": "^5.0.0 || ^6.0.0"
@@ -65,12 +79,5 @@
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
     "vite": "^6.0.0"
-  },
-  "scripts": {
-    "build:ui": "vite build --config vite.config.ui.ts",
-    "build:plugin": "tsup",
-    "build": "npm run build:ui && npm run build:plugin",
-    "dev": "tsup --watch",
-    "prepublishOnly": "npm run build"
   }
 }
