@@ -3,12 +3,12 @@ import ReactDOM from 'react-dom/client'
 
 function App() {
   return (
-    <div style={{ padding: '2rem', fontFamily: 'system-ui' }}>
+    <div style={{ padding: '2rem', fontFamily: 'system-ui', color: 'white' }}>
       <h1>Vite Plugin Asset Manager - Playground</h1>
       <p>
         Visit{' '}
-        <a href="/__asset-manager" target="_blank" rel="noopener noreferrer">
-          /__asset-manager
+        <a href="/__asset_manager__" target="_blank" rel="noopener noreferrer">
+          /__asset_manager__
         </a>{' '}
         to see the asset manager UI.
       </p>

@@ -11,7 +11,7 @@ export function useAssets(): UseAssetsResult {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch('/__asset-manager/api/assets/grouped')
+      const res = await fetch('/__asset_manager__/api/assets/grouped')
       if (!res.ok) throw new Error('Failed to fetch assets')
       const data = await res.json()
       setGroups(data.groups)

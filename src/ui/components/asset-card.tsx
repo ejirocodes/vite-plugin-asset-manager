@@ -22,8 +22,8 @@ export function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
   const [imageError, setImageError] = useState(false)
 
   const isImage = asset.type === 'image'
-  const thumbnailUrl = `/__asset-manager/api/thumbnail?path=${encodeURIComponent(asset.path)}`
-  const fileUrl = `/__asset-manager/api/file?path=${encodeURIComponent(asset.path)}`
+  const thumbnailUrl = `/__asset_manager__/api/thumbnail?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
 
   const handleClick = () => {
     if (onPreview) {

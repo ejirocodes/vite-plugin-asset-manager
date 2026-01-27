@@ -5,7 +5,7 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   root: 'src/ui',
-  base: '/__asset-manager/',
+  base: '/__asset_manager__/',
   build: {
     outDir: '../../dist/client',
     emptyOutDir: true,

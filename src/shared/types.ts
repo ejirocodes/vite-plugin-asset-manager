@@ -48,7 +48,7 @@ export interface ResolvedOptions {
 }
 
 export const DEFAULT_OPTIONS: ResolvedOptions = {
-  base: '/__asset-manager',
+  base: '/__asset_manager__',
   include: ['src', 'public'],
   exclude: ['node_modules', '.git', 'dist', '.cache', 'coverage'],
   extensions: [

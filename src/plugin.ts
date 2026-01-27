@@ -1,4 +1,5 @@
 import type { Plugin, ViteDevServer, ResolvedConfig, IndexHtmlTransformResult } from 'vite'
+import colors from 'picocolors'
 import { setupMiddleware } from './server/index.js'
 import { AssetScanner } from './server/scanner.js'
 import { ThumbnailService } from './server/thumbnail.js'
@@ -125,7 +126,7 @@ const FLOATING_ICON_SCRIPT = (base: string) => `
   // Create trigger button
   const trigger = document.createElement('button');
   trigger.id = 'vam-trigger';
-  trigger.title = 'Open Asset Manager';
+  trigger.title = 'Open Asset Manager (⌥⇧A)';
   trigger.innerHTML = \`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
       <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V88H40V56Zm0,144H40V104H216v96ZM64,128a8,8,0,0,1,8-8h80a8,8,0,0,1,0,16H72A8,8,0,0,1,64,128Zm0,32a8,8,0,0,1,8-8h80a8,8,0,0,1,0,16H72A8,8,0,0,1,64,160Z"/>
@@ -190,8 +191,15 @@ const FLOATING_ICON_SCRIPT = (base: string) => `
   document.getElementById('vam-close-btn').addEventListener('click', close);
 
   document.addEventListener('keydown', (e) => {
+    // Close on Escape
     if (e.key === 'Escape' && isOpen) {
       close();
+    }
+    // Toggle on Option/Alt + Shift + A
+    if (e.altKey && e.shiftKey && e.code === 'KeyA') {
+      e.preventDefault();
+      if (isOpen) close();
+      else open();
     }
   });
 })();
@@ -224,13 +232,31 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
         root: config.root
       })
 
-      scanner.init().then(() => {
-        const assets = scanner.getAssets()
-        server.config.logger.info(
-          `\n  Asset Manager ready at ${resolvedOptions.base}`
-        )
-        server.config.logger.info(`  Found ${assets.length} assets\n`)
-      })
+      scanner.init()
+
+      const _printUrls = server.printUrls
+      server.printUrls = () => {
+        _printUrls()
+
+        const colorUrl = (url: string) =>
+          colors.cyan(url.replace(/:(\d+)\//, (_, port) => `:${colors.bold(port)}/`))
+
+        let host = `${server.config.server.https ? 'https' : 'http'}://localhost:${server.config.server.port || '80'}`
+        const url = server.resolvedUrls?.local[0]
+        if (url) {
+          try {
+            const u = new URL(url)
+            host = `${u.protocol}//${u.host}`
+          } catch {
+          }
+        }
+
+        const base = server.config.base || '/'
+        const fullUrl = `${host}${base}${resolvedOptions.base.replace(/^\//, '')}/`
+
+        server.config.logger.info(`  ${colors.magenta('➜')}  ${colors.bold('Vite Asset Manager')}: Open ${colorUrl(fullUrl)} as a separate window`)
+        server.config.logger.info(`  ${colors.magenta('➜')}  ${colors.bold('Vite Asset Manager')}: Press ${colors.yellow('Option(⌥)+Shift(⇧)+A')} in App to toggle the Asset Manager`)
+      }
 
       return () => {
         if (resolvedOptions.watch) {
