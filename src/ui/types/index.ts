@@ -1,4 +1,4 @@
-export type AssetType = 'image' | 'video' | 'audio' | 'document' | 'other'
+export type AssetType = 'image' | 'video' | 'audio' | 'document' | 'font' | 'data' | 'text' | 'other'
 
 export interface Asset {
   id: string

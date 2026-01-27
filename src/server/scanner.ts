@@ -92,12 +92,18 @@ export class AssetScanner extends EventEmitter {
     const imageExts = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.avif', '.ico', '.bmp', '.tiff', '.tif', '.heic', '.heif']
     const videoExts = ['.mp4', '.webm', '.ogg', '.mov', '.avi']
     const audioExts = ['.mp3', '.wav', '.flac', '.aac']
-    const docExts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.md', '.txt', '.yml', '.yaml', '.toml', '.xml']
+    const docExts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx']
+    const fontExts = ['.woff', '.woff2', '.ttf', '.otf', '.eot']
+    const dataExts = ['.json', '.csv', '.xml', '.yml', '.yaml', '.toml']
+    const textExts = ['.md', '.txt']
 
     if (imageExts.includes(extension)) return 'image'
     if (videoExts.includes(extension)) return 'video'
     if (audioExts.includes(extension)) return 'audio'
     if (docExts.includes(extension)) return 'document'
+    if (fontExts.includes(extension)) return 'font'
+    if (dataExts.includes(extension)) return 'data'
+    if (textExts.includes(extension)) return 'text'
     return 'other'
   }
 

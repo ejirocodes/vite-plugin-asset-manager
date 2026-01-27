@@ -19,6 +19,9 @@ export default function App() {
       videos: allAssets.filter(a => a.type === 'video').length,
       audio: allAssets.filter(a => a.type === 'audio').length,
       documents: allAssets.filter(a => a.type === 'document').length,
+      fonts: allAssets.filter(a => a.type === 'font').length,
+      data: allAssets.filter(a => a.type === 'data').length,
+      text: allAssets.filter(a => a.type === 'text').length,
       other: allAssets.filter(a => a.type === 'other').length,
     }
   }, [groups])

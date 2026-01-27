@@ -1,5 +1,15 @@
 import { SearchBar } from './search-bar'
-import { ImagesIcon, VideoCameraIcon, MusicNoteIcon, FileTextIcon, PackageIcon } from '@phosphor-icons/react'
+import {
+  ImagesIcon,
+  VideoCameraIcon,
+  MusicNoteIcon,
+  FileTextIcon,
+  PackageIcon,
+  TextTIcon,
+  DatabaseIcon,
+  ArticleIcon,
+  FileIcon
+} from '@phosphor-icons/react'
 import packageJson from '../../../package.json'
 interface SidebarProps {
   total: number
@@ -11,6 +21,9 @@ interface SidebarProps {
     videos: number
     audio: number
     documents: number
+    fonts: number
+    data: number
+    text: number
     other: number
   }
 }
@@ -82,6 +95,30 @@ export function Sidebar({ total, searchQuery, onSearchChange, searching, stats }
                 count={stats.documents}
                 color="amber"
               />
+              <StatBadge
+                icon={<TextTIcon weight="fill" className="w-3.5 h-3.5" />}
+                label="Fonts"
+                count={stats.fonts}
+                color="rose"
+              />
+              <StatBadge
+                icon={<DatabaseIcon weight="fill" className="w-3.5 h-3.5" />}
+                label="Data"
+                count={stats.data}
+                color="emerald"
+              />
+              <StatBadge
+                icon={<ArticleIcon weight="fill" className="w-3.5 h-3.5" />}
+                label="Text"
+                count={stats.text}
+                color="purple"
+              />
+              <StatBadge
+                icon={<FileIcon weight="fill" className="w-3.5 h-3.5" />}
+                label="Other"
+                count={stats.other}
+                color="zinc"
+              />
             </div>
           )}
         </div>
@@ -120,6 +157,26 @@ export function Sidebar({ total, searchQuery, onSearchChange, searching, stats }
                 label="Documents"
                 count={stats.documents}
               />
+              <NavItem
+                icon={<TextTIcon weight="duotone" className="w-4 h-4" />}
+                label="Fonts"
+                count={stats.fonts}
+              />
+              <NavItem
+                icon={<DatabaseIcon weight="duotone" className="w-4 h-4" />}
+                label="Data"
+                count={stats.data}
+              />
+              <NavItem
+                icon={<ArticleIcon weight="duotone" className="w-4 h-4" />}
+                label="Text"
+                count={stats.text}
+              />
+              <NavItem
+                icon={<FileIcon weight="duotone" className="w-4 h-4" />}
+                label="Other"
+                count={stats.other}
+              />
             </>
           )}
         </nav>
@@ -147,13 +204,17 @@ function StatBadge({
   icon: React.ReactNode
   label: string
   count: number
-  color: 'violet' | 'pink' | 'cyan' | 'amber'
+  color: 'violet' | 'pink' | 'cyan' | 'amber' | 'rose' | 'emerald' | 'purple' | 'zinc'
 }) {
   const colorClasses = {
     violet: 'text-violet-400 bg-violet-500/10',
     pink: 'text-pink-400 bg-pink-500/10',
     cyan: 'text-cyan-400 bg-cyan-500/10',
     amber: 'text-amber-400 bg-amber-500/10',
+    rose: 'text-rose-400 bg-rose-500/10',
+    emerald: 'text-emerald-400 bg-emerald-500/10',
+    purple: 'text-purple-400 bg-purple-500/10',
+    zinc: 'text-zinc-400 bg-zinc-500/10',
   }
 
   return (
