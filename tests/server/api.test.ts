@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { IncomingMessage, ServerResponse } from 'http'
 import { EventEmitter } from 'stream'
 import type { Asset, AssetGroup, Importer } from '../../src/shared/types'
+import { createMockAsset } from '../setup'
 
 vi.mock('fs', () => ({
   default: {
@@ -764,6 +765,147 @@ describe('API Router', () => {
       const data = JSON.parse(res._data)
       expect(data.assets).toEqual([])
       expect(data.total).toBe(0)
+    })
+  })
+
+  describe('GET /assets/grouped?unused=true', () => {
+    it('should return only unused assets', async () => {
+      const assets = [
+        createMockAsset({ path: 'src/used.png', importersCount: 3 }),
+        createMockAsset({ path: 'src/unused1.png', importersCount: 0 }),
+        createMockAsset({ path: 'public/unused2.jpg', importersCount: 0 }),
+        createMockAsset({ path: 'public/used.svg', importersCount: 1 })
+      ]
+
+      mockScanner.getGroupedAssets.mockReturnValue([
+        { directory: 'src', assets: [assets[0], assets[1]], count: 2 },
+        { directory: 'public', assets: [assets[2], assets[3]], count: 2 }
+      ])
+
+      const router = createApiRouter(
+        mockScanner,
+        mockImporterScanner,
+        mockThumbnailService,
+        '/project',
+        basePath,
+        'code'
+      )
+
+      const req = createMockRequest(`${basePath}/api/assets/grouped?unused=true`)
+      const res = createMockResponse()
+      const next = vi.fn()
+
+      await router(req, res, next)
+
+      expect(res._headers['content-type']).toBe('application/json')
+      const data = JSON.parse(res._data)
+      expect(data.groups).toHaveLength(2)
+      expect(data.groups[0].assets).toHaveLength(1)
+      expect(data.groups[0].assets[0].path).toBe('src/unused1.png')
+      expect(data.groups[1].assets).toHaveLength(1)
+      expect(data.groups[1].assets[0].path).toBe('public/unused2.jpg')
+      expect(data.total).toBe(2)
+    })
+
+    it('should combine type and unused filters', async () => {
+      const assets = [
+        createMockAsset({ path: 'src/used.png', type: 'image', importersCount: 3 }),
+        createMockAsset({ path: 'src/unused-image.png', type: 'image', importersCount: 0 }),
+        createMockAsset({ path: 'src/unused-video.mp4', type: 'video', importersCount: 0 }),
+        createMockAsset({ path: 'public/unused-image.jpg', type: 'image', importersCount: 0 })
+      ]
+
+      mockScanner.getGroupedAssets.mockReturnValue([
+        { directory: 'src', assets: [assets[0], assets[1], assets[2]], count: 3 },
+        { directory: 'public', assets: [assets[3]], count: 1 }
+      ])
+
+      const router = createApiRouter(
+        mockScanner,
+        mockImporterScanner,
+        mockThumbnailService,
+        '/project',
+        basePath,
+        'code'
+      )
+
+      const req = createMockRequest(`${basePath}/api/assets/grouped?type=image&unused=true`)
+      const res = createMockResponse()
+      const next = vi.fn()
+
+      await router(req, res, next)
+
+      expect(res._headers['content-type']).toBe('application/json')
+      const data = JSON.parse(res._data)
+      expect(data.groups).toHaveLength(2)
+      expect(data.total).toBe(2)
+      expect(data.groups[0].assets[0].path).toBe('src/unused-image.png')
+      expect(data.groups[1].assets[0].path).toBe('public/unused-image.jpg')
+    })
+
+    it('should remove empty groups after filtering', async () => {
+      const assets = [
+        createMockAsset({ path: 'src/used.png', importersCount: 3 }),
+        createMockAsset({ path: 'public/unused.jpg', importersCount: 0 })
+      ]
+
+      mockScanner.getGroupedAssets.mockReturnValue([
+        { directory: 'src', assets: [assets[0]], count: 1 },
+        { directory: 'public', assets: [assets[1]], count: 1 }
+      ])
+
+      const router = createApiRouter(
+        mockScanner,
+        mockImporterScanner,
+        mockThumbnailService,
+        '/project',
+        basePath,
+        'code'
+      )
+
+      const req = createMockRequest(`${basePath}/api/assets/grouped?unused=true`)
+      const res = createMockResponse()
+      const next = vi.fn()
+
+      await router(req, res, next)
+
+      expect(res._headers['content-type']).toBe('application/json')
+      const data = JSON.parse(res._data)
+      expect(data.groups).toHaveLength(1)
+      expect(data.groups[0].directory).toBe('public')
+    })
+  })
+
+  describe('GET /stats with unused count', () => {
+    it('should include unused count in stats', async () => {
+      const assets = [
+        createMockAsset({ type: 'image', importersCount: 3 }),
+        createMockAsset({ type: 'image', importersCount: 0 }),
+        createMockAsset({ type: 'video', importersCount: 0 }),
+        createMockAsset({ type: 'image', importersCount: 1 })
+      ]
+
+      mockScanner.getAssets.mockReturnValue(assets)
+
+      const router = createApiRouter(
+        mockScanner,
+        mockImporterScanner,
+        mockThumbnailService,
+        '/project',
+        basePath,
+        'code'
+      )
+
+      const req = createMockRequest(`${basePath}/api/stats`)
+      const res = createMockResponse()
+      const next = vi.fn()
+
+      await router(req, res, next)
+
+      expect(res._headers['content-type']).toBe('application/json')
+      const data = JSON.parse(res._data)
+      expect(data.unused).toBe(2)
+      expect(data.total).toBe(4)
     })
   })
 })

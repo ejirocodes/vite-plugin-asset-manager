@@ -11,6 +11,7 @@ interface Stats {
   data: number
   text: number
   other: number
+  unused: number
 }
 
 interface UseStatsResult {
@@ -29,7 +30,8 @@ export function useStats(): UseStatsResult {
     fonts: 0,
     data: 0,
     text: 0,
-    other: 0
+    other: 0,
+    unused: 0
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -50,7 +52,8 @@ export function useStats(): UseStatsResult {
         fonts: data.byType.font,
         data: data.byType.data,
         text: data.byType.text,
-        other: data.byType.other
+        other: data.byType.other,
+        unused: data.unused
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')

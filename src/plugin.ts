@@ -238,8 +238,11 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
         launchEditor: resolvedOptions.launchEditor
       })
 
-      scanner.init()
-      importerScanner.init()
+      scanner.init().then(() => {
+        importerScanner.init().then(() => {
+          scanner.enrichWithImporterCounts(importerScanner)
+        })
+      })
 
       const _printUrls = server.printUrls
       server.printUrls = () => {
@@ -273,6 +276,7 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
           broadcastSSE('asset-manager:update', event)
         })
         importerScanner.on('change', event => {
+          scanner.enrichWithImporterCounts(importerScanner)
           broadcastSSE('asset-manager:importers-update', event)
         })
       }

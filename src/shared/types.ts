@@ -58,6 +58,7 @@ export interface Asset {
   size: number
   mtime: number
   directory: string
+  importersCount?: number
 }
 
 export interface AssetGroup {
@@ -71,6 +72,7 @@ export interface AssetStats {
   byType: Record<AssetType, number>
   totalSize: number
   directories: number
+  unused: number
 }
 
 export interface AssetManagerOptions {

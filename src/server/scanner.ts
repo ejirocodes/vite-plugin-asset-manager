@@ -156,6 +156,17 @@ export class AssetScanner extends EventEmitter {
     return this.cache.get(relativePath)
   }
 
+  /**
+   * Enrich assets with importer count metadata.
+   * Should be called after scanning completes and when importers change.
+   */
+  enrichWithImporterCounts(importerScanner: { getImporters: (assetPath: string) => any[] }): void {
+    for (const asset of this.cache.values()) {
+      const importers = importerScanner.getImporters(asset.path)
+      asset.importersCount = importers.length
+    }
+  }
+
   private initWatcher(): void {
     const watchPaths = this.options.include.map(dir => path.join(this.root, dir))
 

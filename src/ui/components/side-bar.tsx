@@ -10,7 +10,8 @@ import {
   TextTIcon,
   DatabaseIcon,
   ArticleIcon,
-  FileIcon
+  FileIcon,
+  WarningCircleIcon
 } from '@phosphor-icons/react'
 import packageJson from '../../../package.json'
 import type { AssetType } from '../types'
@@ -33,6 +34,8 @@ interface SidebarProps {
   searching: boolean
   selectedType: AssetType | null
   onTypeSelect: (type: AssetType | null) => void
+  showUnusedOnly: boolean
+  onUnusedFilterToggle: () => void
   stats?: {
     images: number
     videos: number
@@ -42,6 +45,7 @@ interface SidebarProps {
     data: number
     text: number
     other: number
+    unused: number
   }
 }
 
@@ -52,6 +56,8 @@ export const Sidebar = memo(function Sidebar({
   searching,
   selectedType,
   onTypeSelect,
+  showUnusedOnly,
+  onUnusedFilterToggle,
   stats
 }: SidebarProps) {
   return (
@@ -140,6 +146,12 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.other}
                 color="zinc"
               />
+              <StatBadge
+                icon={<WarningCircleIcon weight="fill" className="w-3.5 h-3.5" />}
+                label="Unused"
+                count={stats.unused}
+                color="amber"
+              />
             </div>
           )}
         </div>
@@ -214,6 +226,14 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.other}
                 active={selectedType === 'other'}
                 onClick={() => onTypeSelect('other')}
+              />
+              <div className="my-2 border-t border-sidebar-border" />
+              <NavItem
+                icon={<WarningCircleIcon weight="duotone" className="w-4 h-4" />}
+                label="Unused Assets"
+                count={stats.unused}
+                active={showUnusedOnly}
+                onClick={onUnusedFilterToggle}
               />
             </>
           )}

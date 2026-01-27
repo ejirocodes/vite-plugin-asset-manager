@@ -450,4 +450,62 @@ describe('AssetScanner', () => {
       expect(closeSpy).toHaveBeenCalled()
     })
   })
+
+  describe('enrichWithImporterCounts', () => {
+    it('should add importersCount to all assets', async () => {
+      mockFg.mockResolvedValue([
+        { path: 'src/image1.png', dirent: null, stats: null },
+        { path: 'src/image2.png', dirent: null, stats: null },
+        { path: 'public/logo.png', dirent: null, stats: null }
+      ])
+      mockFs.stat.mockResolvedValue({
+        size: 1024,
+        mtimeMs: Date.now(),
+        isFile: () => true,
+        isDirectory: () => false
+      } as any)
+
+      const scanner = new AssetScanner('/project', DEFAULT_OPTIONS)
+      await scanner.init()
+
+      const mockImporterScanner = {
+        getImporters: vi.fn((path: string) => {
+          if (path === 'src/image1.png') return [{}, {}, {}] // 3 importers
+          if (path === 'src/image2.png') return [] // 0 importers (unused)
+          if (path === 'public/logo.png') return [{}] // 1 importer
+          return []
+        })
+      }
+
+      scanner.enrichWithImporterCounts(mockImporterScanner)
+
+      const assets = scanner.getAssets()
+      expect(assets).toHaveLength(3)
+      expect(assets[0].importersCount).toBe(3)
+      expect(assets[1].importersCount).toBe(0)
+      expect(assets[2].importersCount).toBe(1)
+    })
+
+    it('should handle assets with no importers', async () => {
+      mockFg.mockResolvedValue([{ path: 'public/unused.png', dirent: null, stats: null }])
+      mockFs.stat.mockResolvedValue({
+        size: 512,
+        mtimeMs: Date.now(),
+        isFile: () => true,
+        isDirectory: () => false
+      } as any)
+
+      const scanner = new AssetScanner('/project', DEFAULT_OPTIONS)
+      await scanner.init()
+
+      const mockImporterScanner = {
+        getImporters: vi.fn(() => [])
+      }
+
+      scanner.enrichWithImporterCounts(mockImporterScanner)
+
+      const assets = scanner.getAssets()
+      expect(assets[0].importersCount).toBe(0)
+    })
+  })
 })

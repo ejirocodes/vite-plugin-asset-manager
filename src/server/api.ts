@@ -152,6 +152,17 @@ async function handleGetGroupedAssets(
       .filter(group => group.count > 0)
   }
 
+  const unused = query.unused === 'true'
+  if (unused) {
+    groups = groups
+      .map(group => ({
+        ...group,
+        assets: group.assets.filter(a => a.importersCount === 0),
+        count: group.assets.filter(a => a.importersCount === 0).length
+      }))
+      .filter(group => group.count > 0)
+  }
+
   const total = groups.reduce((sum, g) => sum + g.count, 0)
   sendJson(res, { groups, total })
 }
@@ -253,7 +264,8 @@ async function handleGetStats(res: ServerResponse, scanner: AssetScanner) {
       other: assets.filter(a => a.type === 'other').length
     },
     totalSize: assets.reduce((sum, a) => sum + a.size, 0),
-    directories: [...new Set(assets.map(a => a.directory))].length
+    directories: [...new Set(assets.map(a => a.directory))].length,
+    unused: assets.filter(a => a.importersCount === 0).length
   }
 
   sendJson(res, stats)

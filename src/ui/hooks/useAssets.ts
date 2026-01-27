@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import type { AssetGroup, AssetType, UseAssetsResult } from '../types'
 import { useSSE } from './useSSE'
 
-export function useAssets(typeFilter?: AssetType | null): UseAssetsResult {
+export function useAssets(typeFilter?: AssetType | null, unusedFilter?: boolean): UseAssetsResult {
   const [groups, setGroups] = useState<AssetGroup[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -13,9 +13,16 @@ export function useAssets(typeFilter?: AssetType | null): UseAssetsResult {
     try {
       setLoading(true)
       setError(null)
-      const url = typeFilter
-        ? `/__asset_manager__/api/assets/grouped?type=${typeFilter}`
+
+      const params = new URLSearchParams()
+      if (typeFilter) params.append('type', typeFilter)
+      if (unusedFilter) params.append('unused', 'true')
+
+      const queryString = params.toString()
+      const url = queryString
+        ? `/__asset_manager__/api/assets/grouped?${queryString}`
         : '/__asset_manager__/api/assets/grouped'
+
       const res = await fetch(url)
       if (!res.ok) throw new Error('Failed to fetch assets')
       const data = await res.json()
@@ -26,7 +33,7 @@ export function useAssets(typeFilter?: AssetType | null): UseAssetsResult {
     } finally {
       setLoading(false)
     }
-  }, [typeFilter])
+  }, [typeFilter, unusedFilter])
 
   useEffect(() => {
     fetchAssets()

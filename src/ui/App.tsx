@@ -34,7 +34,8 @@ const EmptyStateNoAssets = (
 
 export default function App() {
   const [selectedType, setSelectedType] = useState<AssetType | null>(null)
-  const { groups, loading } = useAssets(selectedType)
+  const [showUnusedOnly, setShowUnusedOnly] = useState(false)
+  const { groups, loading } = useAssets(selectedType, showUnusedOnly)
   const { stats } = useStats()
   const { results, searching, search, clear } = useSearch()
   const [searchQuery, setSearchQuery] = useState('')
@@ -51,6 +52,10 @@ export default function App() {
 
   const handleClosePreview = useCallback(() => {
     setSelectedAsset(null)
+  }, [])
+
+  const handleUnusedFilterToggle = useCallback(() => {
+    setShowUnusedOnly(prev => !prev)
   }, [])
 
   useEffect(() => {
@@ -116,6 +121,8 @@ export default function App() {
           searching={searching}
           selectedType={selectedType}
           onTypeSelect={setSelectedType}
+          showUnusedOnly={showUnusedOnly}
+          onUnusedFilterToggle={handleUnusedFilterToggle}
           stats={stats}
         />
         <main className="flex-1 overflow-auto">

@@ -244,4 +244,56 @@ describe('AssetCard', () => {
 
     expect(container.querySelector('.stagger-8')).toBeInTheDocument()
   })
+
+  describe('unused badge', () => {
+    it('should show UNUSED badge when importersCount is 0', () => {
+      const unusedAsset: Asset = {
+        ...mockImageAsset,
+        importersCount: 0
+      }
+
+      render(<AssetCard asset={unusedAsset} />)
+
+      const badge = screen.getByText('UNUSED')
+      expect(badge).toBeInTheDocument()
+      expect(badge).toHaveAttribute('aria-label', 'This asset is not imported by any source files')
+      expect(badge).toHaveAttribute('title', 'This asset is not imported by any source files')
+    })
+
+    it('should not show UNUSED badge when asset is used', () => {
+      const usedAsset: Asset = {
+        ...mockImageAsset,
+        importersCount: 3
+      }
+
+      render(<AssetCard asset={usedAsset} />)
+
+      expect(screen.queryByText('UNUSED')).not.toBeInTheDocument()
+    })
+
+    it('should not show UNUSED badge when importersCount is undefined', () => {
+      const assetWithoutCount: Asset = {
+        ...mockImageAsset,
+        importersCount: undefined
+      }
+
+      render(<AssetCard asset={assetWithoutCount} />)
+
+      expect(screen.queryByText('UNUSED')).not.toBeInTheDocument()
+    })
+
+    it('should have amber styling for unused badge', () => {
+      const unusedAsset: Asset = {
+        ...mockImageAsset,
+        importersCount: 0
+      }
+
+      render(<AssetCard asset={unusedAsset} />)
+
+      const badge = screen.getByText('UNUSED')
+      expect(badge).toHaveClass('bg-amber-500/10')
+      expect(badge).toHaveClass('text-amber-400')
+      expect(badge).toHaveClass('border-amber-500/20')
+    })
+  })
 })

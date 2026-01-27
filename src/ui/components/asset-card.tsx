@@ -110,12 +110,23 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
           {asset.name}
         </p>
         <div className="flex items-center justify-between">
-          <span
-            className={`text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded ${extColor} bg-current/10`}
-            style={{ color: 'inherit' }}
-          >
-            <span className={extColor}>{asset.extension.replace('.', '')}</span>
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded ${extColor} bg-current/10`}
+              style={{ color: 'inherit' }}
+            >
+              <span className={extColor}>{asset.extension.replace('.', '')}</span>
+            </span>
+            {asset.importersCount === 0 && (
+              <span
+                className="text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                aria-label="This asset is not imported by any source files"
+                title="This asset is not imported by any source files"
+              >
+                UNUSED
+              </span>
+            )}
+          </div>
           <span className="text-xs text-muted-foreground font-mono tabular-nums">
             {formatBytes(asset.size)}
           </span>
