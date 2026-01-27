@@ -5,7 +5,7 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   dts: true,
   clean: false,
-  external: ['vite', 'sharp'],
+  external: ['vite', 'sharp', 'archiver'],
   outDir: 'dist',
   splitting: false,
   sourcemap: true,

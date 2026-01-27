@@ -3,9 +3,11 @@ import { Sidebar } from './components/side-bar'
 import { AssetGrid } from './components/asset-grid'
 import { PreviewPanel } from './components/preview-panel'
 import { SortControls } from './components/sort-controls'
+import { BulkActionsBar } from './components/bulk-actions-bar'
 import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
 import { useStats } from './hooks/useStats'
+import { useBulkOperations } from './hooks/useBulkOperations'
 import { useIgnoredAssets } from './providers/ignored-assets-provider'
 import { sortAssets, type SortOption } from '@/ui/lib/sort-utils'
 import {
@@ -40,6 +42,7 @@ export default function App() {
   const { stats } = useStats()
   const { results, searching, search, clear } = useSearch()
   const { isIgnored } = useIgnoredAssets()
+  const { isDeleting, bulkDelete } = useBulkOperations()
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(() => new Set())
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null)
@@ -47,6 +50,10 @@ export default function App() {
     field: 'name',
     direction: 'asc'
   })
+
+  // Bulk selection state
+  const [selectedAssets, setSelectedAssets] = useState<Set<string>>(() => new Set())
+  const [lastSelectedId, setLastSelectedId] = useState<string | null>(null)
 
   const handlePreview = useCallback((asset: Asset) => {
     setSelectedAsset(asset)
@@ -59,6 +66,11 @@ export default function App() {
   const handleUnusedFilterToggle = useCallback(() => {
     setShowUnusedOnly(prev => !prev)
   }, [])
+
+  useEffect(() => {
+    setSelectedAssets(new Set())
+    setLastSelectedId(null)
+  }, [selectedType, showUnusedOnly, searchQuery])
 
   useEffect(() => {
     if (groups.length > 0 && expandedDirs.size === 0) {
@@ -123,6 +135,67 @@ export default function App() {
     })
   }, [])
 
+  const handleToggleSelect = useCallback(
+    (assetId: string, shiftKey: boolean) => {
+      setSelectedAssets(prev => {
+        const next = new Set(prev)
+
+        if (shiftKey && lastSelectedId) {
+          const allAssets = displayGroups.flatMap(g => g.assets)
+          const lastIndex = allAssets.findIndex(a => a.id === lastSelectedId)
+          const currentIndex = allAssets.findIndex(a => a.id === assetId)
+
+          if (lastIndex !== -1 && currentIndex !== -1) {
+            const [start, end] =
+              lastIndex < currentIndex ? [lastIndex, currentIndex] : [currentIndex, lastIndex]
+
+            for (let i = start; i <= end; i++) {
+              next.add(allAssets[i].id)
+            }
+          }
+        } else {
+          if (next.has(assetId)) {
+            next.delete(assetId)
+          } else {
+            next.add(assetId)
+          }
+        }
+
+        return next
+      })
+      setLastSelectedId(assetId)
+    },
+    [lastSelectedId, displayGroups]
+  )
+
+  const handleSelectAll = useCallback(() => {
+    const allIds = displayGroups.flatMap(g => g.assets.map(a => a.id))
+    setSelectedAssets(new Set(allIds))
+  }, [displayGroups])
+
+  const handleDeselectAll = useCallback(() => {
+    setSelectedAssets(new Set())
+    setLastSelectedId(null)
+  }, [])
+
+  const selectedAssetsArray = useMemo(() => {
+    const allAssets = displayGroups.flatMap(g => g.assets)
+    return allAssets.filter(a => selectedAssets.has(a.id))
+  }, [displayGroups, selectedAssets])
+
+  const handleBulkDelete = useCallback(async () => {
+    const success = await bulkDelete(selectedAssetsArray)
+    if (success) {
+      setSelectedAssets(new Set())
+      setLastSelectedId(null)
+    }
+  }, [bulkDelete, selectedAssetsArray])
+
+  const totalVisibleAssets = useMemo(
+    () => displayGroups.reduce((sum, g) => sum + g.count, 0),
+    [displayGroups]
+  )
+
   const adjustedStats = useMemo(() => {
     const ignoredUnusedCount = groups
       .flatMap(g => g.assets)
@@ -167,47 +240,65 @@ export default function App() {
               EmptyStateNoAssets
             )
           ) : (
-            <div className="p-6 space-y-4">
-              <div className="flex items-center justify-end">
-                <SortControls value={sortOption} onChange={setSortOption} />
-              </div>
-              {displayGroups.map(group => (
-                <div
-                  key={group.directory}
-                  className="rounded-xl border border-border bg-card/30 overflow-hidden"
-                >
-                  <button
-                    onClick={() => toggleDir(group.directory)}
-                    className="w-full flex items-center justify-between cursor-pointer px-4 py-3 hover:bg-muted/30 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <CaretRightIcon
-                        weight="bold"
-                        className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
-                          expandedDirs.has(group.directory) ? 'rotate-90' : ''
-                        }`}
-                      />
-                      <FolderOpenIcon weight="duotone" className="w-5 h-5 text-amber-400" />
-                      <span className="font-mono text-sm font-medium text-foreground">
-                        {group.directory}
-                      </span>
-                    </div>
-                    <span className="text-xs text-muted-foreground font-mono bg-muted/50 px-2 py-0.5 rounded-md">
-                      {group.count} {group.count === 1 ? 'item' : 'items'}
-                    </span>
-                  </button>
+            <div className="space-y-4">
+              {selectedAssets.size > 0 && (
+                <BulkActionsBar
+                  selectedCount={selectedAssets.size}
+                  totalCount={totalVisibleAssets}
+                  selectedAssets={selectedAssetsArray}
+                  onSelectAll={handleSelectAll}
+                  onDeselectAll={handleDeselectAll}
+                  onDelete={handleBulkDelete}
+                  isDeleting={isDeleting}
+                />
+              )}
+              <div className="p-6 pt-2 space-y-4">
+                <div className="flex items-center justify-end">
+                  <SortControls value={sortOption} onChange={setSortOption} />
+                </div>
+                {displayGroups.map(group => (
                   <div
-                    className={`
+                    key={group.directory}
+                    className="rounded-xl border border-border bg-card/30 overflow-hidden"
+                  >
+                    <button
+                      onClick={() => toggleDir(group.directory)}
+                      className="w-full flex items-center justify-between cursor-pointer px-4 py-3 hover:bg-muted/30 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <CaretRightIcon
+                          weight="bold"
+                          className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
+                            expandedDirs.has(group.directory) ? 'rotate-90' : ''
+                          }`}
+                        />
+                        <FolderOpenIcon weight="duotone" className="w-5 h-5 text-amber-400" />
+                        <span className="font-mono text-sm font-medium text-foreground">
+                          {group.directory}
+                        </span>
+                      </div>
+                      <span className="text-xs text-muted-foreground font-mono bg-muted/50 px-2 py-0.5 rounded-md">
+                        {group.count} {group.count === 1 ? 'item' : 'items'}
+                      </span>
+                    </button>
+                    <div
+                      className={`
                       overflow-hidden transition-all duration-300 ease-in-out
                       ${expandedDirs.has(group.directory) ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
                     `}
-                  >
-                    <div className="border-t border-border">
-                      <AssetGrid assets={group.assets} onPreview={handlePreview} />
+                    >
+                      <div className="border-t border-border">
+                        <AssetGrid
+                          assets={group.assets}
+                          onPreview={handlePreview}
+                          selectedAssets={selectedAssets}
+                          onToggleSelect={handleToggleSelect}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </main>

@@ -2,6 +2,7 @@ import { useState, memo, useCallback } from 'react'
 import { FileIcon, getFileTypeColor } from './file-icon'
 import { VideoCardPreview, FontCardPreview } from './card-previews'
 import { CopyIcon, CheckIcon, EyeSlashIcon } from '@phosphor-icons/react'
+import { Checkbox } from '@/ui/components/ui/checkbox'
 import { useIgnoredAssets } from '../providers/ignored-assets-provider'
 import type { Asset } from '../types'
 
@@ -9,6 +10,8 @@ interface AssetCardProps {
   asset: Asset
   index?: number
   onPreview?: (asset: Asset) => void
+  isSelected?: boolean
+  onToggleSelect?: (assetId: string, shiftKey: boolean) => void
 }
 
 const formatBytesCache = new Map<number, string>()
@@ -28,7 +31,13 @@ function formatBytes(bytes: number): string {
   return result
 }
 
-export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
+export const AssetCard = memo(function AssetCard({
+  asset,
+  index = 0,
+  onPreview,
+  isSelected = false,
+  onToggleSelect
+}: AssetCardProps) {
   const [copied, setCopied] = useState(false)
   const [imageError, setImageError] = useState(false)
   const { isIgnored } = useIgnoredAssets()
@@ -40,6 +49,14 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
   const handleClick = useCallback(() => {
     onPreview?.(asset)
   }, [asset, onPreview])
+
+  const handleCheckboxChange = useCallback(
+    (checked: boolean, eventDetails: { event: Event }) => {
+      const mouseEvent = eventDetails.event as MouseEvent
+      onToggleSelect?.(asset.id, mouseEvent.shiftKey ?? false)
+    },
+    [asset.id, onToggleSelect]
+  )
 
   const handleCopyPath = useCallback(
     async (e: React.MouseEvent) => {
@@ -69,8 +86,20 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
         hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5
         transition-all duration-200 ease-out
         hover-lift animate-fade-in-up opacity-0 ${staggerClass}
+        ${isSelected ? 'ring-2 ring-primary border-primary' : ''}
       `}
     >
+      {onToggleSelect && (
+        <div
+          className={`absolute top-2 left-2 z-10 transition-opacity duration-150 ${
+            isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}
+          onClick={e => e.stopPropagation()}
+        >
+          <Checkbox checked={isSelected} onCheckedChange={handleCheckboxChange} />
+        </div>
+      )}
+
       <div className="aspect-square relative overflow-hidden">
         <div className="absolute inset-0 checkerboard" />
 
