@@ -9,6 +9,9 @@ import type { AssetStats, AssetType } from '../shared/types.js'
 type NextFunction = () => void
 
 const MIME_TYPES: Record<string, string> = {
+  /**
+   * Images:
+   */ 
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
@@ -18,17 +21,45 @@ const MIME_TYPES: Record<string, string> = {
   '.avif': 'image/avif',
   '.ico': 'image/x-icon',
   '.bmp': 'image/bmp',
+  '.tiff': 'image/tiff',
+  '.tif': 'image/tiff',
+  '.heic': 'image/heic',
+  '.heif': 'image/heif',
+  /**
+   * Videos:
+   */ 
   '.mp4': 'video/mp4',
   '.webm': 'video/webm',
   '.ogg': 'video/ogg',
   '.mov': 'video/quicktime',
+  /**
+   * Audio:
+   */ 
   '.mp3': 'audio/mpeg',
   '.wav': 'audio/wav',
+  /**
+   * Documents:
+   */ 
   '.pdf': 'application/pdf',
   '.json': 'application/json',
   '.md': 'text/markdown',
   '.txt': 'text/plain',
-  '.csv': 'text/csv'
+  '.csv': 'text/csv',
+  /**
+   * Config files:
+   */ 
+  '.yml': 'text/yaml',
+  '.yaml': 'text/yaml',
+  '.toml': 'application/toml',
+  '.xml': 'application/xml',
+  /**
+   * Fonts:
+   */ 
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
+  '.otf': 'font/otf',
+  '.eot': 'application/vnd.ms-fontobject'
 }
 
 export function createApiRouter(

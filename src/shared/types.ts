@@ -52,11 +52,30 @@ export const DEFAULT_OPTIONS: ResolvedOptions = {
   include: ['src', 'public'],
   exclude: ['node_modules', '.git', 'dist', '.cache', 'coverage'],
   extensions: [
-    '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.avif', '.ico', '.bmp',
+    /**
+     * Images:
+     */ 
+    '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.avif', '.ico', '.bmp', '.tiff', '.tif', '.heic', '.heif',
+    /**
+     * Videos:
+     */ 
     '.mp4', '.webm', '.ogg', '.mov', '.avi',
+    /**
+     * Audio:
+     */ 
     '.mp3', '.wav', '.flac', '.aac',
+    /**
+     * Documents:
+     */ 
     '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
-    '.json', '.md', '.txt', '.csv'
+    /**
+     * Text/Config:
+     */ 
+    '.json', '.md', '.txt', '.csv', '.yml', '.yaml', '.toml', '.xml',
+    /**
+     * Fonts:
+     */ 
+    '.woff', '.woff2', '.ttf', '.otf', '.eot'
   ],
   thumbnails: true,
   thumbnailSize: 200,

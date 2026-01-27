@@ -254,8 +254,8 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
         const base = server.config.base || '/'
         const fullUrl = `${host}${base}${resolvedOptions.base.replace(/^\//, '')}/`
 
-        server.config.logger.info(`  ${colors.magenta('➜')}  ${colors.bold('Vite Asset Manager')}: Open ${colorUrl(fullUrl)} as a separate window`)
-        server.config.logger.info(`  ${colors.magenta('➜')}  ${colors.bold('Vite Asset Manager')}: Press ${colors.yellow('Option(⌥)+Shift(⇧)+A')} in App to toggle the Asset Manager`)
+        server.config.logger.info(`  ${colors.magenta('➜')}  ${colors.bold('Asset Manager')}: Open ${colorUrl(fullUrl)} as a separate window`)
+        server.config.logger.info(`  ${colors.magenta('➜')}  ${colors.bold('Asset Manager')}: Press ${colors.yellow('Option(⌥)+Shift(⇧)+A')} in App to toggle the Asset Manager`)
       }
 
       return () => {

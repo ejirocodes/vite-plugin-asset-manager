@@ -89,10 +89,10 @@ export class AssetScanner extends EventEmitter {
   }
 
   private getAssetType(extension: string): AssetType {
-    const imageExts = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.avif', '.ico', '.bmp']
+    const imageExts = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.avif', '.ico', '.bmp', '.tiff', '.tif', '.heic', '.heif']
     const videoExts = ['.mp4', '.webm', '.ogg', '.mov', '.avi']
     const audioExts = ['.mp3', '.wav', '.flac', '.aac']
-    const docExts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.md', '.txt']
+    const docExts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.md', '.txt', '.yml', '.yaml', '.toml', '.xml']
 
     if (imageExts.includes(extension)) return 'image'
     if (videoExts.includes(extension)) return 'video'
