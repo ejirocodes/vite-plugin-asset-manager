@@ -14,6 +14,11 @@ vi.mock('@phosphor-icons/react', () => ({
     <span data-testid="check-icon" className={className}>
       Check
     </span>
+  ),
+  EyeSlashIcon: ({ className }: { className?: string }) => (
+    <span data-testid="eye-slash-icon" className={className}>
+      EyeSlash
+    </span>
   )
 }))
 
@@ -31,6 +36,31 @@ vi.mock('./file-icon', () => ({
     <span data-testid="file-icon">{extension}</span>
   ),
   getFileTypeColor: () => 'text-blue-500'
+}))
+
+let mockIgnoredPaths = new Set<string>()
+
+vi.mock('../providers/ignored-assets-provider', () => ({
+  useIgnoredAssets: () => ({
+    ignoredPaths: mockIgnoredPaths,
+    isIgnored: (path: string) => mockIgnoredPaths.has(path),
+    addIgnored: (path: string) => {
+      mockIgnoredPaths.add(path)
+    },
+    removeIgnored: (path: string) => {
+      mockIgnoredPaths.delete(path)
+    },
+    toggleIgnored: (path: string) => {
+      if (mockIgnoredPaths.has(path)) {
+        mockIgnoredPaths.delete(path)
+      } else {
+        mockIgnoredPaths.add(path)
+      }
+    },
+    clearAll: () => {
+      mockIgnoredPaths.clear()
+    }
+  })
 }))
 
 describe('AssetCard', () => {
@@ -77,6 +107,7 @@ describe('AssetCard', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    mockIgnoredPaths.clear()
     mockWriteText = vi.fn().mockResolvedValue(undefined)
 
     Object.defineProperty(navigator, 'clipboard', {
@@ -294,6 +325,111 @@ describe('AssetCard', () => {
       expect(badge).toHaveClass('bg-amber-500/10')
       expect(badge).toHaveClass('text-amber-400')
       expect(badge).toHaveClass('border-amber-500/20')
+    })
+  })
+
+  describe('ignored badge', () => {
+    it('should show UNUSED badge for unused, non-ignored assets', () => {
+      const unusedAsset: Asset = {
+        ...mockImageAsset,
+        path: 'src/assets/not-ignored.png',
+        importersCount: 0
+      }
+
+      render(<AssetCard asset={unusedAsset} />)
+
+      expect(screen.getByText('UNUSED')).toBeInTheDocument()
+      expect(screen.queryByText('IGNORED')).not.toBeInTheDocument()
+    })
+
+    it('should show IGNORED badge instead of UNUSED when asset is ignored', () => {
+      const unusedAsset: Asset = {
+        ...mockImageAsset,
+        path: 'src/assets/ignored.png',
+        importersCount: 0
+      }
+
+      mockIgnoredPaths.add('src/assets/ignored.png')
+
+      render(<AssetCard asset={unusedAsset} />)
+
+      expect(screen.queryByText('UNUSED')).not.toBeInTheDocument()
+      expect(screen.getByText('IGNORED')).toBeInTheDocument()
+    })
+
+    it('should show no badge for used assets', () => {
+      const usedAsset: Asset = {
+        ...mockImageAsset,
+        path: 'src/assets/used.png',
+        importersCount: 3
+      }
+
+      render(<AssetCard asset={usedAsset} />)
+
+      expect(screen.queryByText('UNUSED')).not.toBeInTheDocument()
+      expect(screen.queryByText('IGNORED')).not.toBeInTheDocument()
+    })
+
+    it('should show eye-slash icon in IGNORED badge', () => {
+      const ignoredAsset: Asset = {
+        ...mockImageAsset,
+        path: 'src/assets/ignored.png',
+        importersCount: 0
+      }
+
+      mockIgnoredPaths.add('src/assets/ignored.png')
+
+      render(<AssetCard asset={ignoredAsset} />)
+
+      expect(screen.getByTestId('eye-slash-icon')).toBeInTheDocument()
+    })
+
+    it('should have muted styling for ignored badge', () => {
+      const ignoredAsset: Asset = {
+        ...mockImageAsset,
+        path: 'src/assets/ignored.png',
+        importersCount: 0
+      }
+
+      mockIgnoredPaths.add('src/assets/ignored.png')
+
+      render(<AssetCard asset={ignoredAsset} />)
+
+      const badge = screen.getByText('IGNORED')
+      expect(badge).toHaveClass('bg-muted/50')
+      expect(badge).toHaveClass('text-muted-foreground')
+      expect(badge).toHaveClass('border-border')
+    })
+
+    it('should have accessibility attributes for IGNORED badge', () => {
+      const ignoredAsset: Asset = {
+        ...mockImageAsset,
+        path: 'src/assets/ignored.png',
+        importersCount: 0
+      }
+
+      mockIgnoredPaths.add('src/assets/ignored.png')
+
+      render(<AssetCard asset={ignoredAsset} />)
+
+      const badge = screen.getByText('IGNORED')
+      expect(badge).toHaveAttribute('aria-label', 'This asset is marked as intentionally unused')
+      expect(badge).toHaveAttribute('title', 'Marked as intentionally unused')
+    })
+
+    it('should not show IGNORED badge for used assets even if in ignore list', () => {
+      const usedButIgnoredAsset: Asset = {
+        ...mockImageAsset,
+        path: 'src/assets/used-ignored.png',
+        importersCount: 5
+      }
+
+      mockIgnoredPaths.add('src/assets/used-ignored.png')
+
+      render(<AssetCard asset={usedButIgnoredAsset} />)
+
+      expect(screen.queryByText('IGNORED')).not.toBeInTheDocument()
+      expect(screen.queryByText('UNUSED')).not.toBeInTheDocument()
     })
   })
 })

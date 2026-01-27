@@ -19,6 +19,7 @@ export interface Asset {
   mtime: number
   directory: string
   importersCount?: number
+  ignored?: boolean
 }
 
 export interface AssetGroup {

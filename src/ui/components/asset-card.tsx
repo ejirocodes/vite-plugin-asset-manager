@@ -1,7 +1,8 @@
 import { useState, memo, useCallback } from 'react'
 import { FileIcon, getFileTypeColor } from './file-icon'
 import { VideoCardPreview, FontCardPreview } from './card-previews'
-import { CopyIcon, CheckIcon } from '@phosphor-icons/react'
+import { CopyIcon, CheckIcon, EyeSlashIcon } from '@phosphor-icons/react'
+import { useIgnoredAssets } from '../providers/ignored-assets-provider'
 import type { Asset } from '../types'
 
 interface AssetCardProps {
@@ -30,6 +31,8 @@ function formatBytes(bytes: number): string {
 export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
   const [copied, setCopied] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const { isIgnored } = useIgnoredAssets()
+  const ignored = isIgnored(asset.path)
 
   const isImage = asset.type === 'image'
   const thumbnailUrl = `/__asset_manager__/api/thumbnail?path=${encodeURIComponent(asset.path)}`
@@ -117,13 +120,23 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
             >
               <span className={extColor}>{asset.extension.replace('.', '')}</span>
             </span>
-            {asset.importersCount === 0 && (
+            {asset.importersCount === 0 && !ignored && (
               <span
                 className="text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20"
                 aria-label="This asset is not imported by any source files"
                 title="This asset is not imported by any source files"
               >
                 UNUSED
+              </span>
+            )}
+            {asset.importersCount === 0 && ignored && (
+              <span
+                className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground border border-border"
+                aria-label="This asset is marked as intentionally unused"
+                title="Marked as intentionally unused"
+              >
+                <EyeSlashIcon weight="fill" className="w-3 h-3" />
+                IGNORED
               </span>
             )}
           </div>

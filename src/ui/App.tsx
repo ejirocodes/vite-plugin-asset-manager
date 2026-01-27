@@ -6,6 +6,7 @@ import { SortControls } from './components/sort-controls'
 import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
 import { useStats } from './hooks/useStats'
+import { useIgnoredAssets } from './providers/ignored-assets-provider'
 import { sortAssets, type SortOption } from '@/ui/lib/sort-utils'
 import {
   CaretRightIcon,
@@ -35,9 +36,10 @@ const EmptyStateNoAssets = (
 export default function App() {
   const [selectedType, setSelectedType] = useState<AssetType | null>(null)
   const [showUnusedOnly, setShowUnusedOnly] = useState(false)
-  const { groups, loading } = useAssets(selectedType, showUnusedOnly)
+  const { groups, loading } = useAssets(selectedType)
   const { stats } = useStats()
   const { results, searching, search, clear } = useSearch()
+  const { isIgnored } = useIgnoredAssets()
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(() => new Set())
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null)
@@ -92,12 +94,22 @@ export default function App() {
       }))
     }
 
-    // Apply sorting to each group's assets
-    return baseGroups.map(group => ({
+    let filtered = baseGroups
+    if (showUnusedOnly) {
+      filtered = filtered
+        .map(group => ({
+          ...group,
+          assets: group.assets.filter(a => a.importersCount === 0 && !isIgnored(a.path)),
+          count: group.assets.filter(a => a.importersCount === 0 && !isIgnored(a.path)).length
+        }))
+        .filter(group => group.count > 0)
+    }
+
+    return filtered.map(group => ({
       ...group,
       assets: sortAssets(group.assets, sortOption)
     }))
-  }, [groups, results, searchQuery, sortOption])
+  }, [groups, results, searchQuery, sortOption, showUnusedOnly, isIgnored])
 
   const toggleDir = useCallback((dir: string) => {
     setExpandedDirs(prev => {
@@ -111,11 +123,22 @@ export default function App() {
     })
   }, [])
 
+  const adjustedStats = useMemo(() => {
+    const ignoredUnusedCount = groups
+      .flatMap(g => g.assets)
+      .filter(a => a.importersCount === 0 && isIgnored(a.path)).length
+
+    return {
+      ...stats,
+      unused: Math.max(0, (stats.unused || 0) - ignoredUnusedCount)
+    }
+  }, [stats, groups, isIgnored])
+
   return (
     <>
       <div className="flex h-screen bg-background noise-bg">
         <Sidebar
-          total={stats.total}
+          total={adjustedStats.total}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           searching={searching}
@@ -123,7 +146,7 @@ export default function App() {
           onTypeSelect={setSelectedType}
           showUnusedOnly={showUnusedOnly}
           onUnusedFilterToggle={handleUnusedFilterToggle}
-          stats={stats}
+          stats={adjustedStats}
         />
         <main className="flex-1 overflow-auto">
           {loading ? (
