@@ -31,7 +31,7 @@ export const FontPreview = memo(function FontPreview({ asset }: FontPreviewProps
     loadFont()
 
     return () => {
-      document.fonts.forEach((font) => {
+      document.fonts.forEach(font => {
         if (font.family === fontFamily) {
           document.fonts.delete(font)
         }
@@ -57,7 +57,7 @@ export const FontPreview = memo(function FontPreview({ asset }: FontPreviewProps
 
   return (
     <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
-      {SIZES.map((size) => (
+      {SIZES.map(size => (
         <div key={size} className="space-y-1">
           <span className="text-[10px] text-muted-foreground font-mono">{size}px</span>
           <p

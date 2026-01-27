@@ -19,7 +19,9 @@ const DEFAULT_WIDTH = 384
 
 export const PreviewPanel = memo(function PreviewPanel({ asset, onClose }: PreviewPanelProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
-  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null)
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(
+    null
+  )
   const [panelWidth, setPanelWidth] = useState(DEFAULT_WIDTH)
   const [isResizing, setIsResizing] = useState(false)
 
@@ -27,27 +29,30 @@ export const PreviewPanel = memo(function PreviewPanel({ asset, onClose }: Previ
     setImageDimensions(null)
   }, [asset.id])
 
-  const handleResizeStart = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsResizing(true)
-    const startX = e.clientX
-    const startWidth = panelWidth
+  const handleResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      setIsResizing(true)
+      const startX = e.clientX
+      const startWidth = panelWidth
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const delta = startX - e.clientX
-      const newWidth = Math.min(Math.max(startWidth + delta, MIN_WIDTH), MAX_WIDTH)
-      setPanelWidth(newWidth)
-    }
+      const handleMouseMove = (e: MouseEvent) => {
+        const delta = startX - e.clientX
+        const newWidth = Math.min(Math.max(startWidth + delta, MIN_WIDTH), MAX_WIDTH)
+        setPanelWidth(newWidth)
+      }
 
-    const handleMouseUp = () => {
-      setIsResizing(false)
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-    }
+      const handleMouseUp = () => {
+        setIsResizing(false)
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
 
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-  }, [panelWidth])
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+    },
+    [panelWidth]
+  )
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

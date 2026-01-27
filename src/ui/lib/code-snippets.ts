@@ -37,7 +37,7 @@ function generateImageSnippets(asset: Asset): CodeSnippet[] {
   height="24"
   src="${publicPath}"
   alt="${alt}"
-/>`,
+/>`
     },
     {
       type: 'react',
@@ -46,7 +46,7 @@ function generateImageSnippets(asset: Asset): CodeSnippet[] {
         ? `<img src="${publicPath}" alt="${alt}" />`
         : `import ${asset.name.replace(/\.[^.]+$/, '').replace(/[-.\s]/g, '')} from '${asset.path}'
 
-<img src={${asset.name.replace(/\.[^.]+$/, '').replace(/[-.\s]/g, '')}} alt="${alt}" />`,
+<img src={${asset.name.replace(/\.[^.]+$/, '').replace(/[-.\s]/g, '')}} alt="${alt}" />`
     },
     {
       type: 'vue',
@@ -61,8 +61,8 @@ import ${asset.name.replace(/\.[^.]+$/, '').replace(/[-.\s]/g, '')} from '${asse
 
 <template>
   <img :src="${asset.name.replace(/\.[^.]+$/, '').replace(/[-.\s]/g, '')}" alt="${alt}" />
-</template>`,
-    },
+</template>`
+    }
   ]
 }
 
@@ -77,7 +77,7 @@ function generateVideoSnippets(asset: Asset): CodeSnippet[] {
       code: `<video
   src="${publicPath}"
   controls
-></video>`,
+></video>`
     },
     {
       type: 'react',
@@ -86,7 +86,7 @@ function generateVideoSnippets(asset: Asset): CodeSnippet[] {
         ? `<video src="${publicPath}" controls />`
         : `import videoSrc from '${asset.path}'
 
-<video src={videoSrc} controls />`,
+<video src={videoSrc} controls />`
     },
     {
       type: 'vue',
@@ -101,8 +101,8 @@ import videoSrc from '${asset.path}'
 
 <template>
   <video :src="videoSrc" controls></video>
-</template>`,
-    },
+</template>`
+    }
   ]
 }
 
@@ -117,7 +117,7 @@ function generateAudioSnippets(asset: Asset): CodeSnippet[] {
       code: `<audio
   src="${publicPath}"
   controls
-></audio>`,
+></audio>`
     },
     {
       type: 'react',
@@ -126,7 +126,7 @@ function generateAudioSnippets(asset: Asset): CodeSnippet[] {
         ? `<audio src="${publicPath}" controls />`
         : `import audioSrc from '${asset.path}'
 
-<audio src={audioSrc} controls />`,
+<audio src={audioSrc} controls />`
     },
     {
       type: 'vue',
@@ -141,8 +141,8 @@ import audioSrc from '${asset.path}'
 
 <template>
   <audio :src="audioSrc" controls></audio>
-</template>`,
-    },
+</template>`
+    }
   ]
 }
 
@@ -155,7 +155,7 @@ function generateFontSnippets(asset: Asset): CodeSnippet[] {
     woff: 'woff',
     ttf: 'truetype',
     otf: 'opentype',
-    eot: 'embedded-opentype',
+    eot: 'embedded-opentype'
   }
 
   return [
@@ -168,7 +168,7 @@ function generateFontSnippets(asset: Asset): CodeSnippet[] {
   font-weight: normal;
   font-style: normal;
   font-display: swap;
-}`,
+}`
     },
     {
       type: 'react',
@@ -183,7 +183,7 @@ function generateFontSnippets(asset: Asset): CodeSnippet[] {
 }
 
 // Usage
-<span style={{ fontFamily: "'${fontName}'" }}>Text</span>`,
+<span style={{ fontFamily: "'${fontName}'" }}>Text</span>`
     },
     {
       type: 'vue',
@@ -200,8 +200,8 @@ function generateFontSnippets(asset: Asset): CodeSnippet[] {
 
 <template>
   <span style="font-family: '${fontName}'">Text</span>
-</template>`,
-    },
+</template>`
+    }
   ]
 }
 
@@ -215,7 +215,7 @@ function generateDataSnippets(asset: Asset): CodeSnippet[] {
       label: 'Fetch',
       code: `fetch('${publicPath}')
   .then(res => res.json())
-  .then(data => console.log(data))`,
+  .then(data => console.log(data))`
     },
     {
       type: 'react',
@@ -231,7 +231,7 @@ useEffect(() => {
         : `import data from '${asset.path}'
 
 // Use directly
-console.log(data)`,
+console.log(data)`
     },
     {
       type: 'vue',
@@ -249,8 +249,8 @@ onMounted(async () => {
 </script>`
         : `<script setup>
 import data from '${asset.path}'
-</script>`,
-    },
+</script>`
+    }
   ]
 }
 
@@ -263,14 +263,14 @@ function generateGenericSnippets(asset: Asset): CodeSnippet[] {
       label: 'Link',
       code: `<a href="${publicPath}" download="${asset.name}">
   Download ${asset.name}
-</a>`,
+</a>`
     },
     {
       type: 'react',
       label: 'React',
       code: `<a href="${publicPath}" download="${asset.name}">
   Download {asset.name}
-</a>`,
+</a>`
     },
     {
       type: 'vue',
@@ -279,8 +279,8 @@ function generateGenericSnippets(asset: Asset): CodeSnippet[] {
   <a href="${publicPath}" download="${asset.name}">
     Download ${asset.name}
   </a>
-</template>`,
-    },
+</template>`
+    }
   ]
 }
 

@@ -11,7 +11,7 @@ type NextFunction = () => void
 const MIME_TYPES: Record<string, string> = {
   /**
    * Images:
-   */ 
+   */
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
@@ -27,19 +27,19 @@ const MIME_TYPES: Record<string, string> = {
   '.heif': 'image/heif',
   /**
    * Videos:
-   */ 
+   */
   '.mp4': 'video/mp4',
   '.webm': 'video/webm',
   '.ogg': 'video/ogg',
   '.mov': 'video/quicktime',
   /**
    * Audio:
-   */ 
+   */
   '.mp3': 'audio/mpeg',
   '.wav': 'audio/wav',
   /**
    * Documents:
-   */ 
+   */
   '.pdf': 'application/pdf',
   '.json': 'application/json',
   '.md': 'text/markdown',
@@ -47,14 +47,14 @@ const MIME_TYPES: Record<string, string> = {
   '.csv': 'text/csv',
   /**
    * Config files:
-   */ 
+   */
   '.yml': 'text/yaml',
   '.yaml': 'text/yaml',
   '.toml': 'application/toml',
   '.xml': 'application/xml',
   /**
    * Fonts:
-   */ 
+   */
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
   '.ttf': 'font/ttf',
@@ -179,11 +179,7 @@ async function handleThumbnail(
   }
 }
 
-async function handleServeFile(
-  res: ServerResponse,
-  root: string,
-  query: Record<string, any>
-) {
+async function handleServeFile(res: ServerResponse, root: string, query: Record<string, any>) {
   const relativePath = query.path as string
   if (!relativePath) {
     res.statusCode = 400

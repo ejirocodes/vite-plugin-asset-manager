@@ -43,13 +43,9 @@ export class AssetScanner extends EventEmitter {
   }
 
   private async performScan(): Promise<void> {
-    const extensionPattern = this.options.extensions
-      .map(ext => ext.replace('.', ''))
-      .join(',')
+    const extensionPattern = this.options.extensions.map(ext => ext.replace('.', '')).join(',')
 
-    const patterns = this.options.include.map(
-      dir => `${dir}/**/*.{${extensionPattern}}`
-    )
+    const patterns = this.options.include.map(dir => `${dir}/**/*.{${extensionPattern}}`)
 
     const entries = await fg(patterns, {
       cwd: this.root,
@@ -89,7 +85,21 @@ export class AssetScanner extends EventEmitter {
   }
 
   private getAssetType(extension: string): AssetType {
-    const imageExts = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.avif', '.ico', '.bmp', '.tiff', '.tif', '.heic', '.heif']
+    const imageExts = [
+      '.png',
+      '.jpg',
+      '.jpeg',
+      '.gif',
+      '.svg',
+      '.webp',
+      '.avif',
+      '.ico',
+      '.bmp',
+      '.tiff',
+      '.tif',
+      '.heic',
+      '.heif'
+    ]
     const videoExts = ['.mp4', '.webm', '.ogg', '.mov', '.avi']
     const audioExts = ['.mp3', '.wav', '.flac', '.aac']
     const docExts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx']

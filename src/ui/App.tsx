@@ -4,7 +4,12 @@ import { AssetGrid } from './components/asset-grid'
 import { PreviewPanel } from './components/preview-panel'
 import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
-import { CaretRightIcon, MagnifyingGlassIcon, PackageIcon, FolderOpenIcon } from '@phosphor-icons/react'
+import {
+  CaretRightIcon,
+  MagnifyingGlassIcon,
+  PackageIcon,
+  FolderOpenIcon
+} from '@phosphor-icons/react'
 import type { Asset } from './types'
 
 const LoadingSpinner = (
@@ -40,18 +45,42 @@ export default function App() {
   }, [])
 
   const stats = useMemo(() => {
-    const counts = { images: 0, videos: 0, audio: 0, documents: 0, fonts: 0, data: 0, text: 0, other: 0 }
+    const counts = {
+      images: 0,
+      videos: 0,
+      audio: 0,
+      documents: 0,
+      fonts: 0,
+      data: 0,
+      text: 0,
+      other: 0
+    }
     for (const group of groups) {
       for (const asset of group.assets) {
         switch (asset.type) {
-          case 'image': counts.images++; break
-          case 'video': counts.videos++; break
-          case 'audio': counts.audio++; break
-          case 'document': counts.documents++; break
-          case 'font': counts.fonts++; break
-          case 'data': counts.data++; break
-          case 'text': counts.text++; break
-          default: counts.other++
+          case 'image':
+            counts.images++
+            break
+          case 'video':
+            counts.videos++
+            break
+          case 'audio':
+            counts.audio++
+            break
+          case 'document':
+            counts.documents++
+            break
+          case 'font':
+            counts.fonts++
+            break
+          case 'data':
+            counts.data++
+            break
+          case 'text':
+            counts.text++
+            break
+          default:
+            counts.other++
         }
       }
     }
@@ -113,17 +142,24 @@ export default function App() {
         searching={searching}
         stats={stats}
       />
-      <main className="flex-1 overflow-y-auto">
-        {loading ? LoadingSpinner : displayGroups.length === 0 ? (
+      <main className="flex-1 overflow-auto">
+        {loading ? (
+          LoadingSpinner
+        ) : displayGroups.length === 0 ? (
           searchQuery ? (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
               <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
-                <MagnifyingGlassIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
+                <MagnifyingGlassIcon
+                  weight="duotone"
+                  className="w-10 h-10 text-muted-foreground/50"
+                />
               </div>
               <p className="text-lg font-medium text-foreground mb-1">No results found</p>
               <p className="text-sm">No assets match "{searchQuery}"</p>
             </div>
-          ) : EmptyStateNoAssets
+          ) : (
+            EmptyStateNoAssets
+          )
         ) : (
           <div className="p-6 space-y-4">
             {displayGroups.map(group => (
@@ -166,9 +202,7 @@ export default function App() {
           </div>
         )}
       </main>
-      {selectedAsset && (
-        <PreviewPanel asset={selectedAsset} onClose={handleClosePreview} />
-      )}
+      {selectedAsset && <PreviewPanel asset={selectedAsset} onClose={handleClosePreview} />}
     </div>
   )
 }

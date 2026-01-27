@@ -22,7 +22,7 @@ const colorClasses = {
   rose: 'text-rose-400 bg-rose-500/10',
   emerald: 'text-emerald-400 bg-emerald-500/10',
   purple: 'text-purple-400 bg-purple-500/10',
-  zinc: 'text-zinc-400 bg-zinc-500/10',
+  zinc: 'text-zinc-400 bg-zinc-500/10'
 } as const
 
 interface SidebarProps {
@@ -42,7 +42,13 @@ interface SidebarProps {
   }
 }
 
-export const Sidebar = memo(function Sidebar({ total, searchQuery, onSearchChange, searching, stats }: SidebarProps) {
+export const Sidebar = memo(function Sidebar({
+  total,
+  searchQuery,
+  onSearchChange,
+  searching,
+  stats
+}: SidebarProps) {
   return (
     <aside className="w-72 bg-sidebar border-r border-sidebar-border flex flex-col noise-bg">
       <div className="p-5 border-b border-sidebar-border">
@@ -65,11 +71,7 @@ export const Sidebar = memo(function Sidebar({ total, searchQuery, onSearchChang
       </div>
 
       <div className="p-4">
-        <SearchBar
-          value={searchQuery}
-          onChange={onSearchChange}
-          searching={searching}
-        />
+        <SearchBar value={searchQuery} onChange={onSearchChange} searching={searching} />
       </div>
 
       <div className="px-4 pb-4">
@@ -247,18 +249,21 @@ const NavItem = memo(function NavItem({
     <button
       className={`
         w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all
-        ${active
-          ? 'bg-primary/10 text-primary border border-primary/20'
-          : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
+        ${
+          active
+            ? 'bg-primary/10 text-primary border border-primary/20'
+            : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
         }
       `}
     >
       {icon}
       <span className="font-medium">{label}</span>
-      <span className={`
+      <span
+        className={`
         ml-auto font-mono text-xs tabular-nums
         ${active ? 'text-primary' : 'text-muted-foreground/60'}
-      `}>
+      `}
+      >
         {count}
       </span>
     </button>

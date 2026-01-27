@@ -12,7 +12,7 @@ import {
   FileCssIcon,
   FileIcon as FileIconPhosphor,
   TableIcon,
-  ArticleIcon,
+  ArticleIcon
 } from '@phosphor-icons/react'
 
 interface FileIconProps {
@@ -65,12 +65,15 @@ const iconMap = new Map<string, IconConfig>([
   ['jsx', { icon: FileCodeIcon, color: 'text-cyan-400' }],
   ['tsx', { icon: FileCodeIcon, color: 'text-cyan-400' }],
   ['css', { icon: FileCssIcon, color: 'text-blue-400' }],
-  ['html', { icon: FileCodeIcon, color: 'text-orange-400' }],
+  ['html', { icon: FileCodeIcon, color: 'text-orange-400' }]
 ])
 
 const defaultConfig: IconConfig = { icon: FileIconPhosphor, color: 'text-zinc-500' }
 
-export const FileIcon = memo(function FileIcon({ extension, className = 'w-12 h-12' }: FileIconProps) {
+export const FileIcon = memo(function FileIcon({
+  extension,
+  className = 'w-12 h-12'
+}: FileIconProps) {
   const ext = extension.toLowerCase().replace('.', '')
   const config = iconMap.get(ext) ?? defaultConfig
   const Icon = config.icon

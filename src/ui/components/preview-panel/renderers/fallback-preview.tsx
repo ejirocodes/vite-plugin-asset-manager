@@ -12,9 +12,7 @@ export const FallbackPreview = memo(function FallbackPreview({ asset }: Fallback
       <FileIcon extension={asset.extension} className="w-20 h-20" />
       <div className="text-center">
         <p className="text-sm font-medium text-foreground mb-1">{asset.name}</p>
-        <p className="text-xs text-muted-foreground">
-          Download to preview this file type
-        </p>
+        <p className="text-xs text-muted-foreground">Download to preview this file type</p>
       </div>
     </div>
   )

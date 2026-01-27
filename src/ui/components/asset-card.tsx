@@ -37,17 +37,19 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
     onPreview?.(asset)
   }, [asset, onPreview])
 
-  const handleCopyPath = useCallback(async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    try {
-      await navigator.clipboard.writeText(asset.path)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error('Failed to copy path:', err)
-    }
-  }, [asset.path])
-
+  const handleCopyPath = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation()
+      try {
+        await navigator.clipboard.writeText(asset.path)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      } catch (err) {
+        console.error('Failed to copy path:', err)
+      }
+    },
+    [asset.path]
+  )
 
   const handleImageError = useCallback(() => setImageError(true), [])
 
@@ -99,10 +101,7 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
       </div>
 
       <div className="p-3 border-t border-border">
-        <p
-          className="text-sm font-medium text-foreground truncate mb-1"
-          title={asset.name}
-        >
+        <p className="text-sm font-medium text-foreground truncate mb-1" title={asset.name}>
           {asset.name}
         </p>
         <div className="flex items-center justify-between">
@@ -110,9 +109,7 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
             className={`text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded ${extColor} bg-current/10`}
             style={{ color: 'inherit' }}
           >
-            <span className={extColor}>
-              {asset.extension.replace('.', '')}
-            </span>
+            <span className={extColor}>{asset.extension.replace('.', '')}</span>
           </span>
           <span className="text-xs text-muted-foreground font-mono tabular-nums">
             {formatBytes(asset.size)}

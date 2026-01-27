@@ -6,14 +6,20 @@ interface ImagePreviewProps {
   onDimensionsLoad?: (dimensions: { width: number; height: number }) => void
 }
 
-export const ImagePreview = memo(function ImagePreview({ asset, onDimensionsLoad }: ImagePreviewProps) {
+export const ImagePreview = memo(function ImagePreview({
+  asset,
+  onDimensionsLoad
+}: ImagePreviewProps) {
   const [error, setError] = useState(false)
   const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
 
-  const handleLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.currentTarget
-    onDimensionsLoad?.({ width: img.naturalWidth, height: img.naturalHeight })
-  }, [onDimensionsLoad])
+  const handleLoad = useCallback(
+    (e: React.SyntheticEvent<HTMLImageElement>) => {
+      const img = e.currentTarget
+      onDimensionsLoad?.({ width: img.naturalWidth, height: img.naturalHeight })
+    },
+    [onDimensionsLoad]
+  )
 
   const handleError = useCallback(() => setError(true), [])
 

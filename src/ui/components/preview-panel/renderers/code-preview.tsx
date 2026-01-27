@@ -66,9 +66,7 @@ export const CodePreview = memo(function CodePreview({ asset }: CodePreviewProps
   return (
     <div className="relative">
       <pre className="bg-muted/50 rounded-lg p-4 overflow-x-auto text-xs font-mono max-h-80 overflow-y-auto">
-        <code className="text-foreground/80 whitespace-pre-wrap wrap-break-word">
-          {content}
-        </code>
+        <code className="text-foreground/80 whitespace-pre-wrap wrap-break-word">{content}</code>
       </pre>
       {truncated && (
         <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-muted/80 to-transparent flex items-end justify-center pb-2">
