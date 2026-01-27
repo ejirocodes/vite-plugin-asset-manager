@@ -259,19 +259,16 @@ function handleSSE(res: ServerResponse) {
   res.write(`data: ${JSON.stringify({ type: 'connected' })}\n\n`)
 
   sseClients.add(res)
-  console.log('[Asset Manager SSE] Client connected, total:', sseClients.size)
 
   // Handle client disconnect
   res.on('close', () => {
     sseClients.delete(res)
-    console.log('[Asset Manager SSE] Client disconnected, total:', sseClients.size)
   })
 }
 
 // Broadcast event to all SSE clients
 export function broadcastSSE(event: string, data: unknown) {
   const message = JSON.stringify({ event, data })
-  console.log('[Asset Manager SSE] Broadcasting:', event, 'to', sseClients.size, 'client(s)')
   for (const client of sseClients) {
     client.write(`data: ${message}\n\n`)
   }

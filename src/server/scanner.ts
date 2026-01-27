@@ -3,14 +3,11 @@ import fg from 'fast-glob'
 import path from 'path'
 import fs from 'fs/promises'
 import chokidar from 'chokidar'
-import colors from 'picocolors'
 import type { Asset, AssetGroup, AssetType, ResolvedOptions } from '../shared/types.js'
 
 export interface ScannerEvents {
   change: [{ event: string; path: string }]
 }
-
-const DEBUG_PREFIX = colors.cyan('[Asset Scanner]')
 
 export class AssetScanner extends EventEmitter {
   private root: string
@@ -162,8 +159,6 @@ export class AssetScanner extends EventEmitter {
   private initWatcher(): void {
     const watchPaths = this.options.include.map(dir => path.join(this.root, dir))
 
-    console.log(DEBUG_PREFIX, 'Initializing file watcher for paths:', watchPaths)
-
     this.watcher = chokidar.watch(watchPaths, {
       ignored: this.options.exclude.map(p => `**/${p}/**`),
       persistent: true,
@@ -172,10 +167,6 @@ export class AssetScanner extends EventEmitter {
         stabilityThreshold: 100,
         pollInterval: 50
       }
-    })
-
-    this.watcher.on('ready', () => {
-      console.log(DEBUG_PREFIX, 'File watcher ready')
     })
 
     this.watcher.on('add', filePath => this.handleFileChange('add', filePath))
@@ -187,10 +178,7 @@ export class AssetScanner extends EventEmitter {
     const relativePath = path.relative(this.root, absolutePath)
     const extension = path.extname(relativePath).toLowerCase()
 
-    console.log(DEBUG_PREFIX, `File ${event}:`, relativePath, `(ext: ${extension})`)
-
     if (!this.options.extensions.includes(extension)) {
-      console.log(DEBUG_PREFIX, 'Ignoring - extension not in list')
       return
     }
 
@@ -212,12 +200,10 @@ export class AssetScanner extends EventEmitter {
         }
         this.cache.set(relativePath, asset)
       } catch {
-        console.log(DEBUG_PREFIX, 'Failed to stat file, ignoring')
         return
       }
     }
 
-    console.log(DEBUG_PREFIX, 'Emitting change event:', { event, path: relativePath })
     this.emit('change', { event, path: relativePath })
   }
 

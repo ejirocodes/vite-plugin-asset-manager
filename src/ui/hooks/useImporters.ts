@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { toast } from 'sonner'
 import type { Importer, UseImportersResult } from '../types'
-import { useViteWebSocket } from './useViteWebSocket'
+import { useSSE } from './useSSE'
 
 export function useImporters(assetPath: string): UseImportersResult {
   const [importers, setImporters] = useState<Importer[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { subscribe } = useViteWebSocket()
+  const { subscribe } = useSSE()
 
   const fetchImporters = useCallback(async () => {
     if (!assetPath) {
@@ -54,16 +54,12 @@ export function useImporters(assetPath: string): UseImportersResult {
   useEffect(() => {
     fetchImporters()
 
-    // Subscribe to importer updates via direct WebSocket connection
-    const unsubscribe = subscribe(
-      'asset-manager:importers-update',
-      (data: unknown) => {
-        const updateData = data as { affectedAssets?: string[] }
-        if (updateData.affectedAssets?.includes(assetPath)) {
-          fetchImporters()
-        }
+    const unsubscribe = subscribe('asset-manager:importers-update', (data: unknown) => {
+      const updateData = data as { affectedAssets?: string[] }
+      if (updateData.affectedAssets?.includes(assetPath)) {
+        fetchImporters()
       }
-    )
+    })
 
     return unsubscribe
   }, [assetPath, fetchImporters, subscribe])

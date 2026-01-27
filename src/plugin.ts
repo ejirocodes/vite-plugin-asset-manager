@@ -268,15 +268,11 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
         )
       }
 
-      // Set up SSE broadcasting for file changes
       if (resolvedOptions.watch) {
-        console.log(colors.magenta('[Asset Manager]'), 'Registering scanner event listeners for SSE')
         scanner.on('change', event => {
-          console.log(colors.magenta('[Asset Manager]'), 'Broadcasting SSE update:', event)
           broadcastSSE('asset-manager:update', event)
         })
         importerScanner.on('change', event => {
-          console.log(colors.magenta('[Asset Manager]'), 'Broadcasting importers SSE update:', event)
           broadcastSSE('asset-manager:importers-update', event)
         })
       }
