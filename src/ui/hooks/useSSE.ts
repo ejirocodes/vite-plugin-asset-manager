@@ -1,3 +1,4 @@
+/* global EventSource */
 import { useEffect, useCallback } from 'react'
 
 type MessageHandler = (data: unknown) => void
