@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Sidebar } from './components/side-bar'
 import { AssetGrid } from './components/asset-grid'
+import { PreviewPanel } from './components/preview-panel'
 import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
 import { CaretRightIcon, MagnifyingGlassIcon, PackageIcon, FolderOpenIcon } from '@phosphor-icons/react'
@@ -28,6 +29,15 @@ export default function App() {
   const { results, searching, search, clear } = useSearch()
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(() => new Set())
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null)
+
+  const handlePreview = useCallback((asset: Asset) => {
+    setSelectedAsset(asset)
+  }, [])
+
+  const handleClosePreview = useCallback(() => {
+    setSelectedAsset(null)
+  }, [])
 
   const stats = useMemo(() => {
     const counts = { images: 0, videos: 0, audio: 0, documents: 0, fonts: 0, data: 0, text: 0, other: 0 }
@@ -148,7 +158,7 @@ export default function App() {
                   `}
                 >
                   <div className="border-t border-border">
-                    <AssetGrid assets={group.assets} />
+                    <AssetGrid assets={group.assets} onPreview={handlePreview} />
                   </div>
                 </div>
               </div>
@@ -156,6 +166,9 @@ export default function App() {
           </div>
         )}
       </main>
+      {selectedAsset && (
+        <PreviewPanel asset={selectedAsset} onClose={handleClosePreview} />
+      )}
     </div>
   )
 }
