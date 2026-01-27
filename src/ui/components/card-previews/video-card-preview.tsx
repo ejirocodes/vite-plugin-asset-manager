@@ -37,9 +37,7 @@ export const VideoCardPreview = memo(function VideoCardPreview({ asset }: VideoC
     if (!video) return
 
     if (isVisible) {
-      video.play().catch(() => {
-        // Autoplay might be blocked, that's fine
-      })
+      video.play().catch(() => {})
     } else {
       video.pause()
     }

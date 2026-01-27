@@ -10,7 +10,6 @@ import type { AssetStats, AssetType, EditorType } from '../shared/types.js'
 
 type NextFunction = () => void
 
-// SSE clients for real-time updates
 const sseClients = new Set<ServerResponse>()
 
 const MIME_TYPES: Record<string, string> = {
@@ -265,7 +264,6 @@ function sendJson(res: ServerResponse, data: unknown) {
   res.end(JSON.stringify(data))
 }
 
-// SSE endpoint handler
 function handleSSE(res: ServerResponse) {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -274,18 +272,15 @@ function handleSSE(res: ServerResponse) {
     'Access-Control-Allow-Origin': '*'
   })
 
-  // Send initial connection message
   res.write(`data: ${JSON.stringify({ type: 'connected' })}\n\n`)
 
   sseClients.add(res)
 
-  // Handle client disconnect
   res.on('close', () => {
     sseClients.delete(res)
   })
 }
 
-// Broadcast event to all SSE clients
 export function broadcastSSE(event: string, data: unknown) {
   const message = JSON.stringify({ event, data })
   for (const client of sseClients) {
