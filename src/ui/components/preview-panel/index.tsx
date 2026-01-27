@@ -13,13 +13,41 @@ interface PreviewPanelProps {
   onClose: () => void
 }
 
+const MIN_WIDTH = 300
+const MAX_WIDTH = 600
+const DEFAULT_WIDTH = 384
+
 export const PreviewPanel = memo(function PreviewPanel({ asset, onClose }: PreviewPanelProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null)
+  const [panelWidth, setPanelWidth] = useState(DEFAULT_WIDTH)
+  const [isResizing, setIsResizing] = useState(false)
 
   useEffect(() => {
     setImageDimensions(null)
   }, [asset.id])
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsResizing(true)
+    const startX = e.clientX
+    const startWidth = panelWidth
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const delta = startX - e.clientX
+      const newWidth = Math.min(Math.max(startWidth + delta, MIN_WIDTH), MAX_WIDTH)
+      setPanelWidth(newWidth)
+    }
+
+    const handleMouseUp = () => {
+      setIsResizing(false)
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }, [panelWidth])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -45,8 +73,16 @@ export const PreviewPanel = memo(function PreviewPanel({ asset, onClose }: Previ
     <aside
       role="region"
       aria-label={`Preview of ${asset.name}`}
-      className="w-96 h-screen border-l border-border bg-card/80 backdrop-blur-sm flex flex-col overflow-hidden animate-slide-in-right"
+      style={{ width: panelWidth }}
+      className="fixed top-0 right-0 z-50 h-screen border-l border-border bg-card/80 backdrop-blur-sm flex flex-col overflow-hidden animate-slide-in-right"
     >
+      <div
+        onMouseDown={handleResizeStart}
+        className={`absolute left-0 top-0 h-full w-1.5 cursor-col-resize hover:bg-primary/50 active:bg-primary/70 transition-colors z-10 ${
+          isResizing ? 'bg-primary/70' : ''
+        }`}
+        aria-hidden="true"
+      />
       <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
         <h2 className="text-sm font-semibold text-foreground truncate pr-2" title={asset.name}>
           {asset.name}
