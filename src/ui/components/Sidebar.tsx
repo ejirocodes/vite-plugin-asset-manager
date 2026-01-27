@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { SearchBar } from './search-bar'
 import {
   ImagesIcon,
@@ -11,6 +12,18 @@ import {
   FileIcon
 } from '@phosphor-icons/react'
 import packageJson from '../../../package.json'
+
+const colorClasses = {
+  violet: 'text-violet-400 bg-violet-500/10',
+  pink: 'text-pink-400 bg-pink-500/10',
+  cyan: 'text-cyan-400 bg-cyan-500/10',
+  amber: 'text-amber-400 bg-amber-500/10',
+  rose: 'text-rose-400 bg-rose-500/10',
+  emerald: 'text-emerald-400 bg-emerald-500/10',
+  purple: 'text-purple-400 bg-purple-500/10',
+  zinc: 'text-zinc-400 bg-zinc-500/10',
+} as const
+
 interface SidebarProps {
   total: number
   searchQuery: string
@@ -28,7 +41,8 @@ interface SidebarProps {
   }
 }
 
-export function Sidebar({ total, searchQuery, onSearchChange, searching, stats }: SidebarProps) {
+// rerender-memo: Memoize to prevent re-renders when props unchanged
+export const Sidebar = memo(function Sidebar({ total, searchQuery, onSearchChange, searching, stats }: SidebarProps) {
   return (
     <aside className="w-72 bg-sidebar border-r border-sidebar-border flex flex-col noise-bg">
       <div className="p-5 border-b border-sidebar-border">
@@ -193,9 +207,9 @@ export function Sidebar({ total, searchQuery, onSearchChange, searching, stats }
       </div>
     </aside>
   )
-}
+})
 
-function StatBadge({
+const StatBadge = memo(function StatBadge({
   icon,
   label,
   count,
@@ -204,19 +218,8 @@ function StatBadge({
   icon: React.ReactNode
   label: string
   count: number
-  color: 'violet' | 'pink' | 'cyan' | 'amber' | 'rose' | 'emerald' | 'purple' | 'zinc'
+  color: keyof typeof colorClasses
 }) {
-  const colorClasses = {
-    violet: 'text-violet-400 bg-violet-500/10',
-    pink: 'text-pink-400 bg-pink-500/10',
-    cyan: 'text-cyan-400 bg-cyan-500/10',
-    amber: 'text-amber-400 bg-amber-500/10',
-    rose: 'text-rose-400 bg-rose-500/10',
-    emerald: 'text-emerald-400 bg-emerald-500/10',
-    purple: 'text-purple-400 bg-purple-500/10',
-    zinc: 'text-zinc-400 bg-zinc-500/10',
-  }
-
   return (
     <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md ${colorClasses[color]}`}>
       {icon}
@@ -224,9 +227,10 @@ function StatBadge({
       <span className="ml-auto font-mono text-xs font-semibold tabular-nums">{count}</span>
     </div>
   )
-}
+})
 
-function NavItem({
+// rerender-memo: Memoize to prevent re-renders when props unchanged
+const NavItem = memo(function NavItem({
   icon,
   label,
   count,
@@ -257,4 +261,4 @@ function NavItem({
       </span>
     </button>
   )
-}
+})

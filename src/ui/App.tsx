@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Sidebar } from './components/sidebar'
 import { AssetGrid } from './components/asset-grid'
 import { useAssets } from './hooks/useAssets'
@@ -6,24 +6,46 @@ import { useSearch } from './hooks/useSearch'
 import { CaretRightIcon, MagnifyingGlassIcon, PackageIcon, FolderOpenIcon } from '@phosphor-icons/react'
 import type { Asset } from './types'
 
+const LoadingSpinner = (
+  <div className="flex flex-col items-center justify-center h-full gap-4">
+    <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+    <p className="text-muted-foreground text-sm">Loading assets...</p>
+  </div>
+)
+
+const EmptyStateNoAssets = (
+  <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+    <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
+      <PackageIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
+    </div>
+    <p className="text-lg font-medium text-foreground mb-1">No assets found</p>
+    <p className="text-sm">Add images, videos, or documents to your project</p>
+  </div>
+)
+
 export default function App() {
   const { groups, total, loading } = useAssets()
   const { results, searching, search, clear } = useSearch()
   const [searchQuery, setSearchQuery] = useState('')
-  const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
+  const [expandedDirs, setExpandedDirs] = useState<Set<string>>(() => new Set())
 
   const stats = useMemo(() => {
-    const allAssets = groups.flatMap(g => g.assets)
-    return {
-      images: allAssets.filter(a => a.type === 'image').length,
-      videos: allAssets.filter(a => a.type === 'video').length,
-      audio: allAssets.filter(a => a.type === 'audio').length,
-      documents: allAssets.filter(a => a.type === 'document').length,
-      fonts: allAssets.filter(a => a.type === 'font').length,
-      data: allAssets.filter(a => a.type === 'data').length,
-      text: allAssets.filter(a => a.type === 'text').length,
-      other: allAssets.filter(a => a.type === 'other').length,
+    const counts = { images: 0, videos: 0, audio: 0, documents: 0, fonts: 0, data: 0, text: 0, other: 0 }
+    for (const group of groups) {
+      for (const asset of group.assets) {
+        switch (asset.type) {
+          case 'image': counts.images++; break
+          case 'video': counts.videos++; break
+          case 'audio': counts.audio++; break
+          case 'document': counts.documents++; break
+          case 'font': counts.fonts++; break
+          case 'data': counts.data++; break
+          case 'text': counts.text++; break
+          default: counts.other++
+        }
+      }
     }
+    return counts
   }, [groups])
 
   useEffect(() => {
@@ -60,7 +82,8 @@ export default function App() {
     return groups
   }, [groups, results, searchQuery])
 
-  const toggleDir = (dir: string) => {
+  // rerender-functional-setstate: useCallback with functional setState for stable reference
+  const toggleDir = useCallback((dir: string) => {
     setExpandedDirs(prev => {
       const next = new Set(prev)
       if (next.has(dir)) {
@@ -70,7 +93,7 @@ export default function App() {
       }
       return next
     })
-  }
+  }, [])
 
   return (
     <div className="flex h-screen bg-background noise-bg">
@@ -82,31 +105,16 @@ export default function App() {
         stats={stats}
       />
       <main className="flex-1 overflow-y-auto">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center h-full gap-4">
-            <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
-            <p className="text-muted-foreground text-sm">Loading assets...</p>
-          </div>
-        ) : displayGroups.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-            {searchQuery ? (
-              <>
-                <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
-                  <MagnifyingGlassIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
-                </div>
-                <p className="text-lg font-medium text-foreground mb-1">No results found</p>
-                <p className="text-sm">No assets match "{searchQuery}"</p>
-              </>
-            ) : (
-              <>
-                <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
-                  <PackageIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
-                </div>
-                <p className="text-lg font-medium text-foreground mb-1">No assets found</p>
-                <p className="text-sm">Add images, videos, or documents to your project</p>
-              </>
-            )}
-          </div>
+        {loading ? LoadingSpinner : displayGroups.length === 0 ? (
+          searchQuery ? (
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+              <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
+                <MagnifyingGlassIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
+              </div>
+              <p className="text-lg font-medium text-foreground mb-1">No results found</p>
+              <p className="text-sm">No assets match "{searchQuery}"</p>
+            </div>
+          ) : EmptyStateNoAssets
         ) : (
           <div className="p-6 space-y-4">
             {displayGroups.map(group => (

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo, useCallback } from 'react'
 import { FileIcon, getFileTypeColor } from './file-icon'
 import { CopyIcon, CheckIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 import type { Asset } from '../types'
@@ -9,15 +9,24 @@ interface AssetCardProps {
   onPreview?: (asset: Asset) => void
 }
 
+const formatBytesCache = new Map<number, string>()
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
+  const cached = formatBytesCache.get(bytes)
+  if (cached) return cached
+
+  if (bytes === 0) {
+    formatBytesCache.set(0, '0 B')
+    return '0 B'
+  }
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
+  const result = parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
+  formatBytesCache.set(bytes, result)
+  return result
 }
 
-export function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
+export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
   const [copied, setCopied] = useState(false)
   const [imageError, setImageError] = useState(false)
 
@@ -25,15 +34,15 @@ export function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
   const thumbnailUrl = `/__asset_manager__/api/thumbnail?path=${encodeURIComponent(asset.path)}`
   const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (onPreview) {
       onPreview(asset)
     } else {
       window.open(fileUrl, '_blank')
     }
-  }
+  }, [asset, fileUrl, onPreview])
 
-  const handleCopyPath = async (e: React.MouseEvent) => {
+  const handleCopyPath = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation()
     try {
       await navigator.clipboard.writeText(asset.path)
@@ -42,12 +51,14 @@ export function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
     } catch (err) {
       console.error('Failed to copy path:', err)
     }
-  }
+  }, [asset.path])
 
-  const handleOpenExternal = (e: React.MouseEvent) => {
+  const handleOpenExternal = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     window.open(fileUrl, '_blank')
-  }
+  }, [fileUrl])
+
+  const handleImageError = useCallback(() => setImageError(true), [])
 
   const staggerClass = `stagger-${Math.min((index % 8) + 1, 8)}`
   const extColor = getFileTypeColor(asset.extension)
@@ -72,7 +83,7 @@ export function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
             alt={asset.name}
             className="relative w-full h-full object-cover"
             loading="lazy"
-            onError={() => setImageError(true)}
+            onError={handleImageError}
           />
         ) : (
           <div className="relative w-full h-full flex items-center justify-center bg-card">
@@ -125,4 +136,4 @@ export function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
       </div>
     </div>
   )
-}
+})
