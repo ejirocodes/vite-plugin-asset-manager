@@ -48,7 +48,9 @@ The playground imports the plugin directly from `../src/index` (no pnpm link nee
 2. **Server Layer** (`src/server/`)
    - `scanner.ts` - EventEmitter-based file scanner using fast-glob + chokidar for watching
    - `thumbnail.ts` - Sharp-based thumbnail generation with dual-tier caching (memory + disk in OS temp)
-   - `api.ts` - HTTP API router with endpoints: `/assets`, `/assets/grouped`, `/search`, `/thumbnail`, `/file`, `/stats`
+   - `importer-scanner.ts` - Detects which source files import each asset (ES imports, dynamic imports, require, CSS url, HTML attributes)
+   - `editor-launcher.ts` - Opens files in configured editor at specific line/column using launch-editor
+   - `api.ts` - HTTP API router with endpoints: `/assets`, `/assets/grouped`, `/search`, `/thumbnail`, `/file`, `/stats`, `/importers`, `/open-in-editor`
    - `index.ts` - Middleware setup, serves API at `{base}/api/*` and dashboard UI via sirv
 
 3. **UI Layer** (`src/ui/`)
@@ -57,13 +59,15 @@ The playground imports the plugin directly from `../src/index` (no pnpm link nee
    - Structure:
      - `components/` - App components (Sidebar, SearchBar, AssetGrid, AssetCard, FileIcon)
      - `components/ui/` - shadcn primitives (Button, Card, Input, Sheet, Tabs, etc.)
+     - `components/card-previews/` - Card preview components (FontCardPreview, VideoCardPreview)
      - `components/preview-panel/` - Asset preview system with type-specific renderers
        - `index.tsx` - Main panel using Sheet component
        - `renderers/` - Type-specific previews (image, video, audio, font, code, fallback)
        - `details-section.tsx`, `actions-section.tsx`, `code-snippets.tsx` - Panel sections
-     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search
+       - `importers-section.tsx` - Shows files that import the asset with click-to-open-in-editor
+     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch
      - `providers/theme-provider.tsx` - Theme context using next-themes
-     - `lib/utils.ts` - Tailwind `cn()` utility
+     - `lib/utils.ts` - Tailwind `cn()` utility, `lib/code-snippets.ts` - Import snippet generators
      - `styles/globals.css` - Tailwind entry point with CSS variables
 
 ### TypeScript Configuration
@@ -80,7 +84,7 @@ All shadcn components install to `src/ui/`:
 
 ### Shared Types (`src/shared/types.ts`)
 
-Key types: `Asset`, `AssetGroup`, `AssetType`, `AssetManagerOptions`, `ResolvedOptions`
+Key types: `Asset`, `AssetGroup`, `AssetType`, `AssetManagerOptions`, `ResolvedOptions`, `Importer`, `ImportType`, `EditorType`
 
 Default plugin options:
 - Base path: `/__asset_manager__`
@@ -89,6 +93,7 @@ Default plugin options:
 - Thumbnail size: 200px
 - Floating icon: enabled (injects overlay button into host app)
 - Watch mode: enabled (sends HMR updates on file changes)
+- Launch editor: `'code'` (VS Code) - configurable for click-to-open-in-editor functionality
 
 ## Key Patterns
 
@@ -100,6 +105,8 @@ Default plugin options:
 - **Path aliases**: Both plugin and UI use `@/*` → `./src/*`. For UI code, use `@/ui/*` paths (e.g., `@/ui/lib/utils`, `@/ui/components/ui/button`)
 - **Real-time updates**: File changes emit `asset-manager:update` events via Vite's HMR WebSocket
 - **External dependencies**: `sharp` is external in tsup config (system-level image processing)
+- **Importer detection**: Uses regex-based scanning (not AST) for performance; detects ES imports, dynamic imports, require, CSS url(), HTML src/href
+- **Editor integration**: Uses `launch-editor` package to open files at specific line/column; configurable via `launchEditor` option
 
 ## Linting & Formatting
 
