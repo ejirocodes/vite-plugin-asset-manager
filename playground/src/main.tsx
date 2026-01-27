@@ -1,5 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import logoSvg from './assets/logo.svg'
+import iconSvg from './assets/icon.svg'
 
 function App() {
   return (
@@ -12,7 +14,11 @@ function App() {
         </a>{' '}
         to see the asset manager UI.
       </p>
-      <img src="/favicon.svg" alt="favicon" />
+      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+        <img src={logoSvg} alt="logo" width={48} height={48} />
+        <img src={iconSvg} alt="icon" width={48} height={48} />
+        <img src="/favicon.svg" alt="favicon" width={48} height={48} />
+      </div>
     </div>
   )
 }

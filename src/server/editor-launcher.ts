@@ -18,7 +18,7 @@ export function launchEditor(
   return new Promise((resolve, reject) => {
     const fileSpec = `${absolutePath}:${line}:${column}`
 
-    launch(fileSpec, editor, (_fileName: string, errorMsg: string) => {
+    launch(fileSpec, editor, (_fileName: string, errorMsg: string | null) => {
       if (errorMsg) {
         reject(new Error(errorMsg))
       } else {
