@@ -125,7 +125,6 @@ export function Sidebar({ total, searchQuery, onSearchChange, searching, stats }
         </nav>
       </div>
 
-      {/* Footer */}
       <div className="p-4 border-t border-sidebar-border">
         <div className="flex items-center justify-between text-[10px] text-muted-foreground">
           <div className="flex items-center gap-2">

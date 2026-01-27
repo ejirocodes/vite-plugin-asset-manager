@@ -63,9 +63,7 @@ export function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
         hover-lift animate-fade-in-up opacity-0 ${staggerClass}
       `}
     >
-      {/* Thumbnail area */}
       <div className="aspect-square relative overflow-hidden">
-        {/* Checkerboard background for images with transparency */}
         <div className="absolute inset-0 checkerboard" />
 
         {isImage && !imageError ? (
@@ -104,7 +102,6 @@ export function AssetCard({ asset, index = 0, onPreview }: AssetCardProps) {
         </div>
       </div>
 
-      {/* Metadata */}
       <div className="p-3 border-t border-border">
         <p
           className="text-sm font-medium text-foreground truncate mb-1"
