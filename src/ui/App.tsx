@@ -3,6 +3,7 @@ import { Sidebar } from './components/Sidebar'
 import { AssetGrid } from './components/AssetGrid'
 import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
+import { CaretRightIcon, MagnifyingGlassIcon, PackageIcon, FolderOpenIcon } from '@phosphor-icons/react'
 import type { Asset } from './types'
 
 export default function App() {
@@ -10,6 +11,17 @@ export default function App() {
   const { results, searching, search, clear } = useSearch()
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
+
+  const stats = useMemo(() => {
+    const allAssets = groups.flatMap(g => g.assets)
+    return {
+      images: allAssets.filter(a => a.type === 'image').length,
+      videos: allAssets.filter(a => a.type === 'video').length,
+      audio: allAssets.filter(a => a.type === 'audio').length,
+      documents: allAssets.filter(a => a.type === 'document').length,
+      other: allAssets.filter(a => a.type === 'other').length,
+    }
+  }, [groups])
 
   useEffect(() => {
     if (groups.length > 0 && expandedDirs.size === 0) {
@@ -58,61 +70,77 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-900">
+    <div className="flex h-screen bg-background noise-bg">
       <Sidebar
         total={total}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searching={searching}
+        stats={stats}
       />
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-slate-400">Loading assets...</div>
+          <div className="flex flex-col items-center justify-center h-full gap-4">
+            <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+            <p className="text-muted-foreground text-sm">Loading assets...</p>
           </div>
         ) : displayGroups.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-slate-400">
+          <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
             {searchQuery ? (
               <>
-                <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <p>No assets found for "{searchQuery}"</p>
+                <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
+                  <MagnifyingGlassIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
+                </div>
+                <p className="text-lg font-medium text-foreground mb-1">No results found</p>
+                <p className="text-sm">No assets match "{searchQuery}"</p>
               </>
             ) : (
               <>
-                <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <p>No assets found</p>
-                <p className="text-sm mt-2">Add images, videos, or documents to your project</p>
+                <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
+                  <PackageIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
+                </div>
+                <p className="text-lg font-medium text-foreground mb-1">No assets found</p>
+                <p className="text-sm">Add images, videos, or documents to your project</p>
               </>
             )}
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="p-6 space-y-4">
             {displayGroups.map(group => (
-              <div key={group.directory} className="border border-slate-700 rounded-lg overflow-hidden">
+              <div
+                key={group.directory}
+                className="rounded-xl border border-border bg-card/30 overflow-hidden"
+              >
                 <button
                   onClick={() => toggleDir(group.directory)}
-                  className="w-full flex items-center justify-between px-4 py-3 bg-slate-800 hover:bg-slate-750 transition-colors"
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
                 >
-                  <div className="flex items-center gap-2">
-                    <svg
-                      className={`w-4 h-4 transition-transform ${expandedDirs.has(group.directory) ? 'rotate-90' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                    <span className="font-medium text-slate-200">{group.directory}</span>
+                  <div className="flex items-center gap-3">
+                    <CaretRightIcon
+                      weight="bold"
+                      className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
+                        expandedDirs.has(group.directory) ? 'rotate-90' : ''
+                      }`}
+                    />
+                    <FolderOpenIcon weight="duotone" className="w-5 h-5 text-amber-400" />
+                    <span className="font-mono text-sm font-medium text-foreground">
+                      {group.directory}
+                    </span>
                   </div>
-                  <span className="text-sm text-slate-400">{group.count} items</span>
+                  <span className="text-xs text-muted-foreground font-mono bg-muted/50 px-2 py-0.5 rounded-md">
+                    {group.count} {group.count === 1 ? 'item' : 'items'}
+                  </span>
                 </button>
-                {expandedDirs.has(group.directory) && (
-                  <AssetGrid assets={group.assets} />
-                )}
+                <div
+                  className={`
+                    overflow-hidden transition-all duration-300 ease-in-out
+                    ${expandedDirs.has(group.directory) ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
+                  `}
+                >
+                  <div className="border-t border-border">
+                    <AssetGrid assets={group.assets} />
+                  </div>
+                </div>
               </div>
             ))}
           </div>

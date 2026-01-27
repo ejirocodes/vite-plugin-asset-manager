@@ -1,3 +1,6 @@
+import { useEffect, useRef } from 'react'
+import { MagnifyingGlassIcon, XIcon, CircleNotchIcon, CommandIcon } from '@phosphor-icons/react'
+
 interface SearchBarProps {
   value: string
   onChange: (value: string) => void
@@ -5,37 +8,71 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ value, onChange, searching }: SearchBarProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        inputRef.current?.focus()
+      }
+      if (e.key === 'Escape' && document.activeElement === inputRef.current) {
+        inputRef.current?.blur()
+        onChange('')
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onChange])
+
   return (
-    <div className="relative">
+    <div className="relative group">
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         {searching ? (
-          <svg className="w-4 h-4 text-slate-400 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-          </svg>
+          <CircleNotchIcon
+            weight="bold"
+            className="w-4 h-4 text-muted-foreground animate-spin"
+          />
         ) : (
-          <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <MagnifyingGlassIcon
+            weight="bold"
+            className="w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors"
+          />
         )}
       </div>
+
       <input
+        ref={inputRef}
         type="text"
         value={value}
         onChange={e => onChange(e.target.value)}
-        placeholder="Search..."
-        className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        placeholder="Search assets..."
+        className="
+          w-full pl-10 pr-20 py-2.5
+          bg-input/50 border border-border rounded-lg
+          text-sm text-foreground placeholder:text-muted-foreground
+          focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50
+          transition-all duration-200
+        "
       />
-      {value && (
-        <button
-          onClick={() => onChange('')}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center"
-        >
-          <svg className="w-4 h-4 text-slate-400 hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      )}
+
+      <div className="absolute inset-y-0 right-0 pr-2 flex items-center gap-1">
+        {value ? (
+          <button
+            onClick={() => onChange('')}
+            className="p-1 rounded-md hover:bg-muted transition-colors"
+            aria-label="Clear search"
+          >
+            <XIcon weight="bold" className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
+          </button>
+        ) : (
+          <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-border bg-muted/50 text-[10px] font-mono text-muted-foreground">
+            <CommandIcon weight="bold" className="w-2.5 h-2.5" />
+            <span>K</span>
+          </kbd>
+        )}
+      </div>
     </div>
   )
 }

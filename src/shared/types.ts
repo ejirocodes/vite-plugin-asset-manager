@@ -33,6 +33,7 @@ export interface AssetManagerOptions {
   thumbnails?: boolean
   thumbnailSize?: number
   watch?: boolean
+  floatingIcon?: boolean
 }
 
 export interface ResolvedOptions {
@@ -43,6 +44,7 @@ export interface ResolvedOptions {
   thumbnails: boolean
   thumbnailSize: number
   watch: boolean
+  floatingIcon: boolean
 }
 
 export const DEFAULT_OPTIONS: ResolvedOptions = {
@@ -58,7 +60,8 @@ export const DEFAULT_OPTIONS: ResolvedOptions = {
   ],
   thumbnails: true,
   thumbnailSize: 200,
-  watch: true
+  watch: true,
+  floatingIcon: true
 }
 
 export function resolveOptions(options: AssetManagerOptions): ResolvedOptions {
