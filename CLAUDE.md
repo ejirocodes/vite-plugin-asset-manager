@@ -108,6 +108,26 @@ Default plugin options:
 - **Importer detection**: Uses regex-based scanning (not AST) for performance; detects ES imports, dynamic imports, require, CSS url(), HTML src/href
 - **Editor integration**: Uses `launch-editor` package to open files at specific line/column; configurable via `launchEditor` option
 
+## Testing
+
+```bash
+pnpm run test          # Run all tests once
+pnpm run test:watch    # Watch mode
+pnpm run test:ui       # Run with Vitest UI
+pnpm run test:coverage # Run with coverage report
+pnpm run test:server   # Run server tests only (Node environment)
+pnpm run test:client   # Run UI tests only (jsdom environment)
+```
+
+### Test Structure
+
+- `tests/server/` - Server-side tests (scanner, thumbnail, api, importer-scanner, editor-launcher)
+- `src/ui/**/*.test.{ts,tsx}` - UI component and hook tests (co-located)
+- `tests/setup.ts` - Global test setup, exports `createMockAsset()` and `createMockImporter()` utilities
+- `tests/setup-ui.ts` - UI-specific setup (jsdom), mocks for EventSource, fetch, clipboard
+
+Environment selection: Server tests run in `node`, UI tests (matching `src/ui/**`) run in `jsdom` via `environmentMatchGlobs`.
+
 ## Linting & Formatting
 
 ```bash
@@ -121,5 +141,4 @@ ESLint uses flat config (`eslint.config.js`) with separate rules for plugin code
 
 ## Development Notes
 
-- **No tests yet**: Test infrastructure not set up
 - **Adding shadcn components**: Run `npx shadcn@latest add <component>` from project root; components install to `src/ui/components/ui/`
