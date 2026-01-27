@@ -1,4 +1,4 @@
-import { AssetCard } from './AssetCard'
+import { AssetCard } from './asset-card'
 import type { Asset } from '../types'
 
 interface AssetGridProps {

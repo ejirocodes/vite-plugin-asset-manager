@@ -1,4 +1,4 @@
-import { SearchBar } from './SearchBar'
+import { SearchBar } from './search-bar'
 import { ImagesIcon, VideoCameraIcon, MusicNoteIcon, FileTextIcon, PackageIcon } from '@phosphor-icons/react'
 
 interface SidebarProps {

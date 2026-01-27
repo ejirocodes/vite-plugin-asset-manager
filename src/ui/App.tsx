@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Sidebar } from './components/Sidebar'
-import { AssetGrid } from './components/AssetGrid'
+import { Sidebar } from './components/sidebar'
+import { AssetGrid } from './components/asset-grid'
 import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
 import { CaretRightIcon, MagnifyingGlassIcon, PackageIcon, FolderOpenIcon } from '@phosphor-icons/react'

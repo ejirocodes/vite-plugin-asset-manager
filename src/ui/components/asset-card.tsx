@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileIcon, getFileTypeColor } from './FileIcon'
+import { FileIcon, getFileTypeColor } from './file-icon'
 import { CopyIcon, CheckIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 import type { Asset } from '../types'
 
