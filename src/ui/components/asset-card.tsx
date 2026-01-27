@@ -1,6 +1,6 @@
 import { useState, memo, useCallback } from 'react'
 import { FileIcon, getFileTypeColor } from './file-icon'
-import { CopyIcon, CheckIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
+import { CopyIcon, CheckIcon } from '@phosphor-icons/react'
 import type { Asset } from '../types'
 
 interface AssetCardProps {
@@ -32,15 +32,10 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
 
   const isImage = asset.type === 'image'
   const thumbnailUrl = `/__asset_manager__/api/thumbnail?path=${encodeURIComponent(asset.path)}`
-  const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
 
   const handleClick = useCallback(() => {
-    if (onPreview) {
-      onPreview(asset)
-    } else {
-      window.open(fileUrl, '_blank')
-    }
-  }, [asset, fileUrl, onPreview])
+    onPreview?.(asset)
+  }, [asset, onPreview])
 
   const handleCopyPath = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -53,10 +48,6 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
     }
   }, [asset.path])
 
-  const handleOpenExternal = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    window.open(fileUrl, '_blank')
-  }, [fileUrl])
 
   const handleImageError = useCallback(() => setImageError(true), [])
 
@@ -91,24 +82,18 @@ export const AssetCard = memo(function AssetCard({ asset, index = 0, onPreview }
           </div>
         )}
 
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
           <button
             onClick={handleCopyPath}
             className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
             title="Copy path"
+            aria-label="Copy file path"
           >
             {copied ? (
               <CheckIcon weight="bold" className="w-4 h-4 text-emerald-400" />
             ) : (
               <CopyIcon weight="bold" className="w-4 h-4 text-white" />
             )}
-          </button>
-          <button
-            onClick={handleOpenExternal}
-            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-            title="Open in new tab"
-          >
-            <ArrowSquareOutIcon weight="bold" className="w-4 h-4 text-white" />
           </button>
         </div>
       </div>

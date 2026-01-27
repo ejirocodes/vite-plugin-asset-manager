@@ -144,6 +144,7 @@ export const DetailsSection = memo(function DetailsSection({
   imageDimensions
 }: DetailsSectionProps) {
   const publicPath = getPublicPath(asset)
+  const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
 
   return (
     <div className="p-4">
@@ -153,7 +154,7 @@ export const DetailsSection = memo(function DetailsSection({
           label="Filepath"
           value={asset.absolutePath}
           copyable
-          externalLink={`file://${asset.absolutePath}`}
+          externalLink={fileUrl}
         />
         <DetailRow
           label="Public Path"
