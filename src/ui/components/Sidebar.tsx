@@ -1,6 +1,6 @@
 import { SearchBar } from './search-bar'
 import { ImagesIcon, VideoCameraIcon, MusicNoteIcon, FileTextIcon, PackageIcon } from '@phosphor-icons/react'
-
+import packageJson from '../../../package.json'
 interface SidebarProps {
   total: number
   searchQuery: string
@@ -131,7 +131,7 @@ export function Sidebar({ total, searchQuery, onSearchChange, searching, stats }
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="font-mono">Watching</span>
           </div>
-          <span className="font-mono opacity-50">v1.0.0</span>
+          <span className="font-mono opacity-50">v{packageJson.version}</span>
         </div>
       </div>
     </aside>
