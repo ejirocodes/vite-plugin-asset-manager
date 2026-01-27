@@ -6,6 +6,11 @@ export default defineConfig({
   plugins: [react()],
   root: 'src/ui',
   base: '/__asset_manager__/',
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
+    }
+  },
   build: {
     outDir: '../../dist/client',
     emptyOutDir: true,

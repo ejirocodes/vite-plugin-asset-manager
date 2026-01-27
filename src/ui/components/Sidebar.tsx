@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { SearchBar } from './search-bar'
+import { ModeToggle } from './mode-toggle'
 import {
   ImagesIcon,
   VideoCameraIcon,
@@ -41,7 +42,6 @@ interface SidebarProps {
   }
 }
 
-// rerender-memo: Memoize to prevent re-renders when props unchanged
 export const Sidebar = memo(function Sidebar({ total, searchQuery, onSearchChange, searching, stats }: SidebarProps) {
   return (
     <aside className="w-72 bg-sidebar border-r border-sidebar-border flex flex-col noise-bg">
@@ -202,7 +202,10 @@ export const Sidebar = memo(function Sidebar({ total, searchQuery, onSearchChang
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="font-mono">Watching</span>
           </div>
-          <span className="font-mono opacity-50">v{packageJson.version}</span>
+          <div className="flex relative items-center gap-2">
+            <ModeToggle />
+            <span className="font-mono opacity-50">v{packageJson.version}</span>
+          </div>
         </div>
       </div>
     </aside>

@@ -26,11 +26,12 @@
 
 :root {
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --bg-primary: #09090b;
-  --bg-secondary: #18181b;
-  --bg-tertiary: #27272a;
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
+  /* Legacy variables - light mode */
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-tertiary: #f4f4f5;
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
   --text-muted: #71717a;
   --accent: oklch(0.606 0.25 292.717);
   --background: oklch(1 0 0);
@@ -76,7 +77,7 @@ body {
   font-family: 'Figtree Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Custom scrollbar - thin, zinc colors */
+/* Custom scrollbar - theme aware */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -87,16 +88,23 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-tertiary);
+  background: var(--muted);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--muted-foreground);
 }
 
-/* Dark theme - the primary theme for this app */
+/* Dark theme */
 .dark {
+  /* Legacy variables - dark mode */
+  --bg-primary: #09090b;
+  --bg-secondary: #18181b;
+  --bg-tertiary: #27272a;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
   --background: #09090b;
   --foreground: #fafafa;
   --card: #18181b;
@@ -153,12 +161,21 @@ body {
 /* Checkerboard pattern for transparent image backgrounds */
 .checkerboard {
   background-image:
+    linear-gradient(45deg, #e4e4e7 25%, transparent 25%),
+    linear-gradient(-45deg, #e4e4e7 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e4e4e7 75%),
+    linear-gradient(-45deg, transparent 75%, #e4e4e7 75%);
+  background-size: 12px 12px;
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+  background-color: #fafafa;
+}
+
+.dark .checkerboard {
+  background-image:
     linear-gradient(45deg, #27272a 25%, transparent 25%),
     linear-gradient(-45deg, #27272a 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #27272a 75%),
     linear-gradient(-45deg, transparent 75%, #27272a 75%);
-  background-size: 12px 12px;
-  background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
   background-color: #18181b;
 }
 
