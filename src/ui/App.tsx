@@ -134,75 +134,77 @@ export default function App() {
   }, [])
 
   return (
-    <div className="flex h-screen bg-background noise-bg">
-      <Sidebar
-        total={total}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        searching={searching}
-        stats={stats}
-      />
-      <main className="flex-1 overflow-auto">
-        {loading ? (
-          LoadingSpinner
-        ) : displayGroups.length === 0 ? (
-          searchQuery ? (
-            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-              <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
-                <MagnifyingGlassIcon
-                  weight="duotone"
-                  className="w-10 h-10 text-muted-foreground/50"
-                />
+    <>
+      <div className="flex h-screen bg-background noise-bg">
+        <Sidebar
+          total={total}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searching={searching}
+          stats={stats}
+        />
+        <main className="flex-1 overflow-auto">
+          {loading ? (
+            LoadingSpinner
+          ) : displayGroups.length === 0 ? (
+            searchQuery ? (
+              <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
+                  <MagnifyingGlassIcon
+                    weight="duotone"
+                    className="w-10 h-10 text-muted-foreground/50"
+                  />
+                </div>
+                <p className="text-lg font-medium text-foreground mb-1">No results found</p>
+                <p className="text-sm">No assets match "{searchQuery}"</p>
               </div>
-              <p className="text-lg font-medium text-foreground mb-1">No results found</p>
-              <p className="text-sm">No assets match "{searchQuery}"</p>
-            </div>
+            ) : (
+              EmptyStateNoAssets
+            )
           ) : (
-            EmptyStateNoAssets
-          )
-        ) : (
-          <div className="p-6 space-y-4">
-            {displayGroups.map(group => (
-              <div
-                key={group.directory}
-                className="rounded-xl border border-border bg-card/30 overflow-hidden"
-              >
-                <button
-                  onClick={() => toggleDir(group.directory)}
-                  className="w-full flex items-center justify-between cursor-pointer px-4 py-3 hover:bg-muted/30 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <CaretRightIcon
-                      weight="bold"
-                      className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
-                        expandedDirs.has(group.directory) ? 'rotate-90' : ''
-                      }`}
-                    />
-                    <FolderOpenIcon weight="duotone" className="w-5 h-5 text-amber-400" />
-                    <span className="font-mono text-sm font-medium text-foreground">
-                      {group.directory}
-                    </span>
-                  </div>
-                  <span className="text-xs text-muted-foreground font-mono bg-muted/50 px-2 py-0.5 rounded-md">
-                    {group.count} {group.count === 1 ? 'item' : 'items'}
-                  </span>
-                </button>
+            <div className="p-6 space-y-4">
+              {displayGroups.map(group => (
                 <div
-                  className={`
-                    overflow-hidden transition-all duration-300 ease-in-out
-                    ${expandedDirs.has(group.directory) ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
-                  `}
+                  key={group.directory}
+                  className="rounded-xl border border-border bg-card/30 overflow-hidden"
                 >
-                  <div className="border-t border-border">
-                    <AssetGrid assets={group.assets} onPreview={handlePreview} />
+                  <button
+                    onClick={() => toggleDir(group.directory)}
+                    className="w-full flex items-center justify-between cursor-pointer px-4 py-3 hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <CaretRightIcon
+                        weight="bold"
+                        className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
+                          expandedDirs.has(group.directory) ? 'rotate-90' : ''
+                        }`}
+                      />
+                      <FolderOpenIcon weight="duotone" className="w-5 h-5 text-amber-400" />
+                      <span className="font-mono text-sm font-medium text-foreground">
+                        {group.directory}
+                      </span>
+                    </div>
+                    <span className="text-xs text-muted-foreground font-mono bg-muted/50 px-2 py-0.5 rounded-md">
+                      {group.count} {group.count === 1 ? 'item' : 'items'}
+                    </span>
+                  </button>
+                  <div
+                    className={`
+                      overflow-hidden transition-all duration-300 ease-in-out
+                      ${expandedDirs.has(group.directory) ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
+                    `}
+                  >
+                    <div className="border-t border-border">
+                      <AssetGrid assets={group.assets} onPreview={handlePreview} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
       {selectedAsset && <PreviewPanel asset={selectedAsset} onClose={handleClosePreview} />}
-    </div>
+    </>
   )
 }

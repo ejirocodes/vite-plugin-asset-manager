@@ -17,7 +17,6 @@ export default [
       'postcss.config.js'
     ]
   },
-  // TypeScript files (plugin - non-React)
   {
     files: ['src/**/*.ts'],
     ignores: ['src/ui/**'],
@@ -54,7 +53,6 @@ export default [
       'no-empty': ['error', { allowEmptyCatch: true }]
     }
   },
-  // React/UI files
   {
     files: ['src/ui/**/*.{ts,tsx}'],
     languageOptions: {
@@ -130,6 +128,5 @@ export default [
       'react/no-unescaped-entities': 'off'
     }
   },
-  // Prettier must be last to override other formatting rules
   prettier
 ]
