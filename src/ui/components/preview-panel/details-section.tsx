@@ -28,7 +28,7 @@ function formatDate(timestamp: number): string {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',
+    second: '2-digit'
   }).format(date)
 
   let relative = ''
@@ -66,10 +66,10 @@ function calculateAspectRatio(width: number, height: number): string {
   if (ratioW <= 20 && ratioH <= 20) return `${ratioW}:${ratioH}`
 
   const ratio = width / height
-  if (Math.abs(ratio - 16/9) < 0.01) return '16:9'
-  if (Math.abs(ratio - 4/3) < 0.01) return '4:3'
-  if (Math.abs(ratio - 3/2) < 0.01) return '3:2'
-  if (Math.abs(ratio - 21/9) < 0.01) return '21:9'
+  if (Math.abs(ratio - 16 / 9) < 0.01) return '16:9'
+  if (Math.abs(ratio - 4 / 3) < 0.01) return '4:3'
+  if (Math.abs(ratio - 3 / 2) < 0.01) return '3:2'
+  if (Math.abs(ratio - 21 / 9) < 0.01) return '21:9'
 
   return ratio.toFixed(2) + ':1'
 }
@@ -85,7 +85,12 @@ interface DetailRowProps {
   externalLink?: string
 }
 
-const DetailRow = memo(function DetailRow({ label, value, copyable, externalLink }: DetailRowProps) {
+const DetailRow = memo(function DetailRow({
+  label,
+  value,
+  copyable,
+  externalLink
+}: DetailRowProps) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = useCallback(async () => {
@@ -94,7 +99,7 @@ const DetailRow = memo(function DetailRow({ label, value, copyable, externalLink
       setCopied(true)
       toast.success('Copied to clipboard')
       setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to copy')
     }
   }, [value])
@@ -150,21 +155,9 @@ export const DetailsSection = memo(function DetailsSection({
     <div className="p-4">
       <h3 className="text-xs font-medium text-muted-foreground mb-2">Details</h3>
       <div className="divide-y divide-border">
-        <DetailRow
-          label="Filepath"
-          value={asset.absolutePath}
-          copyable
-          externalLink={fileUrl}
-        />
-        <DetailRow
-          label="Public Path"
-          value={publicPath}
-          copyable
-        />
-        <DetailRow
-          label="Type"
-          value={getAssetTypeLabel(asset.type)}
-        />
+        <DetailRow label="Filepath" value={asset.absolutePath} copyable externalLink={fileUrl} />
+        <DetailRow label="Public Path" value={publicPath} copyable />
+        <DetailRow label="Type" value={getAssetTypeLabel(asset.type)} />
         {imageDimensions && (
           <>
             <DetailRow
@@ -177,18 +170,9 @@ export const DetailsSection = memo(function DetailsSection({
             />
           </>
         )}
-        <DetailRow
-          label="File size"
-          value={formatBytes(asset.size)}
-        />
-        <DetailRow
-          label="Last modified"
-          value={formatDate(asset.mtime)}
-        />
-        <DetailRow
-          label="Importers"
-          value="None"
-        />
+        <DetailRow label="File size" value={formatBytes(asset.size)} />
+        <DetailRow label="Last modified" value={formatDate(asset.mtime)} />
+        <DetailRow label="Importers" value="None" />
       </div>
     </div>
   )

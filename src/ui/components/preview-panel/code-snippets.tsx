@@ -20,7 +20,7 @@ export const CodeSnippets = memo(function CodeSnippets({ asset }: CodeSnippetsPr
       setCopiedTab(type)
       toast.success('Copied to clipboard')
       setTimeout(() => setCopiedTab(null), 2000)
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to copy')
     }
   }, [])
@@ -32,7 +32,7 @@ export const CodeSnippets = memo(function CodeSnippets({ asset }: CodeSnippetsPr
       <Tabs defaultValue={snippets[0].type}>
         <div className="flex items-center justify-between mb-3">
           <TabsList variant="line" activateOnFocus>
-            {snippets.map((snippet) => (
+            {snippets.map(snippet => (
               <TabsTrigger key={snippet.type} value={snippet.type}>
                 {snippet.label}
               </TabsTrigger>
@@ -40,7 +40,7 @@ export const CodeSnippets = memo(function CodeSnippets({ asset }: CodeSnippetsPr
           </TabsList>
         </div>
 
-        {snippets.map((snippet) => (
+        {snippets.map(snippet => (
           <TabsContent key={snippet.type} value={snippet.type}>
             <div className="relative">
               <pre className="bg-muted/50 rounded-lg p-4 pr-12 overflow-x-auto text-xs font-mono">
