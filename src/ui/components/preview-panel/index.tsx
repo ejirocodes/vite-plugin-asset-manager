@@ -4,6 +4,7 @@ import { Button } from '@/ui/components/ui/button'
 import { Separator } from '@/ui/components/ui/separator'
 import { PreviewSection } from './preview-section'
 import { DetailsSection } from './details-section'
+import { ImportersSection } from './importers-section'
 import { ActionsSection } from './actions-section'
 import { CodeSnippets } from './code-snippets'
 import type { Asset } from '@/ui/types'
@@ -108,6 +109,8 @@ export const PreviewPanel = memo(function PreviewPanel({ asset, onClose }: Previ
         <PreviewSection asset={asset} onDimensionsLoad={handleDimensionsLoad} />
         <Separator />
         <DetailsSection asset={asset} imageDimensions={imageDimensions} />
+        <Separator />
+        <ImportersSection asset={asset} />
         <Separator />
         <ActionsSection asset={asset} />
         <Separator />

@@ -2,6 +2,7 @@ import type { Plugin, ViteDevServer, ResolvedConfig, IndexHtmlTransformResult } 
 import colors from 'picocolors'
 import { setupMiddleware } from './server/index.js'
 import { AssetScanner } from './server/scanner.js'
+import { ImporterScanner } from './server/importer-scanner.js'
 import { ThumbnailService } from './server/thumbnail.js'
 import { resolveOptions, type AssetManagerOptions } from './shared/types.js'
 
@@ -209,6 +210,7 @@ const FLOATING_ICON_SCRIPT = (base: string) => `
 export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plugin {
   let config: ResolvedConfig
   let scanner: AssetScanner
+  let importerScanner: ImporterScanner
   let thumbnailService: ThumbnailService
 
   const resolvedOptions = resolveOptions(options)
@@ -223,16 +225,20 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
 
     configureServer(server: ViteDevServer) {
       scanner = new AssetScanner(config.root, resolvedOptions)
+      importerScanner = new ImporterScanner(config.root, resolvedOptions)
       thumbnailService = new ThumbnailService(resolvedOptions.thumbnailSize)
 
       setupMiddleware(server, {
         base: resolvedOptions.base,
         scanner,
+        importerScanner,
         thumbnailService,
-        root: config.root
+        root: config.root,
+        launchEditor: resolvedOptions.launchEditor
       })
 
       scanner.init()
+      importerScanner.init()
 
       const _printUrls = server.printUrls
       server.printUrls = () => {
@@ -265,6 +271,9 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
         if (resolvedOptions.watch) {
           scanner.on('change', event => {
             server.ws.send('asset-manager:update', event)
+          })
+          importerScanner.on('change', event => {
+            server.ws.send('asset-manager:importers-update', event)
           })
         }
       }
@@ -304,6 +313,7 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
 
     buildEnd() {
       scanner?.destroy()
+      importerScanner?.destroy()
     }
   }
 }

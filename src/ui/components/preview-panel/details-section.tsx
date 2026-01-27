@@ -172,7 +172,6 @@ export const DetailsSection = memo(function DetailsSection({
         )}
         <DetailRow label="File size" value={formatBytes(asset.size)} />
         <DetailRow label="Last modified" value={formatDate(asset.mtime)} />
-        <DetailRow label="Importers" value="None" />
       </div>
     </div>
   )

@@ -3,8 +3,10 @@ import { parse as parseUrl } from 'url'
 import path from 'path'
 import fs from 'fs'
 import type { AssetScanner } from './scanner.js'
+import type { ImporterScanner } from './importer-scanner.js'
 import type { ThumbnailService } from './thumbnail.js'
-import type { AssetStats, AssetType } from '../shared/types.js'
+import { launchEditor } from './editor-launcher.js'
+import type { AssetStats, AssetType, EditorType } from '../shared/types.js'
 
 type NextFunction = () => void
 
@@ -64,9 +66,11 @@ const MIME_TYPES: Record<string, string> = {
 
 export function createApiRouter(
   scanner: AssetScanner,
+  importerScanner: ImporterScanner,
   thumbnailService: ThumbnailService,
   root: string,
-  basePath: string
+  basePath: string,
+  editor: EditorType
 ) {
   return async (req: IncomingMessage, res: ServerResponse, next: NextFunction) => {
     const { pathname, query } = parseUrl(req.url || '', true)
@@ -86,6 +90,10 @@ export function createApiRouter(
           return handleServeFile(res, root, query)
         case '/stats':
           return handleGetStats(res, scanner)
+        case '/importers':
+          return handleGetImporters(res, importerScanner, query)
+        case '/open-in-editor':
+          return handleOpenInEditor(req, res, root, editor, query)
         default:
           next()
       }
@@ -231,4 +239,68 @@ async function handleGetStats(res: ServerResponse, scanner: AssetScanner) {
 function sendJson(res: ServerResponse, data: unknown) {
   res.setHeader('Content-Type', 'application/json')
   res.end(JSON.stringify(data))
+}
+
+async function handleGetImporters(
+  res: ServerResponse,
+  importerScanner: ImporterScanner,
+  query: Record<string, any>
+) {
+  const assetPath = query.path as string
+  if (!assetPath) {
+    res.statusCode = 400
+    sendJson(res, { error: 'Missing path parameter' })
+    return
+  }
+
+  const importers = importerScanner.getImporters(assetPath)
+  sendJson(res, { importers, total: importers.length })
+}
+
+async function handleOpenInEditor(
+  req: IncomingMessage,
+  res: ServerResponse,
+  root: string,
+  editor: EditorType,
+  query: Record<string, any>
+) {
+  if (req.method !== 'POST') {
+    res.statusCode = 405
+    sendJson(res, { error: 'Method not allowed' })
+    return
+  }
+
+  const filePath = query.file as string
+  const line = parseInt(query.line as string) || 1
+  const column = parseInt(query.column as string) || 1
+
+  if (!filePath) {
+    res.statusCode = 400
+    sendJson(res, { error: 'Missing file parameter' })
+    return
+  }
+
+  const absolutePath = path.resolve(root, filePath)
+
+  if (!absolutePath.startsWith(root)) {
+    res.statusCode = 403
+    sendJson(res, { error: 'Forbidden' })
+    return
+  }
+
+  try {
+    await fs.promises.access(absolutePath, fs.constants.R_OK)
+  } catch {
+    res.statusCode = 404
+    sendJson(res, { error: 'File not found' })
+    return
+  }
+
+  try {
+    await launchEditor(absolutePath, line, column, editor)
+    sendJson(res, { success: true })
+  } catch (error) {
+    res.statusCode = 500
+    sendJson(res, { error: error instanceof Error ? error.message : 'Failed to open editor' })
+  }
 }

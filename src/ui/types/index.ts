@@ -47,3 +47,27 @@ export interface UseSearchResult {
   search: (query: string) => Promise<void>
   clear: () => void
 }
+
+export type ImportType =
+  | 'es-import'
+  | 'dynamic-import'
+  | 'require'
+  | 'css-url'
+  | 'html-src'
+  | 'html-href'
+
+export interface Importer {
+  filePath: string
+  absolutePath: string
+  line: number
+  column: number
+  importType: ImportType
+  snippet: string
+}
+
+export interface UseImportersResult {
+  importers: Importer[]
+  loading: boolean
+  error: string | null
+  openInEditor: (importer: Importer) => Promise<void>
+}

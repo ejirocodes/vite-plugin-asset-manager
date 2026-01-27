@@ -8,6 +8,46 @@ export type AssetType =
   | 'text'
   | 'other'
 
+export type EditorType =
+  | 'appcode'
+  | 'atom'
+  | 'atom-beta'
+  | 'brackets'
+  | 'clion'
+  | 'code'
+  | 'code-insiders'
+  | 'codium'
+  | 'cursor'
+  | 'emacs'
+  | 'idea'
+  | 'notepad++'
+  | 'pycharm'
+  | 'phpstorm'
+  | 'rubymine'
+  | 'sublime'
+  | 'vim'
+  | 'visualstudio'
+  | 'webstorm'
+  | 'rider'
+  | (string & {})
+
+export type ImportType =
+  | 'es-import'
+  | 'dynamic-import'
+  | 'require'
+  | 'css-url'
+  | 'html-src'
+  | 'html-href'
+
+export interface Importer {
+  filePath: string
+  absolutePath: string
+  line: number
+  column: number
+  importType: ImportType
+  snippet: string
+}
+
 export interface Asset {
   id: string
   name: string
@@ -42,6 +82,11 @@ export interface AssetManagerOptions {
   thumbnailSize?: number
   watch?: boolean
   floatingIcon?: boolean
+  /**
+   * Target editor when opening files via "Open in Editor"
+   * @default 'code' (Visual Studio Code)
+   */
+  launchEditor?: EditorType
 }
 
 export interface ResolvedOptions {
@@ -53,6 +98,7 @@ export interface ResolvedOptions {
   thumbnailSize: number
   watch: boolean
   floatingIcon: boolean
+  launchEditor: EditorType
 }
 
 export const DEFAULT_OPTIONS: ResolvedOptions = {
@@ -124,7 +170,8 @@ export const DEFAULT_OPTIONS: ResolvedOptions = {
   thumbnails: true,
   thumbnailSize: 200,
   watch: true,
-  floatingIcon: true
+  floatingIcon: true,
+  launchEditor: 'code'
 }
 
 export function resolveOptions(options: AssetManagerOptions): ResolvedOptions {

@@ -5,7 +5,9 @@ import fs from 'fs'
 import { fileURLToPath } from 'url'
 import { createApiRouter } from './api.js'
 import type { AssetScanner } from './scanner.js'
+import type { ImporterScanner } from './importer-scanner.js'
 import type { ThumbnailService } from './thumbnail.js'
+import type { EditorType } from '../shared/types.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -29,14 +31,23 @@ function findClientDir(): string {
 export interface MiddlewareContext {
   base: string
   scanner: AssetScanner
+  importerScanner: ImporterScanner
   thumbnailService: ThumbnailService
   root: string
+  launchEditor: EditorType
 }
 
 export function setupMiddleware(server: ViteDevServer, context: MiddlewareContext): void {
-  const { base, scanner, thumbnailService, root } = context
+  const { base, scanner, importerScanner, thumbnailService, root, launchEditor } = context
 
-  const apiRouter = createApiRouter(scanner, thumbnailService, root, base)
+  const apiRouter = createApiRouter(
+    scanner,
+    importerScanner,
+    thumbnailService,
+    root,
+    base,
+    launchEditor
+  )
 
   const clientDir = findClientDir()
 
