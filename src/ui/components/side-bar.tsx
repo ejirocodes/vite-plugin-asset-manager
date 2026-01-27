@@ -13,6 +13,7 @@ import {
   FileIcon
 } from '@phosphor-icons/react'
 import packageJson from '../../../package.json'
+import type { AssetType } from '../types'
 
 const colorClasses = {
   violet: 'text-violet-400 bg-violet-500/10',
@@ -30,6 +31,8 @@ interface SidebarProps {
   searchQuery: string
   onSearchChange: (query: string) => void
   searching: boolean
+  selectedType: AssetType | null
+  onTypeSelect: (type: AssetType | null) => void
   stats?: {
     images: number
     videos: number
@@ -47,6 +50,8 @@ export const Sidebar = memo(function Sidebar({
   searchQuery,
   onSearchChange,
   searching,
+  selectedType,
+  onTypeSelect,
   stats
 }: SidebarProps) {
   return (
@@ -149,7 +154,8 @@ export const Sidebar = memo(function Sidebar({
             icon={<PackageIcon weight="duotone" className="w-4 h-4" />}
             label="All Assets"
             count={total}
-            active
+            active={selectedType === null}
+            onClick={() => onTypeSelect(null)}
           />
           {stats && (
             <>
@@ -157,41 +163,57 @@ export const Sidebar = memo(function Sidebar({
                 icon={<ImagesIcon weight="duotone" className="w-4 h-4" />}
                 label="Images"
                 count={stats.images}
+                active={selectedType === 'image'}
+                onClick={() => onTypeSelect('image')}
               />
               <NavItem
                 icon={<VideoCameraIcon weight="duotone" className="w-4 h-4" />}
                 label="Videos"
                 count={stats.videos}
+                active={selectedType === 'video'}
+                onClick={() => onTypeSelect('video')}
               />
               <NavItem
                 icon={<MusicNoteIcon weight="duotone" className="w-4 h-4" />}
                 label="Audio"
                 count={stats.audio}
+                active={selectedType === 'audio'}
+                onClick={() => onTypeSelect('audio')}
               />
               <NavItem
                 icon={<FileTextIcon weight="duotone" className="w-4 h-4" />}
                 label="Documents"
                 count={stats.documents}
+                active={selectedType === 'document'}
+                onClick={() => onTypeSelect('document')}
               />
               <NavItem
                 icon={<TextTIcon weight="duotone" className="w-4 h-4" />}
                 label="Fonts"
                 count={stats.fonts}
+                active={selectedType === 'font'}
+                onClick={() => onTypeSelect('font')}
               />
               <NavItem
                 icon={<DatabaseIcon weight="duotone" className="w-4 h-4" />}
                 label="Data"
                 count={stats.data}
+                active={selectedType === 'data'}
+                onClick={() => onTypeSelect('data')}
               />
               <NavItem
                 icon={<ArticleIcon weight="duotone" className="w-4 h-4" />}
                 label="Text"
                 count={stats.text}
+                active={selectedType === 'text'}
+                onClick={() => onTypeSelect('text')}
               />
               <NavItem
                 icon={<FileIcon weight="duotone" className="w-4 h-4" />}
                 label="Other"
                 count={stats.other}
+                active={selectedType === 'other'}
+                onClick={() => onTypeSelect('other')}
               />
             </>
           )}
@@ -238,15 +260,18 @@ const NavItem = memo(function NavItem({
   icon,
   label,
   count,
-  active = false
+  active = false,
+  onClick
 }: {
   icon: React.ReactNode
   label: string
   count: number
   active?: boolean
+  onClick?: () => void
 }) {
   return (
     <button
+      onClick={onClick}
       className={`
         w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all
         ${

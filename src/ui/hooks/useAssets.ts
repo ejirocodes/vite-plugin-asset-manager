@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { AssetGroup, UseAssetsResult } from '../types'
+import type { AssetGroup, AssetType, UseAssetsResult } from '../types'
 import { useSSE } from './useSSE'
 
-export function useAssets(): UseAssetsResult {
+export function useAssets(typeFilter?: AssetType | null): UseAssetsResult {
   const [groups, setGroups] = useState<AssetGroup[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -13,7 +13,10 @@ export function useAssets(): UseAssetsResult {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch('/__asset_manager__/api/assets/grouped')
+      const url = typeFilter
+        ? `/__asset_manager__/api/assets/grouped?type=${typeFilter}`
+        : '/__asset_manager__/api/assets/grouped'
+      const res = await fetch(url)
       if (!res.ok) throw new Error('Failed to fetch assets')
       const data = await res.json()
       setGroups(data.groups)
@@ -23,7 +26,7 @@ export function useAssets(): UseAssetsResult {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [typeFilter])
 
   useEffect(() => {
     fetchAssets()

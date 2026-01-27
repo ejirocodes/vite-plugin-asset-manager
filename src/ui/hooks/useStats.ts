@@ -1,0 +1,73 @@
+import { useState, useEffect, useCallback } from 'react'
+import { useSSE } from './useSSE'
+
+interface Stats {
+  total: number
+  images: number
+  videos: number
+  audio: number
+  documents: number
+  fonts: number
+  data: number
+  text: number
+  other: number
+}
+
+interface UseStatsResult {
+  stats: Stats
+  loading: boolean
+  error: string | null
+}
+
+export function useStats(): UseStatsResult {
+  const [stats, setStats] = useState<Stats>({
+    total: 0,
+    images: 0,
+    videos: 0,
+    audio: 0,
+    documents: 0,
+    fonts: 0,
+    data: 0,
+    text: 0,
+    other: 0
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const { subscribe } = useSSE()
+
+  const fetchStats = useCallback(async () => {
+    try {
+      setError(null)
+      const res = await fetch('/__asset_manager__/api/stats')
+      if (!res.ok) throw new Error('Failed to fetch stats')
+      const data = await res.json()
+      setStats({
+        total: data.total,
+        images: data.byType.image,
+        videos: data.byType.video,
+        audio: data.byType.audio,
+        documents: data.byType.document,
+        fonts: data.byType.font,
+        data: data.byType.data,
+        text: data.byType.text,
+        other: data.byType.other
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchStats()
+
+    const unsubscribe = subscribe('asset-manager:update', () => {
+      fetchStats()
+    })
+
+    return unsubscribe
+  }, [fetchStats, subscribe])
+
+  return { stats, loading, error }
+}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Sidebar } from './components/side-bar'
 import { AssetGrid } from './components/asset-grid'
 import { PreviewPanel } from './components/preview-panel'
@@ -34,7 +34,7 @@ const EmptyStateNoAssets = (
 
 export default function App() {
   const [selectedType, setSelectedType] = useState<AssetType | null>(null)
-  const { groups, total, loading } = useAssets(selectedType)
+  const { groups, loading } = useAssets(selectedType)
   const { stats } = useStats()
   const { results, searching, search, clear } = useSearch()
   const [searchQuery, setSearchQuery] = useState('')
@@ -110,7 +110,7 @@ export default function App() {
     <>
       <div className="flex h-screen bg-background noise-bg">
         <Sidebar
-          total={total}
+          total={stats.total}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           searching={searching}

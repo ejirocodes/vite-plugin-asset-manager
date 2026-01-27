@@ -84,7 +84,7 @@ export function createApiRouter(
         case '/assets':
           return handleGetAssets(res, scanner, query)
         case '/assets/grouped':
-          return handleGetGroupedAssets(res, scanner)
+          return handleGetGroupedAssets(res, scanner, query)
         case '/search':
           return handleSearch(res, scanner, query)
         case '/thumbnail':
@@ -135,8 +135,24 @@ async function handleGetAssets(
   sendJson(res, { assets: filtered, total: filtered.length })
 }
 
-async function handleGetGroupedAssets(res: ServerResponse, scanner: AssetScanner) {
-  const groups = scanner.getGroupedAssets()
+async function handleGetGroupedAssets(
+  res: ServerResponse,
+  scanner: AssetScanner,
+  query: Record<string, any>
+) {
+  let groups = scanner.getGroupedAssets()
+
+  const type = query.type as AssetType | undefined
+  if (type) {
+    groups = groups
+      .map(group => ({
+        ...group,
+        assets: group.assets.filter(a => a.type === type),
+        count: group.assets.filter(a => a.type === type).length
+      }))
+      .filter(group => group.count > 0)
+  }
+
   const total = groups.reduce((sum, g) => sum + g.count, 0)
   sendJson(res, { groups, total })
 }
@@ -232,6 +248,9 @@ async function handleGetStats(res: ServerResponse, scanner: AssetScanner) {
       video: assets.filter(a => a.type === 'video').length,
       audio: assets.filter(a => a.type === 'audio').length,
       document: assets.filter(a => a.type === 'document').length,
+      font: assets.filter(a => a.type === 'font').length,
+      data: assets.filter(a => a.type === 'data').length,
+      text: assets.filter(a => a.type === 'text').length,
       other: assets.filter(a => a.type === 'other').length
     },
     totalSize: assets.reduce((sum, a) => sum + a.size, 0),
