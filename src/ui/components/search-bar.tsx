@@ -1,30 +1,35 @@
-import { useEffect, useRef } from 'react'
-import { MagnifyingGlassIcon, XIcon, CircleNotchIcon, CommandIcon } from '@phosphor-icons/react'
+import { useEffect, useRef } from "react";
+import {
+  MagnifyingGlassIcon,
+  XIcon,
+  CircleNotchIcon,
+  CommandIcon,
+} from "@phosphor-icons/react";
 
 interface SearchBarProps {
-  value: string
-  onChange: (value: string) => void
-  searching: boolean
+  value: string;
+  onChange: (value: string) => void;
+  searching: boolean;
 }
 
 export function SearchBar({ value, onChange, searching }: SearchBarProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        inputRef.current?.focus()
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        inputRef.current?.focus();
       }
-      if (e.key === 'Escape' && document.activeElement === inputRef.current) {
-        inputRef.current?.blur()
-        onChange('')
+      if (e.key === "Escape" && document.activeElement === inputRef.current) {
+        inputRef.current?.blur();
+        onChange("");
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onChange])
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onChange]);
 
   return (
     <div className="relative group">
@@ -46,7 +51,7 @@ export function SearchBar({ value, onChange, searching }: SearchBarProps) {
         ref={inputRef}
         type="text"
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         placeholder="Search assets..."
         className="
           w-full pl-10 pr-20 py-2.5
@@ -60,11 +65,14 @@ export function SearchBar({ value, onChange, searching }: SearchBarProps) {
       <div className="absolute inset-y-0 right-0 pr-2 flex items-center gap-1">
         {value ? (
           <button
-            onClick={() => onChange('')}
+            onClick={() => onChange("")}
             className="p-1 rounded-md hover:bg-muted transition-colors"
             aria-label="Clear search"
           >
-            <XIcon weight="bold" className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
+            <XIcon
+              weight="bold"
+              className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground"
+            />
           </button>
         ) : (
           <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-border bg-muted/50 text-[10px] font-mono text-muted-foreground">
@@ -74,5 +82,5 @@ export function SearchBar({ value, onChange, searching }: SearchBarProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

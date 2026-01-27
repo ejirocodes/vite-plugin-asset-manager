@@ -232,7 +232,6 @@ const StatBadge = memo(function StatBadge({
   )
 })
 
-// rerender-memo: Memoize to prevent re-renders when props unchanged
 const NavItem = memo(function NavItem({
   icon,
   label,

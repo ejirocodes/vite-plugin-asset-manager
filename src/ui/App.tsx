@@ -82,7 +82,6 @@ export default function App() {
     return groups
   }, [groups, results, searchQuery])
 
-  // rerender-functional-setstate: useCallback with functional setState for stable reference
   const toggleDir = useCallback((dir: string) => {
     setExpandedDirs(prev => {
       const next = new Set(prev)
