@@ -1,13 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { AssetGroup } from '../types'
-
-interface UseAssetsResult {
-  groups: AssetGroup[]
-  total: number
-  loading: boolean
-  error: string | null
-  refetch: () => Promise<void>
-}
+import type { AssetGroup, UseAssetsResult } from '../types'
 
 export function useAssets(): UseAssetsResult {
   const [groups, setGroups] = useState<AssetGroup[]>([])
@@ -34,7 +26,6 @@ export function useAssets(): UseAssetsResult {
   useEffect(() => {
     fetchAssets()
 
-    // Listen for real-time updates
     if (import.meta.hot) {
       import.meta.hot.on('asset-manager:update', () => {
         fetchAssets()

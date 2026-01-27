@@ -24,3 +24,18 @@ export interface AssetStats {
   totalSize: number
   directories: number
 }
+
+export interface UseAssetsResult {
+  groups: AssetGroup[]
+  total: number
+  loading: boolean
+  error: string | null
+  refetch: () => Promise<void>
+}
+
+export interface UseSearchResult {
+  results: Asset[]
+  searching: boolean
+  search: (query: string) => Promise<void>
+  clear: () => void
+}

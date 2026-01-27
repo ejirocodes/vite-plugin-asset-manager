@@ -1,12 +1,5 @@
 import { useState, useCallback } from 'react'
-import type { Asset } from '../types'
-
-interface UseSearchResult {
-  results: Asset[]
-  searching: boolean
-  search: (query: string) => Promise<void>
-  clear: () => void
-}
+import type { Asset, UseSearchResult } from '../types'
 
 export function useSearch(): UseSearchResult {
   const [results, setResults] = useState<Asset[]>([])
