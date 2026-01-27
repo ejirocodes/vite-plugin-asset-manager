@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Sidebar } from './components/sidebar'
+import { Sidebar } from './components/side-bar'
 import { AssetGrid } from './components/asset-grid'
 import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
@@ -124,7 +124,7 @@ export default function App() {
               >
                 <button
                   onClick={() => toggleDir(group.directory)}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
+                  className="w-full flex items-center justify-between cursor-pointer px-4 py-3 hover:bg-muted/30 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <CaretRightIcon
