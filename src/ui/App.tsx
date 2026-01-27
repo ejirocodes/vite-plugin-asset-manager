@@ -2,15 +2,18 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Sidebar } from './components/side-bar'
 import { AssetGrid } from './components/asset-grid'
 import { PreviewPanel } from './components/preview-panel'
+import { SortControls } from './components/sort-controls'
 import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
+import { useStats } from './hooks/useStats'
+import { sortAssets, type SortOption } from '@/ui/lib/sort-utils'
 import {
   CaretRightIcon,
   MagnifyingGlassIcon,
   PackageIcon,
   FolderOpenIcon
 } from '@phosphor-icons/react'
-import type { Asset } from './types'
+import type { Asset, AssetType } from './types'
 
 const LoadingSpinner = (
   <div className="flex flex-col items-center justify-center h-full gap-4">
@@ -30,11 +33,17 @@ const EmptyStateNoAssets = (
 )
 
 export default function App() {
-  const { groups, total, loading } = useAssets()
+  const [selectedType, setSelectedType] = useState<AssetType | null>(null)
+  const { groups, total, loading } = useAssets(selectedType)
+  const { stats } = useStats()
   const { results, searching, search, clear } = useSearch()
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(() => new Set())
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null)
+  const [sortOption, setSortOption] = useState<SortOption>({
+    field: 'name',
+    direction: 'asc'
+  })
 
   const handlePreview = useCallback((asset: Asset) => {
     setSelectedAsset(asset)
@@ -43,49 +52,6 @@ export default function App() {
   const handleClosePreview = useCallback(() => {
     setSelectedAsset(null)
   }, [])
-
-  const stats = useMemo(() => {
-    const counts = {
-      images: 0,
-      videos: 0,
-      audio: 0,
-      documents: 0,
-      fonts: 0,
-      data: 0,
-      text: 0,
-      other: 0
-    }
-    for (const group of groups) {
-      for (const asset of group.assets) {
-        switch (asset.type) {
-          case 'image':
-            counts.images++
-            break
-          case 'video':
-            counts.videos++
-            break
-          case 'audio':
-            counts.audio++
-            break
-          case 'document':
-            counts.documents++
-            break
-          case 'font':
-            counts.fonts++
-            break
-          case 'data':
-            counts.data++
-            break
-          case 'text':
-            counts.text++
-            break
-          default:
-            counts.other++
-        }
-      }
-    }
-    return counts
-  }, [groups])
 
   useEffect(() => {
     if (groups.length > 0 && expandedDirs.size === 0) {
@@ -105,6 +71,8 @@ export default function App() {
   }, [searchQuery, search, clear])
 
   const displayGroups = useMemo(() => {
+    let baseGroups = groups
+
     if (searchQuery && results.length > 0) {
       const grouped = new Map<string, Asset[]>()
       results.forEach(asset => {
@@ -112,14 +80,19 @@ export default function App() {
         if (!grouped.has(dir)) grouped.set(dir, [])
         grouped.get(dir)!.push(asset)
       })
-      return Array.from(grouped.entries()).map(([directory, assets]) => ({
+      baseGroups = Array.from(grouped.entries()).map(([directory, assets]) => ({
         directory,
         assets,
         count: assets.length
       }))
     }
-    return groups
-  }, [groups, results, searchQuery])
+
+    // Apply sorting to each group's assets
+    return baseGroups.map(group => ({
+      ...group,
+      assets: sortAssets(group.assets, sortOption)
+    }))
+  }, [groups, results, searchQuery, sortOption])
 
   const toggleDir = useCallback((dir: string) => {
     setExpandedDirs(prev => {
@@ -141,6 +114,8 @@ export default function App() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           searching={searching}
+          selectedType={selectedType}
+          onTypeSelect={setSelectedType}
           stats={stats}
         />
         <main className="flex-1 overflow-auto">
@@ -163,6 +138,9 @@ export default function App() {
             )
           ) : (
             <div className="p-6 space-y-4">
+              <div className="flex items-center justify-end">
+                <SortControls value={sortOption} onChange={setSortOption} />
+              </div>
               {displayGroups.map(group => (
                 <div
                   key={group.directory}
