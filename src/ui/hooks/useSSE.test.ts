@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook, act, waitFor } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react'
 
 let useSSE: typeof import('./useSSE').useSSE
 
@@ -48,7 +48,7 @@ describe('useSSE', () => {
   it('should connect to SSE endpoint on mount', async () => {
     renderHook(() => useSSE())
 
-    expect(EventSource).toHaveBeenCalledWith('/__asset_manager__/api/events')
+    expect(globalThis.EventSource).toHaveBeenCalledWith('/__asset_manager__/api/events')
   })
 
   it('should return subscribe function', () => {
@@ -131,7 +131,7 @@ describe('useSSE', () => {
     renderHook(() => useSSE())
 
     // EventSource should only be created once (singleton)
-    expect(EventSource).toHaveBeenCalledTimes(1)
+    expect(globalThis.EventSource).toHaveBeenCalledTimes(1)
   })
 
   it('should close connection when all subscribers unmount', async () => {
@@ -139,7 +139,7 @@ describe('useSSE', () => {
     const { unmount: unmount2 } = renderHook(() => useSSE())
 
     // Both are mounted, EventSource should be created
-    expect(EventSource).toHaveBeenCalledTimes(1)
+    expect(globalThis.EventSource).toHaveBeenCalledTimes(1)
 
     // Unmount first hook
     unmount1()
@@ -215,7 +215,7 @@ describe('useSSE', () => {
     })
 
     // Should attempt to reconnect
-    expect(EventSource).toHaveBeenCalledTimes(2)
+    expect(globalThis.EventSource).toHaveBeenCalledTimes(2)
 
     vi.useRealTimers()
   })

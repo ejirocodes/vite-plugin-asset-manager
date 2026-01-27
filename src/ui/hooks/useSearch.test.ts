@@ -20,7 +20,7 @@ describe('useSearch', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         assets: mockAssets,
@@ -89,7 +89,7 @@ describe('useSearch', () => {
       resolvePromise = resolve
     })
 
-    global.fetch = vi.fn().mockImplementation(async () => {
+    globalThis.fetch = vi.fn().mockImplementation(async () => {
       await pendingPromise
       return {
         ok: true,
@@ -114,7 +114,7 @@ describe('useSearch', () => {
   })
 
   it('should handle search errors gracefully', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 500
     })
@@ -130,7 +130,7 @@ describe('useSearch', () => {
   })
 
   it('should handle network errors gracefully', async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
 
     const { result } = renderHook(() => useSearch())
 
