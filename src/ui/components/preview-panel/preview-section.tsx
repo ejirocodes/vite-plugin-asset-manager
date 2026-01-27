@@ -47,7 +47,7 @@ export const PreviewSection = memo(function PreviewSection({
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 overflow-hidden">
       <h3 className="text-xs font-medium text-muted-foreground mb-3">Preview</h3>
       {renderPreview()}
     </div>

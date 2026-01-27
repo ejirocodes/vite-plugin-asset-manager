@@ -56,9 +56,9 @@ export const FontPreview = memo(function FontPreview({ asset }: FontPreviewProps
   }
 
   return (
-    <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+    <div className="space-y-4 p-4 bg-muted/30 rounded-lg overflow-hidden">
       {SIZES.map(size => (
-        <div key={size} className="space-y-1">
+        <div key={size} className="space-y-1 overflow-hidden">
           <span className="text-[10px] text-muted-foreground font-mono">{size}px</span>
           <p
             style={{ fontFamily, fontSize: size }}
@@ -68,15 +68,15 @@ export const FontPreview = memo(function FontPreview({ asset }: FontPreviewProps
           </p>
         </div>
       ))}
-      <div className="pt-4 border-t border-border">
+      <div className="pt-4 border-t border-border overflow-hidden">
         <span className="text-[10px] text-muted-foreground font-mono mb-2 block">Characters</span>
-        <p style={{ fontFamily }} className="text-lg text-foreground leading-relaxed">
+        <p style={{ fontFamily }} className="text-lg text-foreground leading-relaxed break-all">
           ABCDEFGHIJKLMNOPQRSTUVWXYZ
         </p>
-        <p style={{ fontFamily }} className="text-lg text-foreground leading-relaxed">
+        <p style={{ fontFamily }} className="text-lg text-foreground leading-relaxed break-all">
           abcdefghijklmnopqrstuvwxyz
         </p>
-        <p style={{ fontFamily }} className="text-lg text-foreground leading-relaxed">
+        <p style={{ fontFamily }} className="text-lg text-foreground leading-relaxed break-all">
           0123456789 !@#$%^&*()
         </p>
       </div>
