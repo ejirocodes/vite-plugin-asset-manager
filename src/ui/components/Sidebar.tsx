@@ -12,7 +12,7 @@ export function Sidebar({ total, searchQuery, onSearchChange, searching }: Sideb
     <aside className="w-64 bg-slate-800 border-r border-slate-700 flex flex-col">
       <div className="p-4 border-b border-slate-700">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center">
+          <div className="w-8 h-8 bg-green-500 rounded-sm flex items-center justify-center">
             <span className="text-white font-bold text-lg">V</span>
           </div>
           <span className="font-semibold text-slate-100">Asset Manager</span>
@@ -49,7 +49,7 @@ export function Sidebar({ total, searchQuery, onSearchChange, searching }: Sideb
 
       <div className="p-4 border-t border-slate-700">
         <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
-          <span className="w-5 h-5 bg-green-500 rounded flex items-center justify-center text-white font-bold">V</span>
+          <span className="w-5 h-5 bg-green-500 rounded-sm flex items-center justify-center text-white font-bold">V</span>
           <span>Vite Plugin</span>
         </div>
       </div>

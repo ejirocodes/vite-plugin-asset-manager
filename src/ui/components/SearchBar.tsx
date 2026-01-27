@@ -24,7 +24,7 @@ export function SearchBar({ value, onChange, searching }: SearchBarProps) {
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder="Search..."
-        className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
       {value && (
         <button

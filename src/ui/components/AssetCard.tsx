@@ -52,7 +52,7 @@ export function AssetCard({ asset }: AssetCardProps) {
         <p className="text-xs text-slate-500">{formatBytes(asset.size)}</p>
       </div>
       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-        <span className="text-white text-xs bg-blue-500 px-2 py-1 rounded">Open</span>
+        <span className="text-white text-xs bg-blue-500 px-2 py-1 rounded-sm">Open</span>
       </div>
     </div>
   )
