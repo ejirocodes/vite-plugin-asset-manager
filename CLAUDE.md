@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Vite Plugin Asset Manager is a visual asset management dashboard for Vite projects. It provides a real-time web UI that discovers, catalogues, and displays all media assets (images, videos, audio, documents, fonts, data files, text) with thumbnail generation and search capabilities.
 
 - Node requirement: >=22
-- Vite compatibility: 5.0.0+ or 6.0.0+
+- Vite compatibility: >=5.0.0
 - Package type: ESM module with CJS support
 - Package manager: pnpm (workspace includes `playground/`)
 
