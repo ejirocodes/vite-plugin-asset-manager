@@ -59,6 +59,8 @@ export interface Asset {
   mtime: number
   directory: string
   importersCount?: number
+  contentHash?: string
+  duplicatesCount?: number
 }
 
 export interface AssetGroup {
@@ -73,6 +75,8 @@ export interface AssetStats {
   totalSize: number
   directories: number
   unused: number
+  duplicateGroups: number
+  duplicateFiles: number
 }
 
 export interface AssetManagerOptions {

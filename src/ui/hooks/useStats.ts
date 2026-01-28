@@ -12,6 +12,8 @@ interface Stats {
   text: number
   other: number
   unused: number
+  duplicateGroups: number
+  duplicateFiles: number
 }
 
 interface UseStatsResult {
@@ -31,7 +33,9 @@ export function useStats(): UseStatsResult {
     data: 0,
     text: 0,
     other: 0,
-    unused: 0
+    unused: 0,
+    duplicateGroups: 0,
+    duplicateFiles: 0
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -53,7 +57,9 @@ export function useStats(): UseStatsResult {
         data: data.byType.data,
         text: data.byType.text,
         other: data.byType.other,
-        unused: data.unused
+        unused: data.unused,
+        duplicateGroups: data.duplicateGroups ?? 0,
+        duplicateFiles: data.duplicateFiles ?? 0
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')

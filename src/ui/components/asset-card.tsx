@@ -1,6 +1,7 @@
 import { useState, memo, useCallback } from 'react'
 import { FileIcon, getFileTypeColor } from './file-icon'
 import { VideoCardPreview, FontCardPreview } from './card-previews'
+import { AssetContextMenu } from './asset-context-menu'
 import { CopyIcon, CheckIcon, EyeSlashIcon } from '@phosphor-icons/react'
 import { Checkbox } from '@/ui/components/ui/checkbox'
 import { useIgnoredAssets } from '../providers/ignored-assets-provider'
@@ -78,17 +79,24 @@ export const AssetCard = memo(function AssetCard({
   const extColor = getFileTypeColor(asset.extension)
 
   return (
-    <div
-      onClick={handleClick}
-      className={`
-        group relative rounded-xl overflow-hidden cursor-pointer
-        bg-card border border-border
-        hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5
-        transition-all duration-200 ease-out
-        hover-lift animate-fade-in-up opacity-0 ${staggerClass}
-        ${isSelected ? 'ring-2 ring-primary border-primary' : ''}
-      `}
+    <AssetContextMenu
+      asset={asset}
+      onPreview={onPreview}
+      isSelected={isSelected}
+      onToggleSelect={onToggleSelect}
+      autoSelect={true}
     >
+      <div
+        onClick={handleClick}
+        className={`
+          group relative rounded-xl overflow-hidden cursor-pointer
+          bg-card border border-border
+          hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5
+          transition-all duration-200 ease-out
+          hover-lift animate-fade-in-up opacity-0 ${staggerClass}
+          ${isSelected ? 'ring-2 ring-primary border-primary' : ''}
+        `}
+      >
       {onToggleSelect && (
         <div
           className={`absolute top-2 left-2 z-10 transition-opacity duration-150 ${
@@ -168,6 +176,16 @@ export const AssetCard = memo(function AssetCard({
                 IGNORED
               </span>
             )}
+            {(asset.duplicatesCount ?? 0) > 0 && (
+              <span
+                className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                aria-label={`This asset has ${asset.duplicatesCount} duplicate${asset.duplicatesCount === 1 ? '' : 's'}`}
+                title={`${asset.duplicatesCount} duplicate file${asset.duplicatesCount === 1 ? '' : 's'} found`}
+              >
+                <CopyIcon weight="fill" className="w-3 h-3" />
+                {asset.duplicatesCount} DUPE{asset.duplicatesCount === 1 ? '' : 'S'}
+              </span>
+            )}
           </div>
           <span className="text-xs text-muted-foreground font-mono tabular-nums">
             {formatBytes(asset.size)}
@@ -175,5 +193,6 @@ export const AssetCard = memo(function AssetCard({
         </div>
       </div>
     </div>
+    </AssetContextMenu>
   )
 })

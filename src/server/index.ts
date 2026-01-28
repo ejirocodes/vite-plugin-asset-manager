@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 import { createApiRouter } from './api.js'
 import type { AssetScanner } from './scanner.js'
 import type { ImporterScanner } from './importer-scanner.js'
+import type { DuplicateScanner } from './duplicate-scanner.js'
 import type { ThumbnailService } from './thumbnail.js'
 import type { EditorType } from '../shared/types.js'
 
@@ -32,17 +33,20 @@ export interface MiddlewareContext {
   base: string
   scanner: AssetScanner
   importerScanner: ImporterScanner
+  duplicateScanner: DuplicateScanner
   thumbnailService: ThumbnailService
   root: string
   launchEditor: EditorType
 }
 
 export function setupMiddleware(server: ViteDevServer, context: MiddlewareContext): void {
-  const { base, scanner, importerScanner, thumbnailService, root, launchEditor } = context
+  const { base, scanner, importerScanner, duplicateScanner, thumbnailService, root, launchEditor } =
+    context
 
   const apiRouter = createApiRouter(
     scanner,
     importerScanner,
+    duplicateScanner,
     thumbnailService,
     root,
     base,

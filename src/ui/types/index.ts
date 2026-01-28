@@ -19,6 +19,8 @@ export interface Asset {
   mtime: number
   directory: string
   importersCount?: number
+  contentHash?: string
+  duplicatesCount?: number
   ignored?: boolean
 }
 
@@ -72,4 +74,10 @@ export interface UseImportersResult {
   loading: boolean
   error: string | null
   openInEditor: (importer: Importer) => Promise<void>
+}
+
+export interface UseDuplicatesResult {
+  duplicates: Asset[]
+  loading: boolean
+  error: string | null
 }

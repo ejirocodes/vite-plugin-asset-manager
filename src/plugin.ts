@@ -3,6 +3,7 @@ import colors from 'picocolors'
 import { setupMiddleware } from './server/index.js'
 import { AssetScanner } from './server/scanner.js'
 import { ImporterScanner } from './server/importer-scanner.js'
+import { DuplicateScanner } from './server/duplicate-scanner.js'
 import { ThumbnailService } from './server/thumbnail.js'
 import { broadcastSSE } from './server/api.js'
 import { resolveOptions, type AssetManagerOptions } from './shared/types.js'
@@ -212,6 +213,7 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
   let config: ResolvedConfig
   let scanner: AssetScanner
   let importerScanner: ImporterScanner
+  let duplicateScanner: DuplicateScanner
   let thumbnailService: ThumbnailService
 
   const resolvedOptions = resolveOptions(options)
@@ -227,21 +229,30 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
     configureServer(server: ViteDevServer) {
       scanner = new AssetScanner(config.root, resolvedOptions)
       importerScanner = new ImporterScanner(config.root, resolvedOptions)
+      duplicateScanner = new DuplicateScanner(config.root, resolvedOptions)
       thumbnailService = new ThumbnailService(resolvedOptions.thumbnailSize)
 
       setupMiddleware(server, {
         base: resolvedOptions.base,
         scanner,
         importerScanner,
+        duplicateScanner,
         thumbnailService,
         root: config.root,
         launchEditor: resolvedOptions.launchEditor
       })
 
-      scanner.init().then(() => {
-        importerScanner.init().then(() => {
-          scanner.enrichWithImporterCounts(importerScanner)
-        })
+      scanner.init().then(async () => {
+        await importerScanner.init()
+        scanner.enrichWithImporterCounts(importerScanner)
+
+        await duplicateScanner.init()
+        await duplicateScanner.scanAssets(scanner.getAssets())
+        scanner.enrichWithDuplicateInfo(duplicateScanner)
+
+        if (resolvedOptions.watch) {
+          duplicateScanner.initWatcher()
+        }
       })
 
       const _printUrls = server.printUrls
@@ -272,12 +283,18 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
       }
 
       if (resolvedOptions.watch) {
-        scanner.on('change', event => {
+        scanner.on('change', async event => {
+          await duplicateScanner.scanAssets(scanner.getAssets())
+          scanner.enrichWithDuplicateInfo(duplicateScanner)
           broadcastSSE('asset-manager:update', event)
         })
         importerScanner.on('change', event => {
           scanner.enrichWithImporterCounts(importerScanner)
           broadcastSSE('asset-manager:importers-update', event)
+        })
+        duplicateScanner.on('change', event => {
+          scanner.enrichWithDuplicateInfo(duplicateScanner)
+          broadcastSSE('asset-manager:duplicates-update', event)
         })
       }
     },
@@ -317,6 +334,7 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
     buildEnd() {
       scanner?.destroy()
       importerScanner?.destroy()
+      duplicateScanner?.destroy()
     }
   }
 }

@@ -38,6 +38,7 @@ const EmptyStateNoAssets = (
 export default function App() {
   const [selectedType, setSelectedType] = useState<AssetType | null>(null)
   const [showUnusedOnly, setShowUnusedOnly] = useState(false)
+  const [showDuplicatesOnly, setShowDuplicatesOnly] = useState(false)
   const { groups, loading } = useAssets(selectedType)
   const { stats } = useStats()
   const { results, searching, search, clear } = useSearch()
@@ -67,10 +68,14 @@ export default function App() {
     setShowUnusedOnly(prev => !prev)
   }, [])
 
+  const handleDuplicatesFilterToggle = useCallback(() => {
+    setShowDuplicatesOnly(prev => !prev)
+  }, [])
+
   useEffect(() => {
     setSelectedAssets(new Set())
     setLastSelectedId(null)
-  }, [selectedType, showUnusedOnly, searchQuery])
+  }, [selectedType, showUnusedOnly, showDuplicatesOnly, searchQuery])
 
   useEffect(() => {
     if (groups.length > 0 && expandedDirs.size === 0) {
@@ -117,11 +122,21 @@ export default function App() {
         .filter(group => group.count > 0)
     }
 
+    if (showDuplicatesOnly) {
+      filtered = filtered
+        .map(group => ({
+          ...group,
+          assets: group.assets.filter(a => (a.duplicatesCount ?? 0) > 0),
+          count: group.assets.filter(a => (a.duplicatesCount ?? 0) > 0).length
+        }))
+        .filter(group => group.count > 0)
+    }
+
     return filtered.map(group => ({
       ...group,
       assets: sortAssets(group.assets, sortOption)
     }))
-  }, [groups, results, searchQuery, sortOption, showUnusedOnly, isIgnored])
+  }, [groups, results, searchQuery, sortOption, showUnusedOnly, showDuplicatesOnly, isIgnored])
 
   const toggleDir = useCallback((dir: string) => {
     setExpandedDirs(prev => {
@@ -203,7 +218,8 @@ export default function App() {
 
     return {
       ...stats,
-      unused: Math.max(0, (stats.unused || 0) - ignoredUnusedCount)
+      unused: Math.max(0, (stats.unused || 0) - ignoredUnusedCount),
+      duplicateFiles: stats.duplicateFiles || 0
     }
   }, [stats, groups, isIgnored])
 
@@ -219,6 +235,8 @@ export default function App() {
           onTypeSelect={setSelectedType}
           showUnusedOnly={showUnusedOnly}
           onUnusedFilterToggle={handleUnusedFilterToggle}
+          showDuplicatesOnly={showDuplicatesOnly}
+          onDuplicatesFilterToggle={handleDuplicatesFilterToggle}
           stats={adjustedStats}
         />
         <main className="flex-1 overflow-auto">
@@ -303,7 +321,13 @@ export default function App() {
           )}
         </main>
       </div>
-      {selectedAsset && <PreviewPanel asset={selectedAsset} onClose={handleClosePreview} />}
+      {selectedAsset && (
+        <PreviewPanel
+          asset={selectedAsset}
+          onClose={handleClosePreview}
+          onSelectAsset={handlePreview}
+        />
+      )}
     </>
   )
 }

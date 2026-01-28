@@ -5,6 +5,7 @@ import { Separator } from '@/ui/components/ui/separator'
 import { PreviewSection } from './preview-section'
 import { DetailsSection } from './details-section'
 import { ImportersSection } from './importers-section'
+import { DuplicatesSection } from './duplicates-section'
 import { ActionsSection } from './actions-section'
 import { CodeSnippets } from './code-snippets'
 import type { Asset } from '@/ui/types'
@@ -12,13 +13,18 @@ import type { Asset } from '@/ui/types'
 interface PreviewPanelProps {
   asset: Asset
   onClose: () => void
+  onSelectAsset?: (asset: Asset) => void
 }
 
 const MIN_WIDTH = 300
 const MAX_WIDTH = 600
 const DEFAULT_WIDTH = 384
 
-export const PreviewPanel = memo(function PreviewPanel({ asset, onClose }: PreviewPanelProps) {
+export const PreviewPanel = memo(function PreviewPanel({
+  asset,
+  onClose,
+  onSelectAsset
+}: PreviewPanelProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(
     null
@@ -111,6 +117,12 @@ export const PreviewPanel = memo(function PreviewPanel({ asset, onClose }: Previ
         <DetailsSection asset={asset} imageDimensions={imageDimensions} />
         <Separator />
         <ImportersSection asset={asset} />
+        {(asset.duplicatesCount ?? 0) > 0 && (
+          <>
+            <Separator />
+            <DuplicatesSection asset={asset} onSelectAsset={onSelectAsset} />
+          </>
+        )}
         <Separator />
         <ActionsSection asset={asset} />
         <Separator />

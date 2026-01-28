@@ -11,7 +11,8 @@ import {
   DatabaseIcon,
   ArticleIcon,
   FileIcon,
-  WarningCircleIcon
+  WarningCircleIcon,
+  CopyIcon
 } from '@phosphor-icons/react'
 import packageJson from '../../../package.json'
 import type { AssetType } from '../types'
@@ -24,7 +25,8 @@ const colorClasses = {
   rose: 'text-rose-400 bg-rose-500/10',
   emerald: 'text-emerald-400 bg-emerald-500/10',
   purple: 'text-purple-400 bg-purple-500/10',
-  zinc: 'text-zinc-400 bg-zinc-500/10'
+  zinc: 'text-zinc-400 bg-zinc-500/10',
+  blue: 'text-blue-400 bg-blue-500/10'
 } as const
 
 interface SidebarProps {
@@ -36,6 +38,8 @@ interface SidebarProps {
   onTypeSelect: (type: AssetType | null) => void
   showUnusedOnly: boolean
   onUnusedFilterToggle: () => void
+  showDuplicatesOnly: boolean
+  onDuplicatesFilterToggle: () => void
   stats?: {
     images: number
     videos: number
@@ -46,6 +50,7 @@ interface SidebarProps {
     text: number
     other: number
     unused: number
+    duplicateFiles: number
   }
 }
 
@@ -58,6 +63,8 @@ export const Sidebar = memo(function Sidebar({
   onTypeSelect,
   showUnusedOnly,
   onUnusedFilterToggle,
+  showDuplicatesOnly,
+  onDuplicatesFilterToggle,
   stats
 }: SidebarProps) {
   return (
@@ -152,6 +159,12 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.unused}
                 color="amber"
               />
+              <StatBadge
+                icon={<CopyIcon weight="fill" className="w-3.5 h-3.5" />}
+                label="Dupes"
+                count={stats.duplicateFiles}
+                color="blue"
+              />
             </div>
           )}
         </div>
@@ -234,6 +247,13 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.unused}
                 active={showUnusedOnly}
                 onClick={onUnusedFilterToggle}
+              />
+              <NavItem
+                icon={<CopyIcon weight="duotone" className="w-4 h-4" />}
+                label="Duplicates"
+                count={stats.duplicateFiles}
+                active={showDuplicatesOnly}
+                onClick={onDuplicatesFilterToggle}
               />
             </>
           )}

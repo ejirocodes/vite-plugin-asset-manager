@@ -116,6 +116,14 @@ function createMockThumbnailService() {
   }
 }
 
+function createMockDuplicateScanner() {
+  return {
+    getDuplicateInfo: vi.fn().mockReturnValue({ hash: '', duplicatesCount: 0 }),
+    getDuplicatesByHash: vi.fn().mockReturnValue([]),
+    getStats: vi.fn().mockReturnValue({ duplicateGroups: 0, duplicateFiles: 0 })
+  }
+}
+
 describe('API Router', () => {
   const root = '/project'
   const basePath = '/__asset_manager__'
@@ -123,6 +131,7 @@ describe('API Router', () => {
 
   let mockScanner: ReturnType<typeof createMockScanner>
   let mockImporterScanner: ReturnType<typeof createMockImporterScanner>
+  let mockDuplicateScanner: ReturnType<typeof createMockDuplicateScanner>
   let mockThumbnailService: ReturnType<typeof createMockThumbnailService>
 
   const testAsset: Asset = {
@@ -141,6 +150,7 @@ describe('API Router', () => {
     vi.clearAllMocks()
     mockScanner = createMockScanner([testAsset])
     mockImporterScanner = createMockImporterScanner()
+    mockDuplicateScanner = createMockDuplicateScanner()
     mockThumbnailService = createMockThumbnailService()
   })
 
@@ -149,6 +159,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -171,6 +182,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -191,6 +203,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -213,6 +226,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -236,6 +250,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -257,6 +272,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -278,6 +294,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -299,6 +316,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -318,6 +336,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -341,6 +360,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -368,6 +388,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -388,6 +409,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -407,6 +429,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -428,6 +451,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -449,6 +473,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -485,6 +510,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -506,6 +532,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -530,6 +557,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -559,6 +587,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -578,6 +607,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -597,6 +627,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -621,6 +652,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -646,6 +678,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -672,6 +705,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -696,6 +730,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -725,6 +760,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -749,6 +785,7 @@ describe('API Router', () => {
       const router = createApiRouter(
         mockScanner as any,
         mockImporterScanner as any,
+        mockDuplicateScanner as any,
         mockThumbnailService as any,
         root,
         basePath,
@@ -783,9 +820,10 @@ describe('API Router', () => {
       ])
 
       const router = createApiRouter(
-        mockScanner,
-        mockImporterScanner,
-        mockThumbnailService,
+        mockScanner as any,
+        mockImporterScanner as any,
+        mockDuplicateScanner as any,
+        mockThumbnailService as any,
         '/project',
         basePath,
         'code'
@@ -821,9 +859,10 @@ describe('API Router', () => {
       ])
 
       const router = createApiRouter(
-        mockScanner,
-        mockImporterScanner,
-        mockThumbnailService,
+        mockScanner as any,
+        mockImporterScanner as any,
+        mockDuplicateScanner as any,
+        mockThumbnailService as any,
         '/project',
         basePath,
         'code'
@@ -855,9 +894,10 @@ describe('API Router', () => {
       ])
 
       const router = createApiRouter(
-        mockScanner,
-        mockImporterScanner,
-        mockThumbnailService,
+        mockScanner as any,
+        mockImporterScanner as any,
+        mockDuplicateScanner as any,
+        mockThumbnailService as any,
         '/project',
         basePath,
         'code'
@@ -888,9 +928,10 @@ describe('API Router', () => {
       mockScanner.getAssets.mockReturnValue(assets)
 
       const router = createApiRouter(
-        mockScanner,
-        mockImporterScanner,
-        mockThumbnailService,
+        mockScanner as any,
+        mockImporterScanner as any,
+        mockDuplicateScanner as any,
+        mockThumbnailService as any,
         '/project',
         basePath,
         'code'

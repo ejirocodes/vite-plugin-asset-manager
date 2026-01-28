@@ -167,6 +167,20 @@ export class AssetScanner extends EventEmitter {
     }
   }
 
+  /**
+   * Enrich assets with duplicate detection metadata.
+   * Should be called after scanning completes and when file content changes.
+   */
+  enrichWithDuplicateInfo(duplicateScanner: {
+    getDuplicateInfo: (assetPath: string) => { hash: string; duplicatesCount: number }
+  }): void {
+    for (const asset of this.cache.values()) {
+      const info = duplicateScanner.getDuplicateInfo(asset.path)
+      asset.contentHash = info.hash
+      asset.duplicatesCount = info.duplicatesCount
+    }
+  }
+
   private initWatcher(): void {
     const watchPaths = this.options.include.map(dir => path.join(this.root, dir))
 

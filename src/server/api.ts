@@ -5,8 +5,10 @@ import fs from 'fs'
 import archiver from 'archiver'
 import type { AssetScanner } from './scanner.js'
 import type { ImporterScanner } from './importer-scanner.js'
+import type { DuplicateScanner } from './duplicate-scanner.js'
 import type { ThumbnailService } from './thumbnail.js'
 import { launchEditor } from './editor-launcher.js'
+import { revealInFileExplorer } from './file-revealer.js'
 import type { AssetStats, AssetType, EditorType } from '../shared/types.js'
 
 type NextFunction = () => void
@@ -70,6 +72,7 @@ const MIME_TYPES: Record<string, string> = {
 export function createApiRouter(
   scanner: AssetScanner,
   importerScanner: ImporterScanner,
+  duplicateScanner: DuplicateScanner,
   thumbnailService: ThumbnailService,
   root: string,
   basePath: string,
@@ -92,11 +95,15 @@ export function createApiRouter(
         case '/file':
           return handleServeFile(res, root, query)
         case '/stats':
-          return handleGetStats(res, scanner)
+          return handleGetStats(res, scanner, duplicateScanner)
+        case '/duplicates':
+          return handleGetDuplicates(res, scanner, duplicateScanner, query)
         case '/importers':
           return handleGetImporters(res, importerScanner, query)
         case '/open-in-editor':
           return handleOpenInEditor(req, res, root, editor, query)
+        case '/reveal-in-finder':
+          return handleRevealInFinder(req, res, root, query)
         case '/bulk-download':
           return handleBulkDownload(req, res, root)
         case '/bulk-delete':
@@ -164,6 +171,17 @@ async function handleGetGroupedAssets(
         ...group,
         assets: group.assets.filter(a => a.importersCount === 0),
         count: group.assets.filter(a => a.importersCount === 0).length
+      }))
+      .filter(group => group.count > 0)
+  }
+
+  const duplicates = query.duplicates === 'true'
+  if (duplicates) {
+    groups = groups
+      .map(group => ({
+        ...group,
+        assets: group.assets.filter(a => (a.duplicatesCount ?? 0) > 0),
+        count: group.assets.filter(a => (a.duplicatesCount ?? 0) > 0).length
       }))
       .filter(group => group.count > 0)
   }
@@ -253,8 +271,13 @@ async function handleServeFile(res: ServerResponse, root: string, query: Record<
   fs.createReadStream(absolutePath).pipe(res)
 }
 
-async function handleGetStats(res: ServerResponse, scanner: AssetScanner) {
+async function handleGetStats(
+  res: ServerResponse,
+  scanner: AssetScanner,
+  duplicateScanner: DuplicateScanner
+) {
   const assets = scanner.getAssets()
+  const dupStats = duplicateScanner.getStats()
 
   const stats: AssetStats = {
     total: assets.length,
@@ -270,10 +293,32 @@ async function handleGetStats(res: ServerResponse, scanner: AssetScanner) {
     },
     totalSize: assets.reduce((sum, a) => sum + a.size, 0),
     directories: [...new Set(assets.map(a => a.directory))].length,
-    unused: assets.filter(a => a.importersCount === 0).length
+    unused: assets.filter(a => a.importersCount === 0).length,
+    duplicateGroups: dupStats.duplicateGroups,
+    duplicateFiles: dupStats.duplicateFiles
   }
 
   sendJson(res, stats)
+}
+
+async function handleGetDuplicates(
+  res: ServerResponse,
+  scanner: AssetScanner,
+  duplicateScanner: DuplicateScanner,
+  query: Record<string, any>
+) {
+  const hash = query.hash as string
+
+  if (hash) {
+    // Get specific duplicate group by hash
+    const paths = duplicateScanner.getDuplicatesByHash(hash)
+    const assets = scanner.getAssets().filter(a => paths.includes(a.path))
+    sendJson(res, { duplicates: assets, total: assets.length, hash })
+  } else {
+    // Get all assets that have duplicates
+    const assets = scanner.getAssets().filter(a => (a.duplicatesCount ?? 0) > 0)
+    sendJson(res, { duplicates: assets, total: assets.length })
+  }
 }
 
 function sendJson(res: ServerResponse, data: unknown) {
@@ -366,6 +411,55 @@ async function handleOpenInEditor(
   } catch (error) {
     res.statusCode = 500
     sendJson(res, { error: error instanceof Error ? error.message : 'Failed to open editor' })
+  }
+}
+
+async function handleRevealInFinder(
+  req: IncomingMessage,
+  res: ServerResponse,
+  root: string,
+  query: Record<string, any>
+) {
+  if (req.method !== 'POST') {
+    res.statusCode = 405
+    sendJson(res, { error: 'Method not allowed' })
+    return
+  }
+
+  const filePath = query.path as string
+
+  if (!filePath) {
+    res.statusCode = 400
+    sendJson(res, { error: 'Missing path parameter' })
+    return
+  }
+
+  const absolutePath = path.resolve(root, filePath)
+
+  // Security: validate path is within project root
+  if (!absolutePath.startsWith(root)) {
+    res.statusCode = 403
+    sendJson(res, { error: 'Invalid path' })
+    return
+  }
+
+  // Check if file exists
+  try {
+    await fs.promises.access(absolutePath, fs.constants.R_OK)
+  } catch {
+    res.statusCode = 404
+    sendJson(res, { error: 'File not found' })
+    return
+  }
+
+  try {
+    await revealInFileExplorer(absolutePath)
+    sendJson(res, { success: true })
+  } catch (error) {
+    res.statusCode = 500
+    sendJson(res, {
+      error: error instanceof Error ? error.message : 'Failed to reveal file'
+    })
   }
 }
 
