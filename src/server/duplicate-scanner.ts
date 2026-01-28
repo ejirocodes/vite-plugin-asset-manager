@@ -231,8 +231,7 @@ export class DuplicateScanner extends EventEmitter {
         if (!affectedHashes.includes(hash)) {
           affectedHashes.push(hash)
         }
-      } catch {
-      }
+      } catch {}
     }
 
     if (affectedHashes.length > 0) {

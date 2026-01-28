@@ -16,8 +16,7 @@ export const AssetGrid = memo(function AssetGrid({
   onPreview,
   selectedAssets,
   focusedAssetId,
-  onToggleSelect,
-  onGridFocus
+  onToggleSelect
 }: AssetGridProps) {
   return (
     <div

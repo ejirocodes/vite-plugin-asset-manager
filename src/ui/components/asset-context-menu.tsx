@@ -46,7 +46,6 @@ interface AssetContextMenuProps {
   autoSelect?: boolean
 }
 
-
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
 
 export const AssetContextMenu = memo(function AssetContextMenu({

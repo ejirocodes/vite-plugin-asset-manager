@@ -53,11 +53,9 @@ export default function App() {
     direction: 'asc'
   })
 
-  // Bulk selection state
   const [selectedAssets, setSelectedAssets] = useState<Set<string>>(() => new Set())
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null)
 
-  // Keyboard navigation state
   const [focusedAssetId, setFocusedAssetId] = useState<string | null>(null)
   const [isGridFocused, setIsGridFocused] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -218,59 +216,46 @@ export default function App() {
     }
   }, [bulkDelete, selectedAssetsArray])
 
-  // Keyboard action handlers
-  const handleCopyPaths = useCallback(
-    async (assets: Asset[]) => {
-      try {
-        const paths = assets.map(a => a.path).join('\n')
-        await navigator.clipboard.writeText(paths)
-      } catch (err) {
-        console.error('Failed to copy paths:', err)
-      }
-    },
-    []
-  )
+  const handleCopyPaths = useCallback(async (assets: Asset[]) => {
+    try {
+      const paths = assets.map(a => a.path).join('\n')
+      await navigator.clipboard.writeText(paths)
+    } catch (err) {
+      console.error('Failed to copy paths:', err)
+    }
+  }, [])
 
-  const handleOpenInEditor = useCallback(
-    async (asset: Asset) => {
-      try {
-        // Fetch importers for the asset
-        const response = await fetch(
-          `/__asset_manager__/api/importers?path=${encodeURIComponent(asset.path)}`
-        )
-        if (response.ok) {
-          const data = await response.json()
-          if (data.importers && data.importers.length > 0) {
-            const firstImporter = data.importers[0]
-            // Open in editor
-            await fetch(
-              `/__asset_manager__/api/open-in-editor?file=${encodeURIComponent(firstImporter.file)}&line=${firstImporter.line}&column=${firstImporter.column}`,
-              { method: 'POST' }
-            )
-          }
+  const handleOpenInEditor = useCallback(async (asset: Asset) => {
+    try {
+      const response = await fetch(
+        `/__asset_manager__/api/importers?path=${encodeURIComponent(asset.path)}`
+      )
+      if (response.ok) {
+        const data = await response.json()
+        if (data.importers && data.importers.length > 0) {
+          const firstImporter = data.importers[0]
+          await fetch(
+            `/__asset_manager__/api/open-in-editor?file=${encodeURIComponent(firstImporter.file)}&line=${firstImporter.line}&column=${firstImporter.column}`,
+            { method: 'POST' }
+          )
         }
-      } catch (err) {
-        console.error('Failed to open in editor:', err)
       }
-    },
-    []
-  )
+    } catch (err) {
+      console.error('Failed to open in editor:', err)
+    }
+  }, [])
 
-  const handleRevealInFinder = useCallback(
-    async (asset: Asset) => {
-      try {
-        await fetch(
-          `/__asset_manager__/api/reveal-in-finder?path=${encodeURIComponent(asset.path)}`,
-          { method: 'POST' }
-        )
-      } catch (err) {
-        console.error('Failed to reveal in finder:', err)
-      }
-    },
-    []
-  )
+  const handleRevealInFinder = useCallback(async (asset: Asset) => {
+    try {
+      await fetch(
+        `/__asset_manager__/api/reveal-in-finder?path=${encodeURIComponent(asset.path)}`,
+        { method: 'POST' }
+      )
+    } catch (err) {
+      console.error('Failed to reveal in finder:', err)
+    }
+  }, [])
 
-  // Integrate keyboard navigation
   useKeyboardNavigation({
     flatAssetList,
     focusedAssetId,
@@ -294,7 +279,6 @@ export default function App() {
     onRevealInFinder: handleRevealInFinder
   })
 
-  // Screen reader announcements for focus changes
   useEffect(() => {
     if (focusedAssetId && isGridFocused) {
       const asset = flatAssetList.find(a => a.id === focusedAssetId)
@@ -304,7 +288,6 @@ export default function App() {
     }
   }, [focusedAssetId, isGridFocused, flatAssetList])
 
-  // Screen reader announcements for selection changes
   useEffect(() => {
     if (selectedAssets.size > 0) {
       setSrAnnouncement(
