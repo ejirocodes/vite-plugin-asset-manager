@@ -13,8 +13,8 @@ import type { EditorType } from '../shared/types.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function findClientDir(): string {
-  // When running from built dist: __dirname is dist/server, client is at dist/client
-  const fromDist = path.join(__dirname, '../client')
+  // When running from built dist: __dirname is dist/, client is at dist/client
+  const fromDist = path.join(__dirname, 'client')
   if (fs.existsSync(fromDist)) {
     return fromDist
   }
