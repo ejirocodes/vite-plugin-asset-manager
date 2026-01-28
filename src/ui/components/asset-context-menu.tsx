@@ -21,7 +21,8 @@ import {
   ContextMenuSub,
   ContextMenuSubTrigger,
   ContextMenuSubContent,
-  ContextMenuLabel
+  ContextMenuLabel,
+  ContextMenuGroup
 } from '@/ui/components/ui/context-menu'
 import { useAssetActions } from '@/ui/hooks/useAssetActions'
 import type { Asset } from '../types'
@@ -157,9 +158,11 @@ export const AssetContextMenu = memo(function AssetContextMenu({
         {isSelected && (
           <>
             <ContextMenuSeparator />
-            <ContextMenuLabel className="text-[10px] text-muted-foreground px-2 py-1.5">
-              Selected asset
-            </ContextMenuLabel>
+            <ContextMenuGroup>
+              <ContextMenuLabel className="text-[10px] text-muted-foreground px-2 py-1.5">
+                Selected asset
+              </ContextMenuLabel>
+            </ContextMenuGroup>
           </>
         )}
       </ContextMenuContent>
