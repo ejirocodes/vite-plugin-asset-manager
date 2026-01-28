@@ -49,23 +49,25 @@ The playground imports the plugin directly from `../src/index` (no pnpm link nee
    - `scanner.ts` - EventEmitter-based file scanner using fast-glob + chokidar for watching
    - `thumbnail.ts` - Sharp-based thumbnail generation with dual-tier caching (memory + disk in OS temp)
    - `importer-scanner.ts` - Detects which source files import each asset (ES imports, dynamic imports, require, CSS url, HTML attributes)
+   - `duplicate-scanner.ts` - Content-based duplicate detection using MD5 hashing with streaming support for large files
    - `editor-launcher.ts` - Opens files in configured editor at specific line/column using launch-editor
-   - `api.ts` - HTTP API router with endpoints: `/assets`, `/assets/grouped`, `/search`, `/thumbnail`, `/file`, `/stats`, `/importers`, `/open-in-editor`, `/bulk-download`, `/bulk-delete`, `/events` (SSE)
+   - `file-revealer.ts` - Cross-platform utility to reveal files in system file explorer (Finder/Explorer)
+   - `api.ts` - HTTP API router with endpoints: `/assets`, `/assets/grouped`, `/search`, `/thumbnail`, `/file`, `/stats`, `/importers`, `/duplicates`, `/open-in-editor`, `/reveal-in-finder`, `/bulk-download`, `/bulk-delete`, `/events` (SSE)
    - `index.ts` - Middleware setup, serves API at `{base}/api/*` and dashboard UI via sirv
 
 3. **UI Layer** (`src/ui/`)
    - Self-contained React dashboard with its own `tsconfig.json`
    - Uses Tailwind CSS v4 and shadcn/ui (base-mira style with Phosphor icons)
    - Structure:
-     - `components/` - App components (Sidebar, SearchBar, AssetGrid, AssetCard, FileIcon, BulkActionsBar, SortControls)
-     - `components/ui/` - shadcn primitives (Button, Card, Input, Sheet, Tabs, etc.)
+     - `components/` - App components (Sidebar, SearchBar, AssetGrid, AssetCard, FileIcon, BulkActionsBar, SortControls, AssetContextMenu)
+     - `components/ui/` - shadcn primitives (Button, Card, Input, Sheet, Tabs, ContextMenu, etc.)
      - `components/card-previews/` - Card preview components (FontCardPreview, VideoCardPreview)
      - `components/preview-panel/` - Asset preview system with type-specific renderers
        - `index.tsx` - Main panel using Sheet component
        - `renderers/` - Type-specific previews (image, video, audio, font, code, fallback)
        - `details-section.tsx`, `actions-section.tsx`, `code-snippets.tsx` - Panel sections
        - `importers-section.tsx` - Shows files that import the asset with click-to-open-in-editor
-     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions
+     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetActions()` for context menu actions, `useDuplicates()` for duplicate file queries
      - `providers/theme-provider.tsx` - Theme context using next-themes
      - `providers/ignored-assets-provider.tsx` - Manages ignored assets (localStorage-persisted)
      - `lib/utils.ts` - Tailwind `cn()` utility, `lib/code-snippets.ts` - Import snippet generators
@@ -85,9 +87,12 @@ All shadcn components install to `src/ui/`:
 
 ### Shared Types (`src/shared/types.ts`)
 
-Key types: `Asset`, `AssetGroup`, `AssetType`, `AssetManagerOptions`, `ResolvedOptions`, `Importer`, `ImportType`, `EditorType`, `AssetStats`
+Key types: `Asset`, `AssetGroup`, `AssetType`, `AssetManagerOptions`, `ResolvedOptions`, `Importer`, `ImportType`, `EditorType`, `AssetStats`, `DuplicateInfo`
 
-The `Asset` interface includes `importersCount?: number` to track how many files import each asset. Assets with `importersCount === 0` are considered unused.
+The `Asset` interface includes:
+- `importersCount?: number` - tracks how many files import this asset (assets with 0 are considered unused)
+- `contentHash?: string` - MD5 hash of file contents for duplicate detection
+- `duplicatesCount?: number` - number of other files with identical content
 
 Default plugin options:
 - Base path: `/__asset_manager__`
@@ -113,6 +118,8 @@ Default plugin options:
 - **Bulk operations**: Multi-select assets (Shift+click, Ctrl/Cmd+click), copy paths, download as ZIP, bulk delete with confirmation
 - **Unused assets**: Assets with no importers are marked as unused; filter available in sidebar
 - **Ignored assets**: Locally hide assets from view; persisted in localStorage (key: `vite-asset-manager-ignored-assets`)
+- **Context menu**: Right-click asset cards for quick actions (preview, copy, reveal, delete, etc.)
+- **Duplicate detection**: Content-based deduplication using MD5 hashing with streaming for large files; cached by mtime+size
 
 ## Testing
 
@@ -144,6 +151,63 @@ pnpm run format:check  # Check formatting without changes
 ```
 
 ESLint uses flat config (`eslint.config.js`) with separate rules for plugin code (Node/TS) and UI code (React/TSX).
+
+## Recent Features (Latest Updates)
+
+### Bulk Operations
+Multi-select assets for batch actions:
+- **Selection methods**: Click checkbox, Shift+click (range), Ctrl/Cmd+click (toggle)
+- **Actions**: Copy paths to clipboard, download as ZIP, bulk delete with confirmation
+- **UI**: Sticky action bar appears at top when assets are selected
+- **Implementation**: `useBulkOperations` hook, `BulkActionsBar` component
+- **API endpoints**: `/bulk-download` (POST), `/bulk-delete` (POST)
+
+### Unused Asset Detection
+Identify assets not imported anywhere in your codebase:
+- **Badge indicator**: "Unused" badge on asset cards
+- **Sidebar filter**: "Unused Assets" option to show only unused
+- **Stats tracking**: Unused count in sidebar stats display
+- **Implementation**: `Asset.importersCount` field, `useStats` hook
+- **Integration**: Works with importer scanner to track usage
+
+### Ignored Assets
+Hide assets locally without deleting them:
+- **Storage**: localStorage-persisted (key: `vite-asset-manager-ignored-assets`)
+- **Provider**: `IgnoredAssetsProvider` wraps app
+- **Hook**: `useIgnoredAssets()` for state management
+- **Integration**: Filtered at app level, works with all other filters
+- **Use cases**: Hide generated assets, vendor files, or work-in-progress assets
+
+### Quick Actions Context Menu
+Right-click context menu for fast asset actions:
+- **Trigger**: Right-click any asset card (auto-selects if not already selected)
+- **Actions**: 7 total actions in 5 groups
+  - Open Preview - Opens asset in preview panel
+  - Copy Path - Copies file path to clipboard with checkmark feedback
+  - Copy Import Code - Submenu with HTML/React/Vue code snippets
+  - Open in Editor - Opens first importer location in configured editor (disabled if no importers)
+  - Reveal in Finder/Explorer - Opens system file explorer and highlights the file (platform-specific)
+  - Mark/Unmark as Ignored - Toggle ignored state (only for unused assets)
+  - Delete - Bulk delete with confirmation dialog
+- **Keyboard shortcuts**: Displays shortcuts (⌘O, ⌘⇧R, ⌫) in menu
+- **Visual feedback**: Checkmark indicators for copy success, disabled states for unavailable actions
+- **Implementation**: `useAssetActions` hook, `AssetContextMenu` component, `file-revealer.ts` server utility
+- **API endpoint**: `/reveal-in-finder` (POST)
+- **Cross-platform**: Supports macOS (Finder), Windows (Explorer), and Linux (xdg-open)
+
+### Duplicate File Detection
+Identify duplicate files by content hash:
+- **Algorithm**: MD5 hash of file contents with streaming for files >1MB
+- **Cache strategy**: Two-level caching (hash cache + duplicate groups) validated by mtime+size
+- **UI indicators**: "X duplicates" badge on asset cards showing duplicate count
+- **Real-time updates**: File changes trigger hash recalculation and SSE broadcast
+- **Performance**: Batch processing (20 files at a time) to avoid overwhelming I/O
+- **Implementation**: `DuplicateScanner` class, `useDuplicates` hook
+- **API endpoint**: `/duplicates?hash=` (GET) returns all assets with matching hash
+- **SSE events**: `asset-manager:duplicates-update` emitted when duplicate status changes
+- **Asset enrichment**: Adds `contentHash` and `duplicatesCount` fields to Asset type
+- **Filtering**: Can filter to show only files with duplicates
+- **Use cases**: Find duplicate images, identify redundant assets, clean up project files
 
 ## Development Notes
 
