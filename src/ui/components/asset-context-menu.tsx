@@ -1,4 +1,4 @@
-import { memo, useCallback, type ReactNode } from 'react'
+import { memo, useCallback, useState, type ReactNode } from 'react'
 import {
   EyeIcon,
   CopySimpleIcon,
@@ -24,6 +24,16 @@ import {
   ContextMenuLabel,
   ContextMenuGroup
 } from '@/ui/components/ui/context-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/ui/components/ui/alert-dialog'
 import { useAssetActions } from '@/ui/hooks/useAssetActions'
 import type { Asset } from '../types'
 
@@ -48,6 +58,7 @@ export const AssetContextMenu = memo(function AssetContextMenu({
   autoSelect = true
 }: AssetContextMenuProps) {
   const actions = useAssetActions({ asset, onPreview })
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const handleContextMenu = useCallback(
     (_e: React.MouseEvent) => {
@@ -57,6 +68,15 @@ export const AssetContextMenu = memo(function AssetContextMenu({
     },
     [autoSelect, isSelected, onToggleSelect, asset.id]
   )
+
+  const handleDeleteClick = useCallback(() => {
+    setDeleteDialogOpen(true)
+  }, [])
+
+  const handleDeleteConfirm = useCallback(async () => {
+    await actions.handleDelete()
+    setDeleteDialogOpen(false)
+  }, [actions])
 
   return (
     <ContextMenu>
@@ -147,7 +167,7 @@ export const AssetContextMenu = memo(function AssetContextMenu({
 
         <ContextMenuItem
           variant="destructive"
-          onClick={actions.handleDelete}
+          onClick={handleDeleteClick}
           disabled={actions.isDeleting}
         >
           <TrashIcon weight="bold" className="w-4 h-4 mr-2" />
@@ -166,6 +186,27 @@ export const AssetContextMenu = memo(function AssetContextMenu({
           </>
         )}
       </ContextMenuContent>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete asset?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The following file will be permanently deleted from your
+              computer:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="text-xs font-mono bg-muted/50 rounded p-2 text-muted-foreground truncate">
+            {asset.path}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDeleteConfirm}>
+              {actions.isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </ContextMenu>
   )
 })
