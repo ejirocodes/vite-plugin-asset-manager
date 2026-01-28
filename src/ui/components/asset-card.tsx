@@ -149,17 +149,17 @@ export const AssetCard = memo(function AssetCard({
           <p className="text-sm font-medium text-foreground truncate mb-1" title={asset.name}>
             {asset.name}
           </p>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0 overflow-x-auto scrollbar-hide pr-2">
               <span
-                className={`text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded ${extColor} bg-current/10`}
+                className={`text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded ${extColor} bg-current/10 flex-shrink-0`}
                 style={{ color: 'inherit' }}
               >
                 <span className={extColor}>{asset.extension.replace('.', '')}</span>
               </span>
               {asset.importersCount === 0 && !ignored && (
                 <span
-                  className="text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                  className="text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 flex-shrink-0"
                   aria-label="This asset is not imported by any source files"
                   title="This asset is not imported by any source files"
                 >
@@ -168,7 +168,7 @@ export const AssetCard = memo(function AssetCard({
               )}
               {asset.importersCount === 0 && ignored && (
                 <span
-                  className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground border border-border"
+                  className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground border border-border flex-shrink-0"
                   aria-label="This asset is marked as intentionally unused"
                   title="Marked as intentionally unused"
                 >
@@ -178,7 +178,7 @@ export const AssetCard = memo(function AssetCard({
               )}
               {(asset.duplicatesCount ?? 0) > 0 && (
                 <span
-                  className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 flex-shrink-0"
                   aria-label={`This asset has ${asset.duplicatesCount} duplicate${asset.duplicatesCount === 1 ? '' : 's'}`}
                   title={`${asset.duplicatesCount} duplicate file${asset.duplicatesCount === 1 ? '' : 's'} found`}
                 >
@@ -187,7 +187,7 @@ export const AssetCard = memo(function AssetCard({
                 </span>
               )}
             </div>
-            <span className="text-xs text-muted-foreground font-mono tabular-nums">
+            <span className="text-xs text-muted-foreground font-mono tabular-nums flex-shrink-0">
               {formatBytes(asset.size)}
             </span>
           </div>
