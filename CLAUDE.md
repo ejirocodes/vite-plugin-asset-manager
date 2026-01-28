@@ -67,7 +67,8 @@ The playground imports the plugin directly from `../src/index` (no pnpm link nee
        - `renderers/` - Type-specific previews (image, video, audio, font, code, fallback)
        - `details-section.tsx`, `actions-section.tsx`, `code-snippets.tsx` - Panel sections
        - `importers-section.tsx` - Shows files that import the asset with click-to-open-in-editor
-     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetActions()` for context menu actions, `useDuplicates()` for duplicate file queries
+       - `duplicates-section.tsx` - Shows other files with identical content hash
+     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetActions()` for context menu actions, `useDuplicates()` for duplicate file queries, `useKeyboardNavigation()` for full keyboard navigation support
      - `providers/theme-provider.tsx` - Theme context using next-themes
      - `providers/ignored-assets-provider.tsx` - Manages ignored assets (localStorage-persisted)
      - `lib/utils.ts` - Tailwind `cn()` utility, `lib/code-snippets.ts` - Import snippet generators
@@ -120,6 +121,7 @@ Default plugin options:
 - **Ignored assets**: Locally hide assets from view; persisted in localStorage (key: `vite-asset-manager-ignored-assets`)
 - **Context menu**: Right-click asset cards for quick actions (preview, copy, reveal, delete, etc.)
 - **Duplicate detection**: Content-based deduplication using MD5 hashing with streaming for large files; cached by mtime+size
+- **Keyboard navigation**: Full keyboard support with arrow keys, vim-style `j`/`k`, and shortcuts for all actions (`useKeyboardNavigation` hook)
 
 ## Testing
 
@@ -134,7 +136,7 @@ pnpm run test:client   # Run UI tests only (jsdom environment)
 
 ### Test Structure
 
-- `tests/server/` - Server-side tests (scanner, thumbnail, api, importer-scanner, editor-launcher)
+- `tests/server/` - Server-side tests (scanner, thumbnail, api, importer-scanner, editor-launcher, duplicate-scanner)
 - `src/ui/**/*.test.{ts,tsx}` - UI component and hook tests (co-located)
 - `tests/setup.ts` - Global test setup, exports `createMockAsset()` and `createMockImporter()` utilities
 - `tests/setup-ui.ts` - UI-specific setup (jsdom), mocks for EventSource, fetch, clipboard
@@ -202,12 +204,21 @@ Identify duplicate files by content hash:
 - **UI indicators**: "X duplicates" badge on asset cards showing duplicate count
 - **Real-time updates**: File changes trigger hash recalculation and SSE broadcast
 - **Performance**: Batch processing (20 files at a time) to avoid overwhelming I/O
-- **Implementation**: `DuplicateScanner` class, `useDuplicates` hook
+- **Implementation**: `DuplicateScanner` class, `useDuplicates` hook, `DuplicatesSection` component
 - **API endpoint**: `/duplicates?hash=` (GET) returns all assets with matching hash
 - **SSE events**: `asset-manager:duplicates-update` emitted when duplicate status changes
 - **Asset enrichment**: Adds `contentHash` and `duplicatesCount` fields to Asset type
 - **Filtering**: Can filter to show only files with duplicates
 - **Use cases**: Find duplicate images, identify redundant assets, clean up project files
+
+### Keyboard Navigation
+Full keyboard support for navigating and managing assets:
+- **Navigation**: Arrow keys (grid-aware), `j`/`k` (vim-style), `Tab`/`Shift+Tab` (cycle focus)
+- **Focus**: `/` to focus search, `Escape` to close preview or blur search
+- **Selection**: `Space` to toggle, `Enter` to preview, `Cmd/Ctrl+A` select all, `Cmd/Ctrl+D` deselect
+- **Actions**: `Delete`/`Backspace` to delete, `Cmd/Ctrl+C` copy paths, `Cmd/Ctrl+O` open in editor, `Cmd/Ctrl+Shift+R` reveal in Finder
+- **Implementation**: `useKeyboardNavigation` hook integrated with `App.tsx`
+- **Features**: Grid-aware column calculation, platform-aware modifier keys, respects input field focus
 
 ## Development Notes
 
