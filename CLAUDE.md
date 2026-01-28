@@ -11,6 +11,17 @@ Vite Plugin Asset Manager is a visual asset management dashboard for Vite projec
 - Package type: ESM module with CJS support
 - Package manager: pnpm (workspace includes `playground/`)
 
+## Vite Framework Support
+
+- [ ] Vanilla
+- [ ] Vue
+- [ ] React
+- [ ] Preact
+- [ ] Lit
+- [ ] Svelte
+- [ ] Solid
+- [ ] Qwik
+
 ## Build Commands
 
 ```bash
