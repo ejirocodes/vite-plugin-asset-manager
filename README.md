@@ -129,4 +129,4 @@ cd playground && pnpm run dev
 
 ## License
 
-MIT
+[MIT](LICENSE)
