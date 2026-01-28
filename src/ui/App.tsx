@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { Sidebar } from './components/side-bar'
 import { AssetGrid } from './components/asset-grid'
 import { PreviewPanel } from './components/preview-panel'
@@ -8,6 +8,7 @@ import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
 import { useStats } from './hooks/useStats'
 import { useBulkOperations } from './hooks/useBulkOperations'
+import { useKeyboardNavigation } from './hooks/useKeyboardNavigation'
 import { useIgnoredAssets } from './providers/ignored-assets-provider'
 import { sortAssets, type SortOption } from '@/ui/lib/sort-utils'
 import {
@@ -55,6 +56,12 @@ export default function App() {
   // Bulk selection state
   const [selectedAssets, setSelectedAssets] = useState<Set<string>>(() => new Set())
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null)
+
+  // Keyboard navigation state
+  const [focusedAssetId, setFocusedAssetId] = useState<string | null>(null)
+  const [isGridFocused, setIsGridFocused] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const [srAnnouncement, setSrAnnouncement] = useState('')
 
   const handlePreview = useCallback((asset: Asset) => {
     setSelectedAsset(asset)
@@ -138,6 +145,11 @@ export default function App() {
     }))
   }, [groups, results, searchQuery, sortOption, showUnusedOnly, showDuplicatesOnly, isIgnored])
 
+  // Flat list of all displayed assets for keyboard navigation
+  const flatAssetList = useMemo(() => {
+    return displayGroups.flatMap(group => group.assets)
+  }, [displayGroups])
+
   const toggleDir = useCallback((dir: string) => {
     setExpandedDirs(prev => {
       const next = new Set(prev)
@@ -206,6 +218,101 @@ export default function App() {
     }
   }, [bulkDelete, selectedAssetsArray])
 
+  // Keyboard action handlers
+  const handleCopyPaths = useCallback(
+    async (assets: Asset[]) => {
+      try {
+        const paths = assets.map(a => a.path).join('\n')
+        await navigator.clipboard.writeText(paths)
+      } catch (err) {
+        console.error('Failed to copy paths:', err)
+      }
+    },
+    []
+  )
+
+  const handleOpenInEditor = useCallback(
+    async (asset: Asset) => {
+      try {
+        // Fetch importers for the asset
+        const response = await fetch(
+          `/__asset_manager__/api/importers?path=${encodeURIComponent(asset.path)}`
+        )
+        if (response.ok) {
+          const data = await response.json()
+          if (data.importers && data.importers.length > 0) {
+            const firstImporter = data.importers[0]
+            // Open in editor
+            await fetch(
+              `/__asset_manager__/api/open-in-editor?file=${encodeURIComponent(firstImporter.file)}&line=${firstImporter.line}&column=${firstImporter.column}`,
+              { method: 'POST' }
+            )
+          }
+        }
+      } catch (err) {
+        console.error('Failed to open in editor:', err)
+      }
+    },
+    []
+  )
+
+  const handleRevealInFinder = useCallback(
+    async (asset: Asset) => {
+      try {
+        await fetch(
+          `/__asset_manager__/api/reveal-in-finder?path=${encodeURIComponent(asset.path)}`,
+          { method: 'POST' }
+        )
+      } catch (err) {
+        console.error('Failed to reveal in finder:', err)
+      }
+    },
+    []
+  )
+
+  // Integrate keyboard navigation
+  useKeyboardNavigation({
+    flatAssetList,
+    focusedAssetId,
+    setFocusedAssetId,
+    isGridFocused,
+    setIsGridFocused,
+    selectedAssets,
+    toggleSelection: handleToggleSelect,
+    selectAll: handleSelectAll,
+    clearSelection: handleDeselectAll,
+    previewAsset: selectedAsset,
+    setPreviewAsset: setSelectedAsset,
+    searchQuery,
+    setSearchQuery,
+    searchInputRef,
+    onCopyPaths: handleCopyPaths,
+    onDelete: (assets: Asset[]) => {
+      bulkDelete(assets)
+    },
+    onOpenInEditor: handleOpenInEditor,
+    onRevealInFinder: handleRevealInFinder
+  })
+
+  // Screen reader announcements for focus changes
+  useEffect(() => {
+    if (focusedAssetId && isGridFocused) {
+      const asset = flatAssetList.find(a => a.id === focusedAssetId)
+      if (asset) {
+        setSrAnnouncement(`Focused on ${asset.name}`)
+      }
+    }
+  }, [focusedAssetId, isGridFocused, flatAssetList])
+
+  // Screen reader announcements for selection changes
+  useEffect(() => {
+    if (selectedAssets.size > 0) {
+      setSrAnnouncement(
+        `${selectedAssets.size} asset${selectedAssets.size === 1 ? '' : 's'} selected`
+      )
+    }
+  }, [selectedAssets.size])
+
   const totalVisibleAssets = useMemo(
     () => displayGroups.reduce((sum, g) => sum + g.count, 0),
     [displayGroups]
@@ -225,12 +332,18 @@ export default function App() {
 
   return (
     <>
+      {/* Screen reader live region for keyboard navigation announcements */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {srAnnouncement}
+      </div>
       <div className="flex h-screen bg-background noise-bg">
         <Sidebar
           total={adjustedStats.total}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           searching={searching}
+          searchInputRef={searchInputRef}
+          onSearchFocus={() => setIsGridFocused(false)}
           selectedType={selectedType}
           onTypeSelect={setSelectedType}
           showUnusedOnly={showUnusedOnly}
@@ -310,7 +423,9 @@ export default function App() {
                           assets={group.assets}
                           onPreview={handlePreview}
                           selectedAssets={selectedAssets}
+                          focusedAssetId={focusedAssetId}
                           onToggleSelect={handleToggleSelect}
+                          onGridFocus={() => setIsGridFocused(true)}
                         />
                       </div>
                     </div>
@@ -326,6 +441,8 @@ export default function App() {
           asset={selectedAsset}
           onClose={handleClosePreview}
           onSelectAsset={handlePreview}
+          flatAssetList={flatAssetList}
+          onAssetChange={setSelectedAsset}
         />
       )}
     </>

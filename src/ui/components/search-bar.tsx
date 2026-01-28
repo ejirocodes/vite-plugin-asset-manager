@@ -1,30 +1,17 @@
-import { useEffect, useRef } from 'react'
-import { MagnifyingGlassIcon, XIcon, CircleNotchIcon, CommandIcon } from '@phosphor-icons/react'
+import { forwardRef } from 'react'
+import { MagnifyingGlassIcon, XIcon, CircleNotchIcon } from '@phosphor-icons/react'
 
 interface SearchBarProps {
   value: string
   onChange: (value: string) => void
   searching: boolean
+  onFocus?: () => void
 }
 
-export function SearchBar({ value, onChange, searching }: SearchBarProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        inputRef.current?.focus()
-      }
-      if (e.key === 'Escape' && document.activeElement === inputRef.current) {
-        inputRef.current?.blur()
-        onChange('')
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onChange])
+export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function SearchBar(
+  { value, onChange, searching, onFocus },
+  ref
+) {
 
   return (
     <div className="relative group">
@@ -40,11 +27,12 @@ export function SearchBar({ value, onChange, searching }: SearchBarProps) {
       </div>
 
       <input
-        ref={inputRef}
+        ref={ref}
         type="text"
         value={value}
         onChange={e => onChange(e.target.value)}
-        placeholder="Search assets..."
+        onFocus={onFocus}
+        placeholder="Search assets... (/)"
         className="
           w-full pl-10 pr-20 py-2.5
           bg-input/50 border border-border rounded-lg
@@ -67,12 +55,13 @@ export function SearchBar({ value, onChange, searching }: SearchBarProps) {
             />
           </button>
         ) : (
-          <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-border bg-muted/50 text-[10px] font-mono text-muted-foreground">
-            <CommandIcon weight="bold" className="w-2.5 h-2.5" />
-            <span>K</span>
+          <kbd className="hidden sm:flex items-center px-1.5 py-0.5 rounded border border-border bg-muted/50 text-[10px] font-mono text-muted-foreground">
+            <span>/</span>
           </kbd>
         )}
       </div>
     </div>
   )
-}
+})
+
+SearchBar.displayName = 'SearchBar'

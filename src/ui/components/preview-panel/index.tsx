@@ -14,6 +14,8 @@ interface PreviewPanelProps {
   asset: Asset
   onClose: () => void
   onSelectAsset?: (asset: Asset) => void
+  flatAssetList?: Asset[]
+  onAssetChange?: (asset: Asset) => void
 }
 
 const MIN_WIDTH = 300
@@ -23,7 +25,9 @@ const DEFAULT_WIDTH = 384
 export const PreviewPanel = memo(function PreviewPanel({
   asset,
   onClose,
-  onSelectAsset
+  onSelectAsset,
+  flatAssetList = [],
+  onAssetChange
 }: PreviewPanelProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(
@@ -72,6 +76,36 @@ export const PreviewPanel = memo(function PreviewPanel({
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
+
+  useEffect(() => {
+    if (!flatAssetList.length || !onAssetChange) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
+      if (isInputField) return
+
+      const currentIndex = flatAssetList.findIndex(a => a.id === asset.id)
+      if (currentIndex === -1) return
+
+      if (e.key === 'ArrowRight' || e.key === 'j') {
+        e.preventDefault()
+        const nextIndex = Math.min(currentIndex + 1, flatAssetList.length - 1)
+        if (nextIndex !== currentIndex) {
+          onAssetChange(flatAssetList[nextIndex])
+        }
+      } else if (e.key === 'ArrowLeft' || e.key === 'k') {
+        e.preventDefault()
+        const prevIndex = Math.max(currentIndex - 1, 0)
+        if (prevIndex !== currentIndex) {
+          onAssetChange(flatAssetList[prevIndex])
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [asset.id, flatAssetList, onAssetChange])
 
   useEffect(() => {
     closeButtonRef.current?.focus()

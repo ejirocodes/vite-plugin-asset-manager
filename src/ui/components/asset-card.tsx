@@ -1,4 +1,4 @@
-import { useState, memo, useCallback } from 'react'
+import { useState, useEffect, useRef, memo, useCallback } from 'react'
 import { FileIcon, getFileTypeColor } from './file-icon'
 import { VideoCardPreview, FontCardPreview } from './card-previews'
 import { AssetContextMenu } from './asset-context-menu'
@@ -12,6 +12,7 @@ interface AssetCardProps {
   index?: number
   onPreview?: (asset: Asset) => void
   isSelected?: boolean
+  isFocused?: boolean
   onToggleSelect?: (assetId: string, shiftKey: boolean) => void
 }
 
@@ -37,12 +38,25 @@ export const AssetCard = memo(function AssetCard({
   index = 0,
   onPreview,
   isSelected = false,
+  isFocused = false,
   onToggleSelect
 }: AssetCardProps) {
   const [copied, setCopied] = useState(false)
   const [imageError, setImageError] = useState(false)
   const { isIgnored } = useIgnoredAssets()
   const ignored = isIgnored(asset.path)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  // Scroll focused card into view
+  useEffect(() => {
+    if (isFocused && cardRef.current) {
+      cardRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest'
+      })
+    }
+  }, [isFocused])
 
   const isImage = asset.type === 'image'
   const thumbnailUrl = `/__asset_manager__/api/thumbnail?path=${encodeURIComponent(asset.path)}`
@@ -87,7 +101,11 @@ export const AssetCard = memo(function AssetCard({
       autoSelect={true}
     >
       <div
+        ref={cardRef}
         onClick={handleClick}
+        role="gridcell"
+        tabIndex={isFocused ? 0 : -1}
+        aria-selected={isSelected}
         className={`
           group relative rounded-xl overflow-hidden cursor-pointer
           bg-card border border-border
@@ -95,6 +113,8 @@ export const AssetCard = memo(function AssetCard({
           transition-all duration-200 ease-out
           hover-lift animate-fade-in-up opacity-0 ${staggerClass}
           ${isSelected ? 'ring-2 ring-primary border-primary' : ''}
+          ${isFocused ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}
+          ${isFocused && isSelected ? 'ring-4 ring-blue-500 ring-offset-2 ring-offset-background shadow-[0_0_0_4px_hsl(var(--primary))]' : ''}
         `}
       >
         {onToggleSelect && (

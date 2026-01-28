@@ -34,6 +34,8 @@ interface SidebarProps {
   searchQuery: string
   onSearchChange: (query: string) => void
   searching: boolean
+  searchInputRef?: React.RefObject<HTMLInputElement>
+  onSearchFocus?: () => void
   selectedType: AssetType | null
   onTypeSelect: (type: AssetType | null) => void
   showUnusedOnly: boolean
@@ -59,6 +61,8 @@ export const Sidebar = memo(function Sidebar({
   searchQuery,
   onSearchChange,
   searching,
+  searchInputRef,
+  onSearchFocus,
   selectedType,
   onTypeSelect,
   showUnusedOnly,
@@ -89,7 +93,13 @@ export const Sidebar = memo(function Sidebar({
       </div>
 
       <div className="p-4">
-        <SearchBar value={searchQuery} onChange={onSearchChange} searching={searching} />
+        <SearchBar
+          ref={searchInputRef}
+          value={searchQuery}
+          onChange={onSearchChange}
+          searching={searching}
+          onFocus={onSearchFocus}
+        />
       </div>
 
       <div className="px-4 pb-4">
