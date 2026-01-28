@@ -31,3 +31,5 @@ playground/dist/
 
 # Thumbnail cache (generated at runtime)
 vite-asset-manager-thumbnails/
+
+.claude/settings.local.json

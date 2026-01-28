@@ -1,0 +1,584 @@
+# Features Roadmap & Improvement Opportunities
+
+This document identifies missing features, incomplete implementations, and opportunities for enhancement in the Vite Plugin Asset Manager.
+
+## Current State Summary
+
+The plugin provides a comprehensive asset management solution with:
+- Asset discovery and real-time file watching via SSE (Server-Sent Events)
+- Web dashboard with grid display and resizable preview panel
+- 8 asset type categories with type-specific renderers and card previews
+- Sidebar type filtering (fully functional)
+- Asset sorting (8 sort options via dropdown)
+- Search functionality with debouncing
+- Importer detection with click-to-open-in-editor
+- Floating icon integration with keyboard shortcuts (⌥⇧A)
+- Comprehensive test suite (3,623 lines across 17 test files)
+
+---
+
+## Recently Completed Features
+
+### 1. ~~Test Infrastructure~~ ✓ IMPLEMENTED
+**Status**: ✅ Complete
+**Impact**: High
+
+Comprehensive test suite implemented with Vitest (14 test files):
+
+**Server tests** (`tests/server/` - 6 files):
+- `scanner.test.ts` - Asset discovery, caching, watching
+- `importer-scanner.test.ts` - Import detection across multiple patterns
+- `api.test.ts` - All REST endpoints including SSE
+- `thumbnail.test.ts` - Image thumbnail generation
+- `editor-launcher.test.ts` - Editor integration
+- `duplicate-scanner.test.ts` - Content-based duplicate detection
+
+**Test mocks** (`tests/mocks/` - 5 files):
+- `chokidar.ts`, `fast-glob.ts`, `fs.ts`, `launch-editor.ts`, `sharp.ts`
+
+**Test setup** (`tests/` - 2 files):
+- `setup.ts` - Global test setup with `createMockAsset()` and `createMockImporter()` utilities
+- `setup-ui.ts` - UI-specific setup (jsdom), mocks for EventSource, fetch, clipboard
+
+**UI tests** (`src/ui/**/*.test.{ts,tsx}` - 8 files):
+- `components/asset-card.test.tsx` - Card rendering, copy functionality
+- `components/search-bar.test.tsx` - Search input, keyboard shortcuts
+- `hooks/useAssets.test.ts` - Asset fetching and SSE subscription
+- `hooks/useSearch.test.ts` - Debounced search
+- `hooks/useSSE.test.ts` - Singleton EventSource connection
+- `hooks/useImporters.test.ts` - Importer fetching and editor launch
+- `hooks/useDuplicates.test.ts` - Duplicate asset fetching
+- `providers/ignored-assets-provider.test.tsx` - Ignored assets state management
+
+**Test commands**:
+```bash
+pnpm run test          # Run all tests once
+pnpm run test:watch    # Watch mode
+pnpm run test:ui       # Vitest UI
+pnpm run test:coverage # Coverage report
+pnpm run test:server   # Server tests only
+pnpm run test:client   # UI tests only
+```
+
+---
+
+### 2. ~~Sidebar Type Filtering~~ ✓ IMPLEMENTED
+**Status**: ✅ Complete
+**Impact**: Medium
+
+Sidebar type filtering is fully wired up and functional.
+
+**Implementation**:
+- `side-bar.tsx` - Accepts `selectedType` and `onTypeSelect` props
+- `App.tsx` - Manages `selectedType` state with `useState()`
+- `useAssets.ts` - Accepts `typeFilter` parameter and constructs URL with `?type=` query string
+- NavItem components for all 9 categories (All Assets + 8 types)
+
+**Functionality**:
+- Click type badge in sidebar to filter assets
+- "All Assets" option clears the filter
+- Active type is highlighted
+- Stats display shows count for each type
+
+---
+
+### 3. ~~Importers Detection~~ ✓ IMPLEMENTED
+**Status**: ✅ Complete
+**Impact**: Medium
+
+**Implementation**:
+- `src/server/importer-scanner.ts` - Scans source files for asset imports using regex patterns
+- `src/ui/components/preview-panel/importers-section.tsx` - Displays importing files
+- `src/ui/hooks/useImporters.ts` - Fetches importers and handles open-in-editor
+- API endpoint: `GET /api/importers?path=`
+
+**Features**:
+- Detects ES imports, dynamic imports, require, CSS url(), HTML src/href
+- Shows file path, line number, import type, and code snippet
+- Click to open in editor at exact line/column
+- Real-time updates via WebSocket when imports change
+
+---
+
+### 4. ~~Asset Sorting~~ ✓ IMPLEMENTED
+**Status**: ✅ Complete
+**Impact**: Low-Medium
+
+Asset sorting is fully implemented with a dropdown UI.
+
+**Implementation**:
+- `src/ui/lib/sort-utils.ts` - Sorting logic with 4 sort fields and 2 directions
+- `src/ui/components/sort-controls.tsx` - Sort dropdown component
+- `App.tsx` - Sort state management and application
+
+**Available sort options** (8 total):
+- Name A→Z / Name Z→A
+- Size Smallest / Size Largest
+- Date Newest / Date Oldest
+- Type A→Z / Type Z→A
+
+**Functionality**:
+- Sort dropdown in top-right of main content area
+- Sorting applied per directory group
+- Works with search results and type filters
+
+---
+
+## Missing Features (Gaps in Current Implementation)
+
+### 1. ~~Bulk Operations~~ ✓ IMPLEMENTED
+**Status**: ✅ Complete
+**Impact**: Medium
+
+Multi-select functionality for batch actions is fully implemented.
+
+**Implementation**:
+- `src/ui/hooks/useBulkOperations.ts` - Bulk delete logic
+- `src/ui/components/bulk-actions-bar.tsx` - Action bar with select all/clear
+- `src/ui/components/asset-card.tsx` - Selection state with Shift+click and Ctrl/Cmd+click
+- `src/ui/components/asset-grid.tsx` - Selection tracking
+- `src/ui/App.tsx` - Bulk selection state management
+- `src/server/api.ts` - `/bulk-download` and `/bulk-delete` endpoints
+
+**Features**:
+- Multi-select via Shift+click (range selection) or Ctrl/Cmd+click (toggle)
+- Select all / deselect all buttons
+- Bulk download as ZIP (using archiver package)
+- Bulk copy paths to clipboard
+- Bulk delete with confirmation dialog (shows up to 10 files)
+- Sticky action bar that appears when assets are selected
+- Toast notifications for operation feedback
+
+---
+
+### 2. Advanced Search Filters
+**Status**: Basic text search only
+**Impact**: Medium
+
+Current search matches name and path only.
+
+**Desired filters**:
+- Filter by file size range (e.g., >1MB)
+- Filter by date modified range
+- Filter by image dimensions
+- Filter by extension
+- Combine multiple filters
+
+**Implementation**:
+- Extend search UI with filter dropdowns
+- Modify `/search` endpoint or create `/filter` endpoint
+- Add filter state management
+
+---
+
+## Feature Enhancement Opportunities
+
+### 1. Video/Audio Metadata Display
+**Current**: Basic HTML5 players
+**Enhancement**: Show duration, codec, bitrate, resolution
+
+**Implementation**:
+- Use `ffprobe` or browser MediaElement API
+- Add metadata to Asset type
+- Display in details section
+
+---
+
+### 2. Audio Waveform Visualization
+**Current**: Native audio player
+**Enhancement**: Visual waveform display
+
+**Libraries to consider**:
+- wavesurfer.js
+- waveform-playlist
+
+---
+
+### 3. PDF Full Preview
+**Current**: Basic iframe embed
+**Enhancement**: Page navigation, zoom, text selection
+
+**Libraries to consider**:
+- react-pdf
+- pdfjs-dist
+
+---
+
+### 4. Font Preview Enhancement
+**Current**: Fixed sample text and character set
+**Enhancement**:
+- Interactive font weight/style selector
+- Custom text input
+- Variable font axis controls
+- Glyph browser
+
+---
+
+### 5. ~~Duplicate Detection~~ ✓ IMPLEMENTED
+**Status**: ✅ Complete
+**Enhancement**: Identify duplicate files by content hash
+
+**Implementation**:
+- `src/server/duplicate-scanner.ts` - MD5 content hashing with streaming for large files
+- `src/ui/hooks/useDuplicates.ts` - Hook for fetching duplicate assets by hash
+- `src/shared/types.ts` - Added `contentHash` and `duplicatesCount` fields to Asset interface
+- `src/server/api.ts` - `/duplicates?hash=` endpoint returns all assets with matching hash
+- Asset cards display duplicate count badge
+- Real-time updates via SSE (`asset-manager:duplicates-update` event)
+
+**Features**:
+- Two-level caching: hash cache (mtime+size validation) + duplicate groups
+- Streaming hash computation for files >1MB to avoid memory issues
+- Batch processing (20 files at a time) for I/O efficiency
+- Real-time duplicate detection with file watcher
+- Can filter to show only duplicate files
+- Works with all other filters (type, unused, ignored)
+
+---
+
+### 6. ~~Unused Asset Detection~~ ✓ IMPLEMENTED
+**Status**: ✅ Complete
+**Enhancement**: Identify assets not imported anywhere
+
+**Implementation**:
+- `src/server/importer-scanner.ts` - Tracks importers for each asset
+- `src/shared/types.ts` - `Asset` interface includes `importersCount?: number`
+- `src/server/api.ts` - `/stats` endpoint includes `unused` count
+- `src/ui/hooks/useStats.ts` - Fetches stats including unused count
+- `src/ui/components/side-bar.tsx` - "Unused Assets" filter option
+- `src/ui/components/asset-card.tsx` - Displays "Unused" badge on assets with no importers
+- `src/ui/App.tsx` - `showUnusedOnly` state for filtering
+
+**Features**:
+- Assets with `importersCount === 0` are marked as unused
+- Badge indicator on asset cards showing unused status
+- Sidebar filter to show only unused assets
+- Stats display shows total unused count
+- Works with ignored assets (ignored unused assets don't affect count)
+
+---
+
+### 7. Asset Usage Analytics
+**Current**: Basic stats (count, size)
+**Enhancement**: Detailed analytics dashboard
+
+**Metrics**:
+- Size breakdown by type (pie/bar chart)
+- Size breakdown by directory
+- Largest assets list
+- Recently modified assets
+- Growth over time (if tracking history)
+
+**Libraries to consider**:
+- recharts
+- @nivo/pie
+
+---
+
+### 8. Export Capabilities
+**Current**: Not implemented
+**Enhancement**: Export asset inventory
+
+**Export formats**:
+- JSON (full asset data)
+- CSV (tabular format)
+- Markdown (documentation)
+
+**Use cases**:
+- Asset auditing
+- Documentation generation
+- CI/CD integration
+
+---
+
+### 9. Asset Optimization Suggestions
+**Current**: Not implemented
+**Enhancement**: Identify optimization opportunities
+
+**Suggestions to provide**:
+- Images larger than display size
+- Uncompressed images (suggest WebP/AVIF)
+- Large video files (suggest compression)
+- Unused fonts
+- Duplicate assets
+
+---
+
+### 10. Drag-and-Drop Upload
+**Current**: Not implemented
+**Enhancement**: Add assets directly from dashboard
+
+**Implementation**:
+- Drop zone in dashboard
+- File upload API endpoint
+- Destination directory selector
+- Progress indicator
+
+**Security considerations**:
+- Validate file types
+- Size limits
+- Path validation
+
+---
+
+### 11. ~~Keyboard Navigation~~ ✓ IMPLEMENTED
+**Status**: ✅ Complete
+**Enhancement**: Full keyboard navigation
+
+**Implementation**:
+- `src/ui/hooks/useKeyboardNavigation.ts` - Centralized keyboard event handler
+- Integrated with `App.tsx` via hook with full state management
+
+**Implemented shortcuts**:
+- **Navigation**: Arrow keys (grid-aware), `j`/`k` (vim-style up/down)
+- **Focus**: `/` to focus search, `Escape` to close preview/blur search
+- **Selection**: `Space` to toggle selection, `Tab`/`Shift+Tab` to cycle focus
+- **Bulk**: `Cmd/Ctrl+A` select all, `Cmd/Ctrl+D` deselect all
+- **Actions**: `Enter` to open preview, `Delete`/`Backspace` to delete
+- **Copy/Open**: `Cmd/Ctrl+C` copy paths, `Cmd/Ctrl+O` open in editor, `Cmd/Ctrl+Shift+R` reveal in Finder
+
+**Features**:
+- Grid-aware navigation (calculates columns based on viewport width)
+- Works with both selected assets and focused asset
+- Respects input field focus (disabled when typing in search)
+- Platform-aware modifier keys (Cmd on Mac, Ctrl on Windows/Linux)
+
+---
+
+### 12. Thumbnail Format Options
+**Current**: JPEG only (quality 80)
+**Enhancement**: Configurable format
+
+**Options**:
+- WebP (better compression)
+- AVIF (even better compression)
+- Quality slider
+- Thumbnail size configuration in UI
+
+---
+
+### 13. Custom File Type Support
+**Current**: Fixed extension lists
+**Enhancement**: Plugin-based type support
+
+**Implementation**:
+- Configuration option for custom types
+- Custom thumbnail generators
+- Custom preview renderers
+- Custom code snippet templates
+
+---
+
+### 14. Performance Monitoring
+**Current**: Not implemented
+**Enhancement**: Track dashboard performance
+
+**Metrics**:
+- Initial load time
+- Scan duration
+- Thumbnail generation time
+- API response times
+
+**Display**: Performance panel in settings/debug mode
+
+---
+
+### 15. Accessibility Improvements
+**Current**: Basic ARIA labels
+**Enhancement**: Full accessibility compliance
+
+**Improvements needed**:
+- Screen reader announcements for updates
+- Focus management in grid
+- High contrast mode
+- Reduced motion support
+- Keyboard-only operation
+
+---
+
+### 16. Internationalization (i18n)
+**Current**: English only
+**Enhancement**: Multi-language support
+
+**Implementation**:
+- Extract strings to translation files
+- Language selector in UI
+- RTL layout support
+
+---
+
+### 17. Asset Comparison View
+**Current**: Single asset preview
+**Enhancement**: Side-by-side comparison
+
+**Use cases**:
+- Compare image versions
+- Compare before/after optimization
+- Identify visual differences
+
+---
+
+### 18. ~~Quick Actions Menu~~ ✓ IMPLEMENTED
+**Status**: ✅ Complete
+**Enhancement**: Right-click context menu on asset cards
+
+**Implementation**:
+- `src/ui/hooks/useAssetActions.ts` - Core action hook with 7 handlers
+- `src/ui/components/asset-context-menu.tsx` - Context menu UI component
+- `src/ui/components/asset-card.tsx` - Wrapped with context menu
+- `src/server/file-revealer.ts` - Cross-platform file reveal utility
+- `src/server/api.ts` - Added `/reveal-in-finder` endpoint
+
+**Actions** (7 total):
+- Open in preview (Eye icon)
+- Copy path (CopySimple icon) [shows checkmark feedback]
+- Copy import code (Code icon) - Submenu with HTML/React/Vue
+- Open in external editor (CodeBlock icon) [disabled if no importers]
+- Reveal in Finder/Explorer (FolderOpen icon) - Platform-specific
+- Mark/Unmark as Ignored (EyeSlash/Eye icon) [only for unused assets]
+- Delete (Trash icon, destructive variant) [with confirmation]
+
+**Features**:
+- Auto-select on right-click
+- Toast notifications for all actions
+- Keyboard shortcuts display (⌘O, ⌘⇧R, ⌫)
+- Platform-specific labels (Finder vs Explorer)
+- Checkmark indicators for copy success
+- Disabled states for unavailable actions
+- Follows frontend-design principles with bold icons and microinteractions
+
+---
+
+### 19. Favorites/Bookmarks
+**Current**: Not implemented
+**Enhancement**: Mark frequently used assets
+
+**Implementation**:
+- Star/favorite toggle on cards
+- Favorites section in sidebar
+- Persist to localStorage or project config
+
+---
+
+### 20. Recent Assets View
+**Current**: Not implemented
+**Enhancement**: Show recently viewed/opened assets
+
+**Implementation**:
+- Track asset views in session storage
+- "Recent" section in sidebar
+- Clear recent history option
+
+---
+
+## Configuration Enhancements
+
+### Additional Options to Support
+
+```typescript
+interface EnhancedOptions extends AssetManagerOptions {
+  // Thumbnail options
+  thumbnailFormat?: 'jpeg' | 'webp' | 'avif'
+  thumbnailQuality?: number  // 1-100
+
+  // Behavior options
+  openInNewTab?: boolean     // Preview behavior
+  defaultView?: 'grid' | 'list'
+  defaultSort?: 'name' | 'size' | 'date' | 'type'
+  sortDirection?: 'asc' | 'desc'
+
+  // Feature flags
+  enableDuplicateDetection?: boolean
+  enableImportersTracking?: boolean
+  enableAnalytics?: boolean
+
+  // Custom types
+  customTypes?: {
+    name: string
+    extensions: string[]
+    icon?: string
+    color?: string
+  }[]
+}
+```
+
+---
+
+## Recently Implemented (Since Last Update)
+
+### 5. ~~Bulk Operations~~ ✓ IMPLEMENTED
+See details in "Missing Features" section above.
+
+### 6. ~~Unused Asset Detection~~ ✓ IMPLEMENTED
+See details in "Feature Enhancement Opportunities" section above.
+
+### 7. ~~Ignored Assets~~ ✓ IMPLEMENTED (New Feature)
+**Status**: ✅ Complete
+**Impact**: Medium
+
+Allows users to locally hide assets from view without deleting them.
+
+**Implementation**:
+- `src/ui/providers/ignored-assets-provider.tsx` - Context provider for ignored assets
+- `src/ui/providers/ignored-assets-provider.test.tsx` - Tests for provider
+- `src/ui/hooks/useIgnoredAssets.ts` - Hook exported from provider
+- `src/ui/components/asset-card.tsx` - "Ignore"/"Unignore" toggle in context menu
+- `src/ui/App.tsx` - Filters out ignored assets from display
+
+**Features**:
+- Right-click context menu on asset cards to ignore/unignore
+- Ignored assets are hidden from all views (filtered at App level)
+- Persisted in localStorage with key `vite-asset-manager-ignored-assets`
+- Works with all filters (type, unused, search)
+- Does not send ignored assets to bulk operations
+- "Clear All" option to reset ignored list
+- Dimmed/muted appearance for ignored assets before hiding
+
+---
+
+## Priority Recommendations
+
+### High Priority (Core Functionality) - ALL DONE ✓
+1. ~~Test infrastructure~~ ✓ DONE
+2. ~~Sidebar type filtering~~ ✓ DONE
+3. ~~Asset sorting~~ ✓ DONE
+4. ~~Keyboard navigation~~ ✓ DONE
+
+### Medium Priority (User Experience) - MOSTLY DONE
+5. ~~Bulk operations~~ ✓ DONE
+6. Advanced search filters (remaining)
+7. ~~Duplicate detection~~ ✓ DONE
+8. ~~Quick actions menu~~ ✓ DONE
+
+### Lower Priority (Nice to Have)
+9. ~~Importers detection~~ ✓ DONE
+10. ~~Unused asset detection~~ ✓ DONE
+11. Usage analytics
+12. Export capabilities
+13. Drag-and-drop upload
+
+### Future Consideration
+14. Asset optimization suggestions
+15. Comparison view
+16. i18n support
+17. Custom file type plugins
+
+---
+
+## Implementation Notes
+
+### Breaking Changes to Avoid
+- Keep existing API endpoint signatures stable
+- Maintain backward compatibility in options
+- Don't change asset ID encoding scheme
+
+### Performance Considerations
+- Lazy load heavy features (analytics, duplicate detection)
+- Cache computed data (importers, duplicates)
+- Use Web Workers for heavy client-side processing
+- Implement virtual scrolling for large asset collections
+
+### Testing New Features
+- Add feature flags for experimental features
+- Use playground for manual testing
+- Document breaking changes clearly
