@@ -30,10 +30,7 @@ interface UseAssetActionsResult {
   isOpeningEditor: boolean
 }
 
-export function useAssetActions({
-  asset,
-  onPreview
-}: UseAssetActionsProps): UseAssetActionsResult {
+export function useAssetActions({ asset, onPreview }: UseAssetActionsProps): UseAssetActionsResult {
   const [copyPathState, setCopyPathState] = useState<CopyState>('idle')
   const [copyCodeState, setCopyCodeState] = useState<CopyState>('idle')
   const [isOpeningEditor, setIsOpeningEditor] = useState(false)

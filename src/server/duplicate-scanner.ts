@@ -57,11 +57,9 @@ export class DuplicateScanner extends EventEmitter {
   }
 
   private async performScan(assets: Asset[]): Promise<void> {
-    // Clear duplicate groups but keep hash cache for validation
     this.duplicateGroups.clear()
     this.pathToHash.clear()
 
-    // Process assets in batches to avoid overwhelming I/O
     const BATCH_SIZE = 20
     for (let i = 0; i < assets.length; i += BATCH_SIZE) {
       const batch = assets.slice(i, i + BATCH_SIZE)
@@ -75,7 +73,6 @@ export class DuplicateScanner extends EventEmitter {
       if (hash) {
         this.pathToHash.set(asset.path, hash)
 
-        // Add to duplicate group
         if (!this.duplicateGroups.has(hash)) {
           this.duplicateGroups.set(hash, new Set())
         }
@@ -96,16 +93,13 @@ export class DuplicateScanner extends EventEmitter {
     try {
       const stats = await fs.promises.stat(absolutePath)
 
-      // Check if cached hash is still valid
       const cached = this.hashCache.get(relativePath)
       if (cached && cached.mtime === stats.mtimeMs && cached.size === stats.size) {
         return cached.hash
       }
 
-      // Compute new hash
       const hash = await this.computeFileHash(absolutePath, stats.size)
 
-      // Update cache
       this.hashCache.set(relativePath, {
         hash,
         mtime: stats.mtimeMs,
@@ -123,7 +117,6 @@ export class DuplicateScanner extends EventEmitter {
    * Uses streaming for large files to avoid memory issues.
    */
   private async computeFileHash(absolutePath: string, size: number): Promise<string> {
-    // Use streaming for files > 1MB
     if (size > STREAMING_THRESHOLD) {
       return new Promise((resolve, reject) => {
         const hash = crypto.createHash('md5')
@@ -134,7 +127,6 @@ export class DuplicateScanner extends EventEmitter {
       })
     }
 
-    // Read small files directly
     const content = await fs.promises.readFile(absolutePath)
     return crypto.createHash('md5').update(content).digest('hex')
   }
@@ -207,7 +199,6 @@ export class DuplicateScanner extends EventEmitter {
 
     if (previousHash) {
       affectedHashes.push(previousHash)
-      // Remove from old group
       const oldGroup = this.duplicateGroups.get(previousHash)
       if (oldGroup) {
         oldGroup.delete(normalizedPath)
@@ -219,15 +210,12 @@ export class DuplicateScanner extends EventEmitter {
     }
 
     if (event === 'unlink') {
-      // File was deleted, just clean up cache
       this.hashCache.delete(normalizedPath)
     } else {
-      // File was added or changed, compute new hash
       try {
         const stats = await fs.promises.stat(absolutePath)
         const hash = await this.computeFileHash(absolutePath, stats.size)
 
-        // Update caches
         this.hashCache.set(normalizedPath, {
           hash,
           mtime: stats.mtimeMs,
@@ -235,7 +223,6 @@ export class DuplicateScanner extends EventEmitter {
         })
         this.pathToHash.set(normalizedPath, hash)
 
-        // Add to new group
         if (!this.duplicateGroups.has(hash)) {
           this.duplicateGroups.set(hash, new Set())
         }
@@ -245,11 +232,9 @@ export class DuplicateScanner extends EventEmitter {
           affectedHashes.push(hash)
         }
       } catch {
-        // File might have been deleted
       }
     }
 
-    // Emit change event if duplicate status changed
     if (affectedHashes.length > 0) {
       this.emit('change', { event, affectedHashes })
     }
@@ -263,7 +248,7 @@ export class DuplicateScanner extends EventEmitter {
     if (this.watcher) return
 
     const watchPaths = this.options.include.map(dir => path.join(this.root, dir))
-    const extensionPattern = this.options.extensions.map(ext => ext.replace('.', '')).join(',')
+    // const extensionPattern = this.options.extensions.map(ext => ext.replace('.', '')).join(',')
 
     this.watcher = chokidar.watch(watchPaths, {
       ignored: [

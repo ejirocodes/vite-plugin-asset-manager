@@ -97,102 +97,102 @@ export const AssetCard = memo(function AssetCard({
           ${isSelected ? 'ring-2 ring-primary border-primary' : ''}
         `}
       >
-      {onToggleSelect && (
-        <div
-          className={`absolute top-2 left-2 z-10 transition-opacity duration-150 ${
-            isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-          }`}
-          onClick={e => e.stopPropagation()}
-        >
-          <Checkbox checked={isSelected} onCheckedChange={handleCheckboxChange} />
-        </div>
-      )}
-
-      <div className="aspect-square relative overflow-hidden">
-        <div className="absolute inset-0 checkerboard" />
-
-        {isImage && !imageError ? (
-          <img
-            src={thumbnailUrl}
-            alt={asset.name}
-            className="relative w-full h-full object-cover"
-            loading="lazy"
-            onError={handleImageError}
-          />
-        ) : asset.type === 'video' ? (
-          <VideoCardPreview asset={asset} />
-        ) : asset.type === 'font' ? (
-          <FontCardPreview asset={asset} />
-        ) : (
-          <div className="relative w-full h-full flex items-center justify-center bg-card">
-            <FileIcon extension={asset.extension} className="w-16 h-16" />
+        {onToggleSelect && (
+          <div
+            className={`absolute top-2 left-2 z-10 transition-opacity duration-150 ${
+              isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            }`}
+            onClick={e => e.stopPropagation()}
+          >
+            <Checkbox checked={isSelected} onCheckedChange={handleCheckboxChange} />
           </div>
         )}
 
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-          <button
-            onClick={handleCopyPath}
-            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-            title="Copy path"
-            aria-label="Copy file path"
-          >
-            {copied ? (
-              <CheckIcon weight="bold" className="w-4 h-4 text-emerald-400" />
-            ) : (
-              <CopyIcon weight="bold" className="w-4 h-4 text-white" />
-            )}
-          </button>
-        </div>
-      </div>
+        <div className="aspect-square relative overflow-hidden">
+          <div className="absolute inset-0 checkerboard" />
 
-      <div className="p-3 border-t border-border">
-        <p className="text-sm font-medium text-foreground truncate mb-1" title={asset.name}>
-          {asset.name}
-        </p>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <span
-              className={`text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded ${extColor} bg-current/10`}
-              style={{ color: 'inherit' }}
+          {isImage && !imageError ? (
+            <img
+              src={thumbnailUrl}
+              alt={asset.name}
+              className="relative w-full h-full object-cover"
+              loading="lazy"
+              onError={handleImageError}
+            />
+          ) : asset.type === 'video' ? (
+            <VideoCardPreview asset={asset} />
+          ) : asset.type === 'font' ? (
+            <FontCardPreview asset={asset} />
+          ) : (
+            <div className="relative w-full h-full flex items-center justify-center bg-card">
+              <FileIcon extension={asset.extension} className="w-16 h-16" />
+            </div>
+          )}
+
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+            <button
+              onClick={handleCopyPath}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              title="Copy path"
+              aria-label="Copy file path"
             >
-              <span className={extColor}>{asset.extension.replace('.', '')}</span>
-            </span>
-            {asset.importersCount === 0 && !ignored && (
-              <span
-                className="text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                aria-label="This asset is not imported by any source files"
-                title="This asset is not imported by any source files"
-              >
-                UNUSED
-              </span>
-            )}
-            {asset.importersCount === 0 && ignored && (
-              <span
-                className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground border border-border"
-                aria-label="This asset is marked as intentionally unused"
-                title="Marked as intentionally unused"
-              >
-                <EyeSlashIcon weight="fill" className="w-3 h-3" />
-                IGNORED
-              </span>
-            )}
-            {(asset.duplicatesCount ?? 0) > 0 && (
-              <span
-                className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                aria-label={`This asset has ${asset.duplicatesCount} duplicate${asset.duplicatesCount === 1 ? '' : 's'}`}
-                title={`${asset.duplicatesCount} duplicate file${asset.duplicatesCount === 1 ? '' : 's'} found`}
-              >
-                <CopyIcon weight="fill" className="w-3 h-3" />
-                {asset.duplicatesCount} DUPE{asset.duplicatesCount === 1 ? '' : 'S'}
-              </span>
-            )}
+              {copied ? (
+                <CheckIcon weight="bold" className="w-4 h-4 text-emerald-400" />
+              ) : (
+                <CopyIcon weight="bold" className="w-4 h-4 text-white" />
+              )}
+            </button>
           </div>
-          <span className="text-xs text-muted-foreground font-mono tabular-nums">
-            {formatBytes(asset.size)}
-          </span>
+        </div>
+
+        <div className="p-3 border-t border-border">
+          <p className="text-sm font-medium text-foreground truncate mb-1" title={asset.name}>
+            {asset.name}
+          </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span
+                className={`text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded ${extColor} bg-current/10`}
+                style={{ color: 'inherit' }}
+              >
+                <span className={extColor}>{asset.extension.replace('.', '')}</span>
+              </span>
+              {asset.importersCount === 0 && !ignored && (
+                <span
+                  className="text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                  aria-label="This asset is not imported by any source files"
+                  title="This asset is not imported by any source files"
+                >
+                  UNUSED
+                </span>
+              )}
+              {asset.importersCount === 0 && ignored && (
+                <span
+                  className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground border border-border"
+                  aria-label="This asset is marked as intentionally unused"
+                  title="Marked as intentionally unused"
+                >
+                  <EyeSlashIcon weight="fill" className="w-3 h-3" />
+                  IGNORED
+                </span>
+              )}
+              {(asset.duplicatesCount ?? 0) > 0 && (
+                <span
+                  className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  aria-label={`This asset has ${asset.duplicatesCount} duplicate${asset.duplicatesCount === 1 ? '' : 's'}`}
+                  title={`${asset.duplicatesCount} duplicate file${asset.duplicatesCount === 1 ? '' : 's'} found`}
+                >
+                  <CopyIcon weight="fill" className="w-3 h-3" />
+                  {asset.duplicatesCount} DUPE{asset.duplicatesCount === 1 ? '' : 'S'}
+                </span>
+              )}
+            </div>
+            <span className="text-xs text-muted-foreground font-mono tabular-nums">
+              {formatBytes(asset.size)}
+            </span>
+          </div>
         </div>
       </div>
-    </div>
     </AssetContextMenu>
   )
 })

@@ -23,11 +23,13 @@ export async function revealInFileExplorer(absolutePath: string): Promise<void> 
         args = ['/select,', absolutePath]
         break
 
-      case 'linux': // Linux
+      case 'linux': {
+        // Linux - xdg-open doesn't support file selection, so open the containing directory
         const directory = path.dirname(absolutePath)
         command = 'xdg-open'
         args = [directory]
         break
+      }
 
       default:
         return reject(new Error(`Unsupported platform: ${platform}`))
