@@ -43,7 +43,8 @@
     "playground:preact": "pnpm --filter playground-preact dev",
     "playground:lit": "pnpm --filter playground-lit dev",
     "playground:svelte": "pnpm --filter playground-svelte dev",
-    "playground:solid": "pnpm --filter playground-solid dev"
+    "playground:solid": "pnpm --filter playground-solid dev",
+    "playground:qwik": "pnpm --filter playground-qwik dev"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
