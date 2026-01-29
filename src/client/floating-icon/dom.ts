@@ -1,4 +1,4 @@
-import { ELEMENT_IDS, type Position } from './constants'
+import { DIMENSIONS, ELEMENT_IDS, type Position } from './constants'
 import { VITE_ICON } from './icons'
 
 export interface FloatingIconElements {
@@ -111,29 +111,48 @@ export function updatePanelState(
 
   if (isOpen) {
     const containerRect = elements.container.getBoundingClientRect()
+    const margin = DIMENSIONS.VIEWPORT_MARGIN
     const overlap = 8
 
+    // Calculate actual panel dimensions (matching CSS min() logic)
+    const panelWidth = Math.min(
+      window.innerWidth * (DIMENSIONS.PANEL_WIDTH_PERCENT / 100),
+      DIMENSIONS.PANEL_MAX_WIDTH
+    )
+    const panelHeight = Math.min(
+      window.innerHeight * (DIMENSIONS.PANEL_HEIGHT_PERCENT / 100),
+      DIMENSIONS.PANEL_MAX_HEIGHT,
+      window.innerHeight - 40
+    )
+
+    let panelLeft: number
+    let panelTop: number
+
+    // Calculate ideal position based on edge
     if (edge === 'left') {
-      elements.panel.style.left = `${containerRect.right - overlap}px`
-      elements.panel.style.top = `${containerRect.top - overlap}px`
-      elements.panel.style.right = 'auto'
-      elements.panel.style.bottom = 'auto'
+      panelLeft = containerRect.right - overlap
+      panelTop = containerRect.top - overlap
     } else if (edge === 'right') {
-      elements.panel.style.right = `${window.innerWidth - containerRect.left - overlap}px`
-      elements.panel.style.top = `${containerRect.top - overlap}px`
-      elements.panel.style.left = 'auto'
-      elements.panel.style.bottom = 'auto'
+      panelLeft = containerRect.left - panelWidth + overlap
+      panelTop = containerRect.top - overlap
     } else if (edge === 'top') {
-      elements.panel.style.top = `${containerRect.bottom - overlap}px`
-      elements.panel.style.left = `${containerRect.left - overlap}px`
-      elements.panel.style.right = 'auto'
-      elements.panel.style.bottom = 'auto'
+      panelLeft = containerRect.left - overlap
+      panelTop = containerRect.bottom - overlap
     } else {
-      elements.panel.style.bottom = `${window.innerHeight - containerRect.top - overlap}px`
-      elements.panel.style.left = `${containerRect.left - overlap}px`
-      elements.panel.style.right = 'auto'
-      elements.panel.style.top = 'auto'
+      // bottom
+      panelLeft = containerRect.left - overlap
+      panelTop = containerRect.top - panelHeight + overlap
     }
+
+    // Clamp to viewport bounds with margin
+    panelLeft = Math.max(margin, Math.min(panelLeft, window.innerWidth - panelWidth - margin))
+    panelTop = Math.max(margin, Math.min(panelTop, window.innerHeight - panelHeight - margin))
+
+    // Apply position using left/top exclusively for predictable behavior
+    elements.panel.style.left = `${panelLeft}px`
+    elements.panel.style.top = `${panelTop}px`
+    elements.panel.style.right = 'auto'
+    elements.panel.style.bottom = 'auto'
   }
 }
 

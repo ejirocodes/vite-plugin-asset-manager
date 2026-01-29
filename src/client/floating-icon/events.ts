@@ -139,11 +139,28 @@ export function setupKeyboardHandlers(context: EventHandlerContext): CleanupFn {
   }
 }
 
+export function setupResizeHandler(context: EventHandlerContext): CleanupFn {
+  const { elements, positionState, panelState } = context
+
+  const onResize = () => {
+    if (panelState.isOpen()) {
+      updatePanelState(elements, true, positionState.get().edge)
+    }
+  }
+
+  window.addEventListener('resize', onResize)
+
+  return () => {
+    window.removeEventListener('resize', onResize)
+  }
+}
+
 export function setupAllHandlers(context: EventHandlerContext): CleanupFn {
   const cleanupFns = [
     setupDragHandlers(context),
     setupClickHandlers(context),
-    setupKeyboardHandlers(context)
+    setupKeyboardHandlers(context),
+    setupResizeHandler(context)
   ]
 
   return () => {
