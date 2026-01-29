@@ -1,10 +1,17 @@
 /* global EventSource */
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useSyncExternalStore } from 'react'
 
 type MessageHandler = (data: unknown) => void
 
+export type SSEConnectionStatus =
+  | 'connecting'
+  | 'connected'
+  | 'disconnected'
+  | 'reconnecting'
+
 interface SSEHook {
   subscribe: (event: string, handler: MessageHandler) => () => void
+  status: SSEConnectionStatus
 }
 
 let sharedEventSource: EventSource | null = null
@@ -12,6 +19,26 @@ const sharedHandlers = new Map<string, Set<MessageHandler>>()
 let reconnectTimeout: number | null = null
 let reconnectAttempts = 0
 let connectionCount = 0
+
+// Connection status tracking
+let connectionStatus: SSEConnectionStatus = 'disconnected'
+const statusListeners = new Set<() => void>()
+
+function setConnectionStatus(newStatus: SSEConnectionStatus): void {
+  if (connectionStatus !== newStatus) {
+    connectionStatus = newStatus
+    statusListeners.forEach(listener => listener())
+  }
+}
+
+function subscribeToStatus(listener: () => void): () => void {
+  statusListeners.add(listener)
+  return () => statusListeners.delete(listener)
+}
+
+function getConnectionStatus(): SSEConnectionStatus {
+  return connectionStatus
+}
 
 const MAX_RECONNECT_ATTEMPTS = 10
 const RECONNECT_DELAY = 1000
@@ -25,11 +52,13 @@ function connect(): void {
   }
 
   try {
+    setConnectionStatus('connecting')
     const eventSource = new EventSource('/__asset_manager__/api/events')
     sharedEventSource = eventSource
 
     eventSource.onopen = () => {
       reconnectAttempts = 0
+      setConnectionStatus('connected')
     }
 
     eventSource.onmessage = event => {
@@ -55,12 +84,17 @@ function connect(): void {
 
       if (connectionCount > 0 && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
         reconnectAttempts++
+        setConnectionStatus('reconnecting')
         reconnectTimeout = window.setTimeout(() => {
           connect()
         }, RECONNECT_DELAY)
+      } else {
+        setConnectionStatus('disconnected')
       }
     }
-  } catch {}
+  } catch {
+    setConnectionStatus('disconnected')
+  }
 }
 
 function disconnect(): void {
@@ -73,6 +107,7 @@ function disconnect(): void {
     sharedEventSource = null
   }
   reconnectAttempts = 0
+  setConnectionStatus('disconnected')
 }
 
 /** @internal Reset module state for testing */
@@ -80,13 +115,20 @@ export function __resetForTesting(): void {
   disconnect()
   sharedHandlers.clear()
   connectionCount = 0
+  statusListeners.clear()
 }
 
 /**
  * Hook to connect to the asset manager's SSE endpoint for real-time updates.
  * Uses a shared singleton EventSource connection for efficiency.
+ *
+ * @returns {SSEHook} Object containing:
+ *   - subscribe: Function to subscribe to SSE events
+ *   - status: Current connection status ('connecting' | 'connected' | 'disconnected' | 'reconnecting')
  */
 export function useSSE(): SSEHook {
+  const status = useSyncExternalStore(subscribeToStatus, getConnectionStatus)
+
   useEffect(() => {
     connectionCount++
     connect()
@@ -116,5 +158,5 @@ export function useSSE(): SSEHook {
     }
   }, [])
 
-  return { subscribe }
+  return { subscribe, status }
 }

@@ -16,6 +16,7 @@ import {
 } from '@phosphor-icons/react'
 import packageJson from '../../../package.json'
 import type { AssetType } from '../types'
+import { useSSE, type SSEConnectionStatus } from '../hooks/useSSE'
 
 const colorClasses = {
   violet: 'text-violet-400 bg-violet-500/10',
@@ -56,6 +57,28 @@ interface SidebarProps {
   }
 }
 
+const statusConfig: Record<
+  SSEConnectionStatus,
+  { dotClass: string; label: string }
+> = {
+  connecting: {
+    dotClass: 'bg-amber-500 animate-pulse',
+    label: 'Connecting...'
+  },
+  connected: {
+    dotClass: 'bg-emerald-500 animate-pulse',
+    label: 'Watching'
+  },
+  reconnecting: {
+    dotClass: 'bg-amber-500 animate-pulse',
+    label: 'Reconnecting...'
+  },
+  disconnected: {
+    dotClass: 'bg-zinc-500',
+    label: 'Disconnected'
+  }
+}
+
 export const Sidebar = memo(function Sidebar({
   total,
   searchQuery,
@@ -71,6 +94,9 @@ export const Sidebar = memo(function Sidebar({
   onDuplicatesFilterToggle,
   stats
 }: SidebarProps) {
+  const { status } = useSSE()
+  const { dotClass, label } = statusConfig[status]
+
   return (
     <aside className="w-72 bg-sidebar border-r border-sidebar-border flex flex-col noise-bg">
       <div className="p-5 border-b border-sidebar-border">
@@ -79,7 +105,9 @@ export const Sidebar = memo(function Sidebar({
             <div className="w-9 h-9 rounded-lg bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
               <PackageIcon weight="bold" className="w-5 h-5 text-white" />
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-sidebar" />
+            <div
+              className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-sidebar ${dotClass}`}
+            />
           </div>
           <div>
             <h1 className="font-mono text-sm font-semibold tracking-wide text-foreground">
@@ -273,8 +301,8 @@ export const Sidebar = memo(function Sidebar({
       <div className="p-4 border-t border-sidebar-border">
         <div className="flex items-center justify-between text-[10px] text-muted-foreground">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-mono">Watching</span>
+            <div className={`w-2 h-2 rounded-full ${dotClass}`} />
+            <span className="font-mono">{label}</span>
           </div>
           <div className="flex relative items-center gap-2">
             <ModeToggle />
