@@ -94,7 +94,9 @@ src/
     │   ├── useImporters.test.ts # Tests
     │   ├── useSSE.ts           # Shared SSE connection for real-time updates
     │   ├── useSSE.test.ts      # Tests
-    │   └── useStats.ts         # Fetch asset statistics with unused count
+    │   ├── useStats.ts         # Fetch asset statistics with unused count
+    │   ├── useResponsiveColumns.ts # Viewport-aware grid column calculation
+    │   └── useVirtualGrid.ts   # Virtual scrolling with @tanstack/react-virtual
     ├── providers/
     │   ├── theme-provider.tsx
     │   ├── ignored-assets-provider.tsx      # Manages ignored assets (localStorage)
@@ -313,6 +315,26 @@ The playground includes a variety of test assets:
   - Organized sections with icons (Database, Calendar, File)
 - **API**: Converts to query params (`minSize`, `maxSize`, `minDate`, `maxDate`, `extensions`)
 - **Performance**: Returns `filterParamsString` (primitive) for stable dependencies (Vercel best practice)
+
+### Virtual Scrolling
+- **Purpose**: Handle large asset collections (100+ assets) without DOM bloat
+- **Library**: `@tanstack/react-virtual` for row-based virtualization
+- **Hooks**:
+  - `useVirtualGrid()` - Wraps virtualizer, returns `virtualRows`, `totalHeight`, `getRowItems`, `scrollToItem`
+  - `useResponsiveColumns()` - Returns responsive column count based on viewport width
+- **Component**: `<AssetGrid>` uses virtualization with `scrollContainerRef` prop
+- **Row height**: Fixed 244px (200px card + 44px footer) with 16px gap
+- **Overscan**: 2 rows buffer for smooth scrolling
+- **Breakpoints**: 6 cols (≥1536px), 5 cols (≥1280px), 4 cols (≥1024px), 3 cols (≥768px), 2 cols (≥640px), 1 col (default)
+- **Integration**: Keyboard navigation uses `scrollToItem()` to keep focused asset visible
+
+### Performance Optimizations
+- **Applied Vercel best practices** for React rendering optimization
+- **Primitive dependencies**: Hooks use strings instead of objects to prevent re-renders
+- **Stable callbacks**: `isIgnored` uses ref pattern for consistent identity
+- **Single-pass filtering**: Combined iterations in `displayGroups` computation
+- **Static JSX hoisting**: `LoadingSpinner`, `EmptyState` defined outside component
+- **Details**: See `.claude/REFACTORING_SUMMARY.md`
 
 ## Troubleshooting
 

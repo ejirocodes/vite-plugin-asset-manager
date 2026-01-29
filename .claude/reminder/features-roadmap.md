@@ -542,6 +542,54 @@ Allows users to locally hide assets from view without deleting them.
 
 ---
 
+### 8. ~~Virtual Scrolling~~ ✓ IMPLEMENTED (New Feature)
+**Status**: ✅ Complete
+**Impact**: High (Performance)
+
+Row-based virtualization for handling large asset collections (100+ assets) without DOM bloat.
+
+**Implementation**:
+- `src/ui/hooks/useResponsiveColumns.ts` - Calculates grid columns based on viewport width
+- `src/ui/hooks/useVirtualGrid.ts` - Wraps `@tanstack/react-virtual` for grid virtualization
+- `src/ui/components/asset-grid.tsx` - Refactored to use virtual rendering
+- `package.json` - Added `@tanstack/react-virtual` dependency
+
+**Features**:
+- Fixed row height (244px) with 16px gap for predictable virtualization
+- 2-row overscan buffer for smooth scrolling
+- Responsive columns: 6 (2xl) → 5 (xl) → 4 (lg) → 3 (md) → 2 (sm) → 1 (default)
+- `scrollContainerRef` passed from App.tsx to AssetGrid
+- `scrollToItem()` integration with keyboard navigation
+- Maintains all existing interactions (selection, context menu, preview)
+
+---
+
+### 9. ~~Performance Optimizations (Vercel Best Practices)~~ ✓ IMPLEMENTED (New Feature)
+**Status**: ✅ Complete
+**Impact**: Medium-High (Performance)
+
+Applied Vercel React best practices without breaking changes.
+
+**Implementation**:
+- See `.claude/REFACTORING_SUMMARY.md` for detailed changes
+- 7 files modified with no API changes
+
+**Optimizations applied**:
+- `rendering-hoist-jsx` - Static JSX hoisted outside render (LoadingSpinner, EmptyState)
+- `rerender-dependencies` - Primitive string dependencies in hooks
+- `rerender-memo` - Single-pass filtering in displayGroups
+- `rerender-use-ref-transient-values` - Stable isIgnored callback
+- `js-combine-iterations` - Combined iterations into single loops
+- `js-cache-property-access` - Cached property lookups in sorting
+- `rerender-functional-setstate` - Documented functional setState patterns
+
+**Impact**:
+- Reduced unnecessary re-renders
+- Stable hook execution across renders
+- O(n) instead of O(2n) filtering operations
+
+---
+
 ## Priority Recommendations
 
 ### High Priority (Core Functionality) - ALL DONE ✓
@@ -559,9 +607,11 @@ Allows users to locally hide assets from view without deleting them.
 ### Lower Priority (Nice to Have)
 9. ~~Importers detection~~ ✓ DONE
 10. ~~Unused asset detection~~ ✓ DONE
-11. Usage analytics
-12. Export capabilities
-13. Drag-and-drop upload
+11. ~~Virtual scrolling~~ ✓ DONE
+12. ~~Performance optimizations~~ ✓ DONE
+13. Usage analytics
+14. Export capabilities
+15. Drag-and-drop upload
 
 ### Future Consideration
 14. Asset optimization suggestions
@@ -582,7 +632,7 @@ Allows users to locally hide assets from view without deleting them.
 - Lazy load heavy features (analytics, duplicate detection)
 - Cache computed data (importers, duplicates)
 - Use Web Workers for heavy client-side processing
-- Implement virtual scrolling for large asset collections
+- ~~Implement virtual scrolling for large asset collections~~ ✓ DONE
 
 ### Testing New Features
 - Add feature flags for experimental features

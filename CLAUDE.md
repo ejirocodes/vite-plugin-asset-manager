@@ -79,7 +79,7 @@ The playground imports the plugin directly from `../src/index` (no pnpm link nee
        - `details-section.tsx`, `actions-section.tsx`, `code-snippets.tsx` - Panel sections
        - `importers-section.tsx` - Shows files that import the asset with click-to-open-in-editor
        - `duplicates-section.tsx` - Shows other files with identical content hash
-     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetActions()` for context menu actions, `useDuplicates()` for duplicate file queries, `useKeyboardNavigation()` for full keyboard navigation support, `useAdvancedFilters()` for size/date/extension filtering
+     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetActions()` for context menu actions, `useDuplicates()` for duplicate file queries, `useKeyboardNavigation()` for full keyboard navigation support, `useAdvancedFilters()` for size/date/extension filtering, `useResponsiveColumns()` for viewport-aware grid columns, `useVirtualGrid()` for virtualized rendering with @tanstack/react-virtual
      - `providers/theme-provider.tsx` - Theme context using next-themes
      - `providers/ignored-assets-provider.tsx` - Manages ignored assets (localStorage-persisted)
      - `lib/utils.ts` - Tailwind `cn()` utility, `lib/code-snippets.ts` - Import snippet generators
@@ -136,6 +136,7 @@ Default plugin options:
 - **Context menu**: Right-click asset cards for quick actions (preview, copy, reveal, delete, etc.)
 - **Duplicate detection**: Content-based deduplication using MD5 hashing with streaming for large files; cached by mtime+size
 - **Keyboard navigation**: Full keyboard support with arrow keys, vim-style `j`/`k`, and shortcuts for all actions (`useKeyboardNavigation` hook)
+- **Virtual scrolling**: Uses `@tanstack/react-virtual` for row-based virtualization; renders only visible rows + 2 row buffer for smooth scrolling
 
 ## Testing
 
@@ -246,6 +247,26 @@ Filter assets by size, date modified, and file extension:
 - **Implementation**: `useAdvancedFilters` hook, `AdvancedFilters` component
 - **Integration**: Works with type filters, unused/duplicate filters, and search
 - **Performance**: Uses primitive string dependencies to prevent unnecessary rerenders (Vercel best practice)
+
+### Virtual Scrolling
+Virtualized grid rendering for handling large asset collections (100+ assets) without DOM bloat:
+- **Library**: `@tanstack/react-virtual` for row-based virtualization
+- **Implementation**: `useVirtualGrid` hook wraps virtualizer, `useResponsiveColumns` calculates grid columns
+- **Row height**: Fixed 244px (200px card + 44px footer) with 16px gap
+- **Overscan**: 2 rows buffer for smooth scrolling
+- **Scroll container**: Shared `mainRef` passed from `App.tsx` to each `AssetGrid`
+- **Scroll-to-item**: Keyboard navigation triggers `scrollToItem()` to keep focused asset visible
+- **Features**: Absolute positioning with `translateY()`, maintains all existing interactions (selection, context menu, preview)
+
+### Performance Optimizations (Vercel Best Practices)
+React performance optimizations applied without breaking changes:
+- **Hoisted JSX**: Static components (`LoadingSpinner`, `EmptyState`) defined outside render
+- **Primitive dependencies**: Hooks return `filterParamsString` (string) instead of objects to prevent re-renders
+- **Stable callbacks**: `isIgnored` uses ref pattern for consistent reference identity
+- **Single-pass filtering**: `displayGroups` computation combines multiple iterations into one loop
+- **Cached property access**: Sort comparisons cache property lookups
+- **Functional setState**: Uses callback form to avoid stale closures
+- **Implementation**: See `.claude/REFACTORING_SUMMARY.md` for detailed changes
 
 ## Development Notes
 

@@ -320,6 +320,7 @@ The plugin uses Server-Sent Events for real-time updates instead of WebSocket:
 | `sirv` | Lightweight static file server (smaller than express.static) |
 | `launch-editor` | Cross-platform editor launching with line/column support |
 | `archiver` | ZIP file creation for bulk downloads |
+| `@tanstack/react-virtual` | High-performance virtual scrolling for large lists |
 
 ## Development Tools
 
@@ -364,13 +365,51 @@ interface AssetManagerOptions {
 - ~~Duplicate Detection~~ ✓ Implemented - MD5 content hashing with streaming, duplicate count badges, real-time updates
 - ~~Keyboard Navigation~~ ✓ Implemented - Full keyboard support with arrow keys, vim bindings, shortcuts for all actions
 - ~~Advanced Filters~~ ✓ Implemented - Filter by size (4 presets), date modified (5 presets), and file extension (multi-select)
+- ~~Virtual Scrolling~~ ✓ Implemented - Row-based virtualization with @tanstack/react-virtual for large asset collections
+- ~~Performance Optimizations~~ ✓ Implemented - Vercel React best practices (primitive deps, stable callbacks, single-pass filtering)
 
 ### Planned
-- Lazy loading for large asset collections
 - Drag-and-drop upload
 - Asset optimization suggestions (oversized images)
 - Custom date/size ranges (currently presets only)
 - Image dimension filtering
+
+### 6l. Virtual Scrolling System
+- **Library**: `@tanstack/react-virtual` for row-based virtualization
+- **Hooks**:
+  - `useResponsiveColumns.ts` - Calculates grid columns based on viewport width (mirrors Tailwind breakpoints)
+  - `useVirtualGrid.ts` - Wraps `useVirtualizer` for grid-based row virtualization
+- **Component**: `asset-grid.tsx` - Refactored to use virtual rendering
+- **Architecture**:
+  - Fixed row height (244px = 200px card + 44px footer)
+  - Gap: 16px between cards
+  - Overscan: 2 rows buffer for smooth scrolling
+  - Absolute positioning with `translateY()` for visible rows
+  - Total height set on wrapper for proper scrollbar
+- **Responsive breakpoints**:
+  - 6 columns: ≥1536px (2xl)
+  - 5 columns: ≥1280px (xl)
+  - 4 columns: ≥1024px (lg)
+  - 3 columns: ≥768px (md)
+  - 2 columns: ≥640px (sm)
+  - 1 column: default
+- **Scroll management**:
+  - `scrollContainerRef` passed from `App.tsx` (main element)
+  - `scrollToItem()` keeps focused asset visible during keyboard navigation
+- **Benefits**: Handles 100+ assets without DOM bloat, maintains all interactions (selection, context menu, preview)
+
+### 6m. Performance Optimizations (Vercel Best Practices)
+- **File**: `.claude/REFACTORING_SUMMARY.md` - Detailed documentation
+- **Applied optimizations**:
+  1. **rendering-hoist-jsx**: Static components (`LoadingSpinner`, `EmptyState`) hoisted outside render
+  2. **rerender-dependencies**: Primitive string dependencies instead of objects in hooks
+  3. **rerender-memo**: Single-pass filtering in `displayGroups` computation
+  4. **rerender-use-ref-transient-values**: Stable `isIgnored` callback using ref
+  5. **js-combine-iterations**: Multiple iterations merged into single loops
+  6. **js-cache-property-access**: Property lookups cached in sort comparisons
+  7. **rerender-functional-setstate**: Documented existing functional setState patterns
+- **Files modified**: App.tsx, useAdvancedFilters.ts, useAssets.ts, useSearch.ts, ignored-assets-provider.tsx, asset-card.tsx, sort-utils.ts
+- **Impact**: Reduced re-renders, stable hook execution, O(n) instead of O(2n) filtering
 
 ## UI Component Library
 Key shadcn/ui components in use (19 total):
