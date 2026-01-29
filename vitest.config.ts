@@ -6,26 +6,47 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export default defineConfig({
-  plugins: [react()],
+const sharedConfig = {
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@/ui': path.resolve(__dirname, './src/ui')
     }
-  },
+  }
+}
+
+export default defineConfig({
+  plugins: [react()],
+  ...sharedConfig,
   test: {
     globals: true,
     watch: false,
     reporters: ['default'],
-    include: ['tests/**/*.test.ts', 'src/**/*.test.{ts,tsx}'],
-    environment: 'node',
-    environmentMatchGlobs: [
-      ['src/ui/**/*.test.{ts,tsx}', 'jsdom']
-    ],
-    setupFiles: ['./tests/setup.ts'],
     testTimeout: 10000,
     hookTimeout: 10000,
+    projects: [
+      {
+        ...sharedConfig,
+        test: {
+          name: 'server',
+          globals: true,
+          environment: 'node',
+          include: ['tests/**/*.test.ts'],
+          setupFiles: ['./tests/setup.ts']
+        }
+      },
+      {
+        ...sharedConfig,
+        plugins: [react()],
+        test: {
+          name: 'ui',
+          globals: true,
+          environment: 'jsdom',
+          include: ['src/ui/**/*.test.{ts,tsx}'],
+          setupFiles: ['./tests/setup.ts', './tests/setup-ui.ts']
+        }
+      }
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],

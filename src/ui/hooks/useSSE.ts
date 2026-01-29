@@ -75,6 +75,13 @@ function disconnect(): void {
   reconnectAttempts = 0
 }
 
+/** @internal Reset module state for testing */
+export function __resetForTesting(): void {
+  disconnect()
+  sharedHandlers.clear()
+  connectionCount = 0
+}
+
 /**
  * Hook to connect to the asset manager's SSE endpoint for real-time updates.
  * Uses a shared singleton EventSource connection for efficiency.
