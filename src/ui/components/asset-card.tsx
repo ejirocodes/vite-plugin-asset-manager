@@ -119,7 +119,7 @@ export const AssetCard = memo(function AssetCard({
           </div>
         )}
 
-        <div className="aspect-square relative overflow-hidden">
+        <div className="relative overflow-hidden h-[200px]">
           <div className="absolute inset-0 checkerboard" />
 
           {isImage && !imageError ? (

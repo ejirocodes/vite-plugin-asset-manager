@@ -50,7 +50,7 @@ export const AssetGrid = memo(function AssetGrid({
   if (assets.length === 0) return null
 
   return (
-    <div role="grid" aria-multiselectable="true" className="p-4">
+    <div role="grid" aria-multiselectable="true" className="px-4 pt-4 pb-8">
       <div style={{ height: totalHeight, position: 'relative' }}>
         {virtualRows.map(virtualRow => {
           const rowItems = getRowItems(virtualRow.index)
