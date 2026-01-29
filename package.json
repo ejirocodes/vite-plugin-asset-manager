@@ -40,7 +40,8 @@
     "playground:react": "pnpm --filter playground-react dev",
     "playground:vue": "pnpm --filter playground-vue dev",
     "playground:vanilla": "pnpm --filter playground-vanilla dev",
-    "playground:preact": "pnpm --filter playground-preact dev"
+    "playground:preact": "pnpm --filter playground-preact dev",
+    "playground:lit": "pnpm --filter playground-lit dev"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
