@@ -121,7 +121,7 @@ export const AssetCard = memo(function AssetCard({
           </div>
         )}
 
-        <div className="relative aspect-square bg-zinc-950/50">
+        <div className="relative h-45 bg-zinc-950/50">
           <div
             className="absolute inset-0 opacity-30"
             style={{

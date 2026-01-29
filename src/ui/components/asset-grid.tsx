@@ -13,8 +13,9 @@ interface AssetGridProps {
   onToggleSelect?: (assetId: string, shiftKey: boolean) => void
 }
 
-const ROW_HEIGHT = 200
-const GAP = 20
+const THUMBNAIL_HEIGHT = 180
+const FOOTER_HEIGHT = 60
+const GAP = 24
 const MIN_CARD_WIDTH = 180
 
 export const AssetGrid = memo(function AssetGrid({
@@ -31,7 +32,7 @@ export const AssetGrid = memo(function AssetGrid({
     items: assets,
     columns,
     scrollElement: scrollContainerRef,
-    rowHeight: ROW_HEIGHT + 25,
+    rowHeight: THUMBNAIL_HEIGHT + FOOTER_HEIGHT,
     gap: GAP,
     overscan: 2
   })
@@ -51,7 +52,7 @@ export const AssetGrid = memo(function AssetGrid({
   if (assets.length === 0) return null
 
   return (
-    <div role="grid" aria-multiselectable="true" className="px-4 pt-4 pb-8">
+    <div role="grid" aria-multiselectable="true" className="px-6 pt-4">
       <div style={{ height: totalHeight, position: 'relative' }}>
         {virtualRows.map(virtualRow => {
           const rowItems = getRowItems(virtualRow.index)

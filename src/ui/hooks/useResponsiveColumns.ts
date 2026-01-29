@@ -1,11 +1,11 @@
 import { useState, useEffect, RefObject } from 'react'
 
 const MIN_CARD_WIDTH = 180
-const GAP = 20
+const GAP = 24
 
 function getColumns(containerWidth: number): number {
   if (containerWidth <= 0) return 1
-  const availableWidth = containerWidth - 32 // account for padding
+  const availableWidth = containerWidth - 48 // account for px-6 padding (24px each side)
   const cols = Math.floor((availableWidth + GAP) / (MIN_CARD_WIDTH + GAP))
   return Math.max(1, cols)
 }
