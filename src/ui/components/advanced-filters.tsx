@@ -97,8 +97,8 @@ export const AdvancedFilters = memo(function AdvancedFilters({
           variant="outline"
           size="sm"
           className={cn(
-            'gap-1.5 h-8 px-2.5 font-medium transition-all duration-200',
-            'border-border/60 hover:border-border hover:bg-accent/50',
+            'h-7! gap-1.5 px-2.5 font-medium transition-all duration-200',
+            'bg-input/20 dark:bg-input/30 border-border/50 hover:bg-input/30 dark:hover:bg-input/40',
             activeCount > 0 && 'border-primary/40 bg-primary/5 hover:bg-primary/10'
           )}
         >

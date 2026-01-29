@@ -307,7 +307,7 @@ export default function App() {
     setPreviewAsset: setSelectedAsset,
     searchQuery,
     setSearchQuery,
-    searchInputRef,
+    searchInputRef: searchInputRef as React.RefObject<HTMLInputElement>,
     onCopyPaths: handleCopyPaths,
     onDelete: (assets: Asset[]) => {
       bulkDelete(assets)
@@ -368,7 +368,7 @@ export default function App() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           searching={searching}
-          searchInputRef={searchInputRef}
+          searchInputRef={searchInputRef as React.RefObject<HTMLInputElement>}
           onSearchFocus={() => setIsGridFocused(false)}
           selectedType={selectedType}
           onTypeSelect={setSelectedType}
