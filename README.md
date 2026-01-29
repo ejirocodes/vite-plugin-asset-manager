@@ -59,7 +59,7 @@ assetManager({
 - [x] Vanilla
 - [x] Vue
 - [x] React
-- [ ] Preact
+- [x] Preact
 - [ ] Lit
 - [ ] Svelte
 - [ ] Solid
@@ -128,6 +128,7 @@ pnpm run test:coverage
 pnpm run playground:react    # React
 pnpm run playground:vue      # Vue
 pnpm run playground:vanilla  # Vanilla
+pnpm run playground:preact   # Preact
 ```
 
 ## License

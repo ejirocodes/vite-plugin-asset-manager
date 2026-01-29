@@ -636,5 +636,5 @@ Applied Vercel React best practices without breaking changes.
 
 ### Testing New Features
 - Add feature flags for experimental features
-- Use playgrounds for manual testing (react, vue, vanilla)
+- Use playgrounds for manual testing (react, vue, vanilla, preact)
 - Document breaking changes clearly

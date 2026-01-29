@@ -18,6 +18,7 @@ pnpm run dev
 pnpm run playground:react    # React playground
 pnpm run playground:vue      # Vue playground
 pnpm run playground:vanilla  # Vanilla playground
+pnpm run playground:preact   # Preact playground
 # Then visit: http://localhost:5173/__asset_manager__
 
 # Testing (14 test files: 6 server + 8 UI)
@@ -229,10 +230,11 @@ pnpm publish
 ```
 
 ## Playgrounds
-Three framework playgrounds are available:
+Four framework playgrounds are available:
 - `playgrounds/react/` - Vite+React
 - `playgrounds/vue/` - Vite+Vue
 - `playgrounds/vanilla/` - Vite+Vanilla (no framework)
+- `playgrounds/preact/` - Vite+Preact
 
 Each includes test assets in `src/assets/` and `public/` directories.
 

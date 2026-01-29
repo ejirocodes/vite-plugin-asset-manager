@@ -16,7 +16,7 @@ Vite Plugin Asset Manager is a visual asset management dashboard for Vite projec
 - [x] Vanilla
 - [x] Vue
 - [x] React
-- [ ] Preact
+- [x] Preact
 - [ ] Lit
 - [ ] Svelte
 - [ ] Solid
@@ -41,6 +41,7 @@ The `playgrounds/` directory contains framework-specific demo projects:
 - `playgrounds/react/` - Vite+React demo
 - `playgrounds/vue/` - Vite+Vue demo
 - `playgrounds/vanilla/` - Vite+Vanilla (no framework) demo
+- `playgrounds/preact/` - Vite+Preact demo
 
 ```bash
 cd playgrounds/react
@@ -50,6 +51,7 @@ pnpm run dev           # Start dev server with asset manager at /__asset_manager
 pnpm run playground:react
 pnpm run playground:vue
 pnpm run playground:vanilla
+pnpm run playground:preact
 ```
 
 Each playground imports the plugin directly from `../../src/index` (no pnpm link needed). They also include `vite-plugin-inspect` for debugging Vite internals.
