@@ -20,6 +20,8 @@ pnpm run playground:vue      # Vue playground
 pnpm run playground:vanilla  # Vanilla playground
 pnpm run playground:preact   # Preact playground
 pnpm run playground:lit      # Lit playground
+pnpm run playground:svelte   # Svelte playground
+pnpm run playground:solid    # Solid playground
 # Then visit: http://localhost:5173/__asset_manager__
 
 # Testing (14 test files: 6 server + 8 UI)
@@ -231,12 +233,14 @@ pnpm publish
 ```
 
 ## Playgrounds
-Five framework playgrounds are available:
+Seven framework playgrounds are available:
 - `playgrounds/react/` - Vite+React
 - `playgrounds/vue/` - Vite+Vue
 - `playgrounds/vanilla/` - Vite+Vanilla (no framework)
 - `playgrounds/preact/` - Vite+Preact
 - `playgrounds/lit/` - Vite+Lit
+- `playgrounds/svelte/` - Vite+Svelte
+- `playgrounds/solid/` - Vite+Solid
 
 Each includes test assets in `src/assets/` and `public/` directories.
 
