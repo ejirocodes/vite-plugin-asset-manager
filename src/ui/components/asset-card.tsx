@@ -16,7 +16,6 @@ interface AssetCardProps {
   onToggleSelect?: (assetId: string, shiftKey: boolean) => void
 }
 
-
 const formatBytesCache = new Map<number, string>()
 function formatBytes(bytes: number): string {
   const cached = formatBytesCache.get(bytes)
@@ -48,7 +47,6 @@ export const AssetCard = memo(function AssetCard({
   const ignored = isIgnored(asset.path)
   const cardRef = useRef<HTMLDivElement>(null)
 
-
   const isImage = asset.type === 'image'
   const thumbnailUrl = `/__asset_manager__/api/thumbnail?path=${encodeURIComponent(asset.path)}`
 
@@ -70,7 +68,7 @@ export const AssetCard = memo(function AssetCard({
       try {
         await navigator.clipboard.writeText(asset.path)
         setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
+        setTimeout(() => setCopied(false), 1500)
       } catch (err) {
         console.error('Failed to copy path:', err)
       }
@@ -98,36 +96,50 @@ export const AssetCard = memo(function AssetCard({
         tabIndex={isFocused ? 0 : -1}
         aria-selected={isSelected}
         className={`
-          group relative rounded-xl overflow-hidden cursor-pointer
-          bg-card border border-border
-          hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5
-          transition-all duration-200 ease-out
-          hover-lift animate-fade-in-up opacity-0 ${staggerClass}
-          ${isSelected ? 'ring-2 ring-primary border-primary' : ''}
-          ${isFocused ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-background' : ''}
-          ${isFocused && isSelected ? 'ring-4 ring-blue-500 ring-offset-2 ring-offset-background shadow-[0_0_0_4px_hsl(var(--primary))]' : ''}
+          group relative cursor-pointer
+          bg-zinc-900/50 rounded-lg overflow-hidden
+          border border-zinc-800/80
+          transition-all duration-150 ease-out
+          hover:bg-zinc-900/80 hover:border-zinc-700/80
+          animate-fade-in-up opacity-0 ${staggerClass}
+          ${isSelected ? 'ring-1 ring-violet-500/70 border-violet-500/50 bg-violet-500/5' : ''}
+          ${isFocused ? 'ring-2 ring-blue-500 ring-offset-1 ring-offset-zinc-950' : ''}
         `}
       >
         {onToggleSelect && (
           <div
-            className={`absolute top-2 left-2 z-10 transition-opacity duration-150 ${
+            className={`absolute top-2 left-2 z-10 transition-opacity duration-100 ${
               isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
             }`}
             onClick={e => e.stopPropagation()}
           >
-            <Checkbox checked={isSelected} onCheckedChange={handleCheckboxChange} />
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={handleCheckboxChange}
+              className="border-zinc-600 data-[state=checked]:bg-violet-500 data-[state=checked]:border-violet-500"
+            />
           </div>
         )}
 
-        <div className="flex items-center justify-center p-3 bg-card">
-          <div className="relative w-28.25 h-28.25 rounded-lg overflow-hidden shrink-0">
-            <div className="absolute inset-0 checkerboard" />
+        <div className="relative aspect-square bg-zinc-950/50">
+          <div
+            className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage: `linear-gradient(45deg, rgba(255,255,255,0.02) 25%, transparent 25%),
+                               linear-gradient(-45deg, rgba(255,255,255,0.02) 25%, transparent 25%),
+                               linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.02) 75%),
+                               linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.02) 75%)`,
+              backgroundSize: '8px 8px',
+              backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px'
+            }}
+          />
 
+          <div className="relative w-full h-full flex items-center justify-center p-3">
             {isImage && !imageError ? (
               <img
                 src={thumbnailUrl}
                 alt={asset.name}
-                className="relative w-full h-full object-contain p-2"
+                className="max-w-full max-h-full object-contain"
                 loading="lazy"
                 onError={handleImageError}
               />
@@ -136,71 +148,67 @@ export const AssetCard = memo(function AssetCard({
             ) : asset.type === 'font' ? (
               <FontCardPreview asset={asset} />
             ) : (
-              <div className="relative w-full h-full flex items-center justify-center bg-card">
-                <FileIcon extension={asset.extension} className="w-10 h-10" />
-              </div>
+              <FileIcon extension={asset.extension} className="w-12 h-12 opacity-60" />
             )}
+          </div>
 
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-lg">
-              <button
-                onClick={handleCopyPath}
-                className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
-                title="Copy path"
-                aria-label="Copy file path"
-              >
-                {copied ? (
+          <div className="absolute inset-0 bg-zinc-950/70 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center backdrop-blur-[2px]">
+            <button
+              onClick={handleCopyPath}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors text-xs text-zinc-300 hover:text-white"
+              title="Copy path"
+              aria-label="Copy file path"
+            >
+              {copied ? (
+                <>
                   <CheckIcon weight="bold" className="w-3.5 h-3.5 text-emerald-400" />
-                ) : (
-                  <CopyIcon weight="bold" className="w-3.5 h-3.5 text-white" />
-                )}
-              </button>
-            </div>
+                  <span className="text-emerald-400">Copied</span>
+                </>
+              ) : (
+                <>
+                  <CopyIcon weight="bold" className="w-3.5 h-3.5" />
+                  <span>Copy path</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 
-        <div className="p-3 border-t border-border">
-          <p className="text-sm font-medium text-foreground truncate mb-1" title={asset.name}>
+        <div className="px-3 py-2.5 border-t border-zinc-800/50">
+          <p
+            className="text-[13px] font-medium text-zinc-200 truncate leading-tight"
+            title={asset.name}
+          >
             {asset.name}
           </p>
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0 overflow-x-auto scrollbar-hide pr-2">
+
+          <div className="flex items-center justify-between gap-2 mt-1.5">
+            <div className="flex items-center gap-1 min-w-0 overflow-hidden">
               <span
-                className={`text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded ${extColor} bg-current/10 flex-shrink-0`}
-                style={{ color: 'inherit' }}
+                className={`text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm ${extColor} bg-current/10 shrink-0`}
               >
                 <span className={extColor}>{asset.extension.replace('.', '')}</span>
               </span>
+
               {asset.importersCount === 0 && !ignored && (
-                <span
-                  className="text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 flex-shrink-0"
-                  aria-label="This asset is not imported by any source files"
-                  title="This asset is not imported by any source files"
-                >
-                  UNUSED
+                <span className="text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-amber-500/10 text-amber-500 shrink-0">
+                  unused
                 </span>
               )}
               {asset.importersCount === 0 && ignored && (
-                <span
-                  className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground border border-border flex-shrink-0"
-                  aria-label="This asset is marked as intentionally unused"
-                  title="Marked as intentionally unused"
-                >
-                  <EyeSlashIcon weight="fill" className="w-3 h-3" />
-                  IGNORED
+                <span className="flex items-center gap-0.5 text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-zinc-800 text-zinc-500 shrink-0">
+                  <EyeSlashIcon weight="fill" className="w-2.5 h-2.5" />
+                  ignored
                 </span>
               )}
               {(asset.duplicatesCount ?? 0) > 0 && (
-                <span
-                  className="flex items-center gap-1 text-[10px] font-mono font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 flex-shrink-0"
-                  aria-label={`This asset has ${asset.duplicatesCount} duplicate${asset.duplicatesCount === 1 ? '' : 's'}`}
-                  title={`${asset.duplicatesCount} duplicate file${asset.duplicatesCount === 1 ? '' : 's'} found`}
-                >
-                  <CopyIcon weight="fill" className="w-3 h-3" />
-                  {asset.duplicatesCount} DUPE{asset.duplicatesCount === 1 ? '' : 'S'}
+                <span className="text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-blue-500/10 text-blue-400 shrink-0">
+                  {asset.duplicatesCount} dupe{asset.duplicatesCount === 1 ? '' : 's'}
                 </span>
               )}
             </div>
-            <span className="text-xs text-muted-foreground font-mono tabular-nums flex-shrink-0">
+
+            <span className="text-[11px] text-zinc-500 font-mono tabular-nums shrink-0">
               {formatBytes(asset.size)}
             </span>
           </div>
