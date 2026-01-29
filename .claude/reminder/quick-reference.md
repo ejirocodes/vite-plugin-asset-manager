@@ -22,6 +22,7 @@ pnpm run playground:preact   # Preact playground
 pnpm run playground:lit      # Lit playground
 pnpm run playground:svelte   # Svelte playground
 pnpm run playground:solid    # Solid playground
+pnpm run playground:qwik     # Qwik playground
 # Then visit: http://localhost:5173/__asset_manager__
 
 # Testing (14 test files: 6 server + 8 UI)
@@ -233,7 +234,7 @@ pnpm publish
 ```
 
 ## Playgrounds
-Seven framework playgrounds are available:
+Eight framework playgrounds are available:
 - `playgrounds/react/` - Vite+React
 - `playgrounds/vue/` - Vite+Vue
 - `playgrounds/vanilla/` - Vite+Vanilla (no framework)
@@ -241,6 +242,7 @@ Seven framework playgrounds are available:
 - `playgrounds/lit/` - Vite+Lit
 - `playgrounds/svelte/` - Vite+Svelte
 - `playgrounds/solid/` - Vite+Solid
+- `playgrounds/qwik/` - Vite+Qwik
 
 Each includes test assets in `src/assets/` and `public/` directories.
 

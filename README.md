@@ -77,7 +77,7 @@ Start your dev server and visit `/__asset_manager__/` or press **`⌥⇧A`** (Op
 | Lit | ✅ |
 | Svelte | ✅ |
 | Solid | ✅ |
-| Qwik | 🚧 |
+| Qwik | ✅ |
 
 ## Configuration
 
@@ -165,6 +165,7 @@ pnpm run playground:preact
 pnpm run playground:lit
 pnpm run playground:svelte
 pnpm run playground:solid
+pnpm run playground:qwik
 ```
 
 ## License
