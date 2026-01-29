@@ -52,6 +52,7 @@ src/
     │   ├── asset-context-menu.tsx # Right-click context menu for asset actions
     │   ├── asset-grid.tsx       # Grid layout for assets
     │   ├── bulk-actions-bar.tsx # Bulk operations action bar
+    │   ├── advanced-filters.tsx # Advanced size/date/extension filters
     │   ├── file-icon.tsx        # Icon component for file types
     │   ├── mode-toggle.tsx      # Theme mode toggle
     │   ├── search-bar.tsx       # Search input component
@@ -82,6 +83,7 @@ src/
     │   ├── useAssets.ts        # Asset fetching and SSE subscription
     │   ├── useAssets.test.ts   # Tests
     │   ├── useAssetActions.ts  # Context menu action handlers
+    │   ├── useAdvancedFilters.ts # Size/date/extension filtering
     │   ├── useBulkOperations.ts # Bulk delete operations
     │   ├── useDuplicates.ts    # Fetch duplicate assets by content hash
     │   ├── useDuplicates.test.ts # Tests
@@ -295,6 +297,22 @@ The playground includes a variety of test assets:
   - `Cmd/Ctrl+O` - Open in editor (single asset)
   - `Cmd/Ctrl+Shift+R` - Reveal in Finder/Explorer (single asset)
 - **Features**: Platform-aware (Cmd on Mac, Ctrl on Windows/Linux), respects input focus
+
+### Advanced Filters
+- **Purpose**: Filter assets by size, date modified, and file extension
+- **Hook**: `useAdvancedFilters()` from `@/ui/hooks/useAdvancedFilters`
+- **Component**: `<AdvancedFilters>` from `@/ui/components/advanced-filters`
+- **Filter types**:
+  - **Size**: 4 presets (Small <100KB, Medium 100KB-1MB, Large 1-10MB, Extra Large >10MB)
+  - **Date**: 5 presets (Today, Last 7/30/90 days, This year)
+  - **Extensions**: Multi-select from available extensions in current assets
+- **UI features**:
+  - Dropdown button with active filter count badge
+  - Visual feedback with checkmarks on selected filters
+  - "Clear all" button when filters are active
+  - Organized sections with icons (Database, Calendar, File)
+- **API**: Converts to query params (`minSize`, `maxSize`, `minDate`, `maxDate`, `extensions`)
+- **Performance**: Returns `filterParamsString` (primitive) for stable dependencies (Vercel best practice)
 
 ## Troubleshooting
 

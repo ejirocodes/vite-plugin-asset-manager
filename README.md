@@ -13,6 +13,7 @@ A visual asset management dashboard for Vite projects. Discover, browse, and man
 - **Thumbnail Generation** - Sharp-powered thumbnails with dual-tier caching
 - **Import Tracking** - See which files import each asset with click-to-open-in-editor
 - **Duplicate Detection** - Content-based deduplication using MD5 hashing
+- **Advanced Filtering** - Filter by size, date modified, and file extension
 - **Bulk Operations** - Multi-select for batch download (ZIP), copy paths, or delete
 - **Keyboard Navigation** - Full keyboard support with vim-style bindings
 - **Context Menu** - Right-click for quick actions (copy, reveal in Finder, delete, etc.)

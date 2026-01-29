@@ -64,8 +64,8 @@ A Vite plugin that provides a visual dashboard for browsing assets in React/Vite
 | Endpoint | Purpose |
 |----------|---------|
 | `GET /api/assets` | List all assets (filterable by directory/type) |
-| `GET /api/assets/grouped` | Assets grouped by directory |
-| `GET /api/search?q=` | Search by name/path |
+| `GET /api/assets/grouped` | Assets grouped by directory (supports: `?type=`, `?minSize=`, `?maxSize=`, `?minDate=`, `?maxDate=`, `?extensions=`) |
+| `GET /api/search?q=` | Search by name/path (supports same filter params as /assets/grouped) |
 | `GET /api/thumbnail?path=` | Get image thumbnail |
 | `GET /api/file?path=` | Serve original file |
 | `GET /api/stats` | Asset statistics (includes unused and duplicate counts) |
@@ -203,7 +203,26 @@ The preview panel is a fixed sidebar (not a Sheet/Dialog) with 13 total componen
   - Respects input field focus (disabled when typing)
   - Works with both selection and focus states
 
-### 6j. Duplicates Section in Preview Panel
+### 6j. Advanced Filters System
+- **Hook**: `useAdvancedFilters.ts` - Manages size, date, and extension filters
+- **Component**: `advanced-filters.tsx` - Dropdown UI with three filter sections
+- **Filter types**:
+  - Size: 4 presets (small/medium/large/xlarge) mapped to byte ranges
+  - Date: 5 presets (today/last7days/last30days/last90days/thisYear) converted to timestamps
+  - Extensions: Multi-select from available extensions in current asset set
+- **State management**:
+  - Individual state for each filter type
+  - Active count computed from all filter states
+  - Returns `filterParamsString` (primitive string) for stable dependencies (Vercel best practice)
+- **UI features**:
+  - Badge showing active filter count
+  - Visual feedback with checkmarks on selected filters
+  - "Clear all" button in footer when filters are active
+  - Organized sections with icons (Database, Calendar, File)
+  - Filter chips for size, pills for date/extensions
+- **API integration**: Converts filters to query params (`minSize`, `maxSize`, `minDate`, `maxDate`, `extensions`)
+
+### 6k. Duplicates Section in Preview Panel
 - **Component**: `duplicates-section.tsx` - Shows other files with same content hash
 - **Location**: Preview panel, below importers section
 - **Features**:
@@ -344,22 +363,25 @@ interface AssetManagerOptions {
 - ~~Context Menu~~ ✓ Implemented - Right-click menu with 7 actions, platform-specific file reveal
 - ~~Duplicate Detection~~ ✓ Implemented - MD5 content hashing with streaming, duplicate count badges, real-time updates
 - ~~Keyboard Navigation~~ ✓ Implemented - Full keyboard support with arrow keys, vim bindings, shortcuts for all actions
+- ~~Advanced Filters~~ ✓ Implemented - Filter by size (4 presets), date modified (5 presets), and file extension (multi-select)
 
 ### Planned
 - Lazy loading for large asset collections
 - Drag-and-drop upload
 - Asset optimization suggestions (oversized images)
-- Advanced search filters (size range, date range, dimensions)
+- Custom date/size ranges (currently presets only)
+- Image dimension filtering
 
 ## UI Component Library
-Key shadcn/ui components in use (18 total):
+Key shadcn/ui components in use (19 total):
 - `button.tsx` - Button variants (ghost, outline, etc.)
 - `card.tsx` - Card container
 - `input.tsx` - Input fields
 - `badge.tsx` - Status badges
 - `separator.tsx` - Visual separators
 - `tabs.tsx` - Tab navigation
-- `dropdown-menu.tsx` - Context menus
+- `dropdown-menu.tsx` - Dropdown menus (used in filters and sort controls)
+- `context-menu.tsx` - Right-click context menus (used in asset cards)
 - `alert-dialog.tsx` - Confirmation dialogs (used in bulk delete)
 - `sonner.tsx` - Toast notifications
 - `resizable.tsx` - Resizable panels (from react-resizable-panels)

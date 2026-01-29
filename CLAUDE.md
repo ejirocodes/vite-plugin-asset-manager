@@ -70,7 +70,7 @@ The playground imports the plugin directly from `../src/index` (no pnpm link nee
    - Self-contained React dashboard with its own `tsconfig.json`
    - Uses Tailwind CSS v4 and shadcn/ui (base-mira style with Phosphor icons)
    - Structure:
-     - `components/` - App components (Sidebar, SearchBar, AssetGrid, AssetCard, FileIcon, BulkActionsBar, SortControls, AssetContextMenu)
+     - `components/` - App components (Sidebar, SearchBar, AssetGrid, AssetCard, FileIcon, BulkActionsBar, SortControls, AssetContextMenu, AdvancedFilters)
      - `components/ui/` - shadcn primitives (Button, Card, Input, Sheet, Tabs, ContextMenu, etc.)
      - `components/card-previews/` - Card preview components (FontCardPreview, VideoCardPreview)
      - `components/preview-panel/` - Asset preview system with type-specific renderers
@@ -79,7 +79,7 @@ The playground imports the plugin directly from `../src/index` (no pnpm link nee
        - `details-section.tsx`, `actions-section.tsx`, `code-snippets.tsx` - Panel sections
        - `importers-section.tsx` - Shows files that import the asset with click-to-open-in-editor
        - `duplicates-section.tsx` - Shows other files with identical content hash
-     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetActions()` for context menu actions, `useDuplicates()` for duplicate file queries, `useKeyboardNavigation()` for full keyboard navigation support
+     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetActions()` for context menu actions, `useDuplicates()` for duplicate file queries, `useKeyboardNavigation()` for full keyboard navigation support, `useAdvancedFilters()` for size/date/extension filtering
      - `providers/theme-provider.tsx` - Theme context using next-themes
      - `providers/ignored-assets-provider.tsx` - Manages ignored assets (localStorage-persisted)
      - `lib/utils.ts` - Tailwind `cn()` utility, `lib/code-snippets.ts` - Import snippet generators
@@ -99,12 +99,15 @@ All shadcn components install to `src/ui/`:
 
 ### Shared Types (`src/shared/types.ts`)
 
-Key types: `Asset`, `AssetGroup`, `AssetType`, `AssetManagerOptions`, `ResolvedOptions`, `Importer`, `ImportType`, `EditorType`, `AssetStats`, `DuplicateInfo`
+Key types: `Asset`, `AssetGroup`, `AssetType`, `AssetManagerOptions`, `ResolvedOptions`, `Importer`, `ImportType`, `EditorType`, `AssetStats`, `DuplicateInfo`, `SizeFilter`, `DateFilter`, `ExtensionFilter`, `AdvancedFilters`, `SizeFilterPreset`, `DateFilterPreset`
 
 The `Asset` interface includes:
 - `importersCount?: number` - tracks how many files import this asset (assets with 0 are considered unused)
 - `contentHash?: string` - MD5 hash of file contents for duplicate detection
 - `duplicatesCount?: number` - number of other files with identical content
+
+The `AssetStats` interface includes:
+- `extensionBreakdown?: Record<string, number>` - count of assets per file extension
 
 Default plugin options:
 - Base path: `/__asset_manager__`
@@ -230,6 +233,19 @@ Full keyboard support for navigating and managing assets:
 - **Actions**: `Delete`/`Backspace` to delete, `Cmd/Ctrl+C` copy paths, `Cmd/Ctrl+O` open in editor, `Cmd/Ctrl+Shift+R` reveal in Finder
 - **Implementation**: `useKeyboardNavigation` hook integrated with `App.tsx`
 - **Features**: Grid-aware column calculation, platform-aware modifier keys, respects input field focus
+
+### Advanced Filtering
+Filter assets by size, date modified, and file extension:
+- **Filter categories**:
+  - **Size**: Small (<100KB), Medium (100KB-1MB), Large (1-10MB), Extra Large (>10MB)
+  - **Date**: Today, Last 7 days, Last 30 days, Last 90 days, This year
+  - **Extensions**: Multi-select from available extensions in current asset set
+- **UI**: Dropdown button with active filter count badge, organized sections with checkmarks
+- **Clear all**: Quickly reset all active filters
+- **API support**: Query params `minSize`, `maxSize`, `minDate`, `maxDate`, `extensions` (comma-separated)
+- **Implementation**: `useAdvancedFilters` hook, `AdvancedFilters` component
+- **Integration**: Works with type filters, unused/duplicate filters, and search
+- **Performance**: Uses primitive string dependencies to prevent unnecessary rerenders (Vercel best practice)
 
 ## Development Notes
 

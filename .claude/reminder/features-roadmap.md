@@ -151,23 +151,29 @@ Multi-select functionality for batch actions is fully implemented.
 
 ---
 
-### 2. Advanced Search Filters
-**Status**: Basic text search only
+### 2. ~~Advanced Search Filters~~ ✓ IMPLEMENTED (Partially)
+**Status**: ✅ Size, date, and extension filters implemented
 **Impact**: Medium
 
-Current search matches name and path only.
-
-**Desired filters**:
-- Filter by file size range (e.g., >1MB)
-- Filter by date modified range
-- Filter by image dimensions
-- Filter by extension
-- Combine multiple filters
+**Implemented**:
+- Filter by file size: 4 presets (small <100KB, medium 100KB-1MB, large 1-10MB, xlarge >10MB)
+- Filter by date modified: 5 presets (today, last 7/30/90 days, this year)
+- Filter by file extension: Multi-select from available extensions
+- Active filter count badge
+- Clear all filters functionality
+- API support via query params: `minSize`, `maxSize`, `minDate`, `maxDate`, `extensions`
+- Works with type filters, unused/duplicate filters, and search
 
 **Implementation**:
-- Extend search UI with filter dropdowns
-- Modify `/search` endpoint or create `/filter` endpoint
-- Add filter state management
+- `src/ui/hooks/useAdvancedFilters.ts` - Filter state management hook
+- `src/ui/components/advanced-filters.tsx` - Dropdown UI with filter chips/pills
+- `src/server/api.ts` - Query param parsing for `/assets/grouped` and `/search` endpoints
+- `src/shared/types.ts` - `SizeFilter`, `DateFilter`, `ExtensionFilter`, `AdvancedFilters` types
+
+**Remaining**:
+- Custom size ranges (currently presets only)
+- Custom date ranges (currently presets only)
+- Filter by image dimensions
 
 ---
 
@@ -544,9 +550,9 @@ Allows users to locally hide assets from view without deleting them.
 3. ~~Asset sorting~~ ✓ DONE
 4. ~~Keyboard navigation~~ ✓ DONE
 
-### Medium Priority (User Experience) - MOSTLY DONE
+### Medium Priority (User Experience) - ALL DONE ✓
 5. ~~Bulk operations~~ ✓ DONE
-6. Advanced search filters (remaining)
+6. ~~Advanced search filters~~ ✓ DONE (presets implemented, custom ranges remaining)
 7. ~~Duplicate detection~~ ✓ DONE
 8. ~~Quick actions menu~~ ✓ DONE
 
