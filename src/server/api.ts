@@ -186,6 +186,50 @@ async function handleGetGroupedAssets(
       .filter(group => group.count > 0)
   }
 
+  const minSize = query.minSize ? parseInt(query.minSize as string, 10) : undefined
+  const maxSize = query.maxSize ? parseInt(query.maxSize as string, 10) : undefined
+  if (minSize !== undefined || maxSize !== undefined) {
+    groups = groups
+      .map(group => ({
+        ...group,
+        assets: group.assets.filter(a => {
+          if (minSize !== undefined && a.size < minSize) return false
+          if (maxSize !== undefined && a.size > maxSize) return false
+          return true
+        })
+      }))
+      .map(g => ({ ...g, count: g.assets.length }))
+      .filter(g => g.count > 0)
+  }
+
+  const minDate = query.minDate ? parseInt(query.minDate as string, 10) : undefined
+  const maxDate = query.maxDate ? parseInt(query.maxDate as string, 10) : undefined
+  if (minDate !== undefined || maxDate !== undefined) {
+    groups = groups
+      .map(group => ({
+        ...group,
+        assets: group.assets.filter(a => {
+          if (minDate !== undefined && a.mtime < minDate) return false
+          if (maxDate !== undefined && a.mtime > maxDate) return false
+          return true
+        })
+      }))
+      .map(g => ({ ...g, count: g.assets.length }))
+      .filter(g => g.count > 0)
+  }
+
+  const extensions = query.extensions as string | undefined
+  if (extensions) {
+    const extList = extensions.split(',').map(e => e.trim().toLowerCase())
+    groups = groups
+      .map(group => ({
+        ...group,
+        assets: group.assets.filter(a => extList.includes(a.extension.toLowerCase()))
+      }))
+      .map(g => ({ ...g, count: g.assets.length }))
+      .filter(g => g.count > 0)
+  }
+
   const total = groups.reduce((sum, g) => sum + g.count, 0)
   sendJson(res, { groups, total })
 }
@@ -196,7 +240,23 @@ async function handleSearch(
   query: Record<string, any>
 ) {
   const q = (query.q as string) || ''
-  const results = scanner.search(q)
+  let results = scanner.search(q)
+
+  const minSize = query.minSize ? parseInt(query.minSize as string, 10) : undefined
+  const maxSize = query.maxSize ? parseInt(query.maxSize as string, 10) : undefined
+  const minDate = query.minDate ? parseInt(query.minDate as string, 10) : undefined
+  const maxDate = query.maxDate ? parseInt(query.maxDate as string, 10) : undefined
+  const extensions = query.extensions as string | undefined
+
+  if (minSize !== undefined) results = results.filter(a => a.size >= minSize)
+  if (maxSize !== undefined) results = results.filter(a => a.size <= maxSize)
+  if (minDate !== undefined) results = results.filter(a => a.mtime >= minDate)
+  if (maxDate !== undefined) results = results.filter(a => a.mtime <= maxDate)
+  if (extensions) {
+    const extList = extensions.split(',').map(e => e.trim().toLowerCase())
+    results = results.filter(a => extList.includes(a.extension.toLowerCase()))
+  }
+
   sendJson(res, { assets: results, total: results.length, query: q })
 }
 
@@ -279,6 +339,12 @@ async function handleGetStats(
   const assets = scanner.getAssets()
   const dupStats = duplicateScanner.getStats()
 
+  const extensionCounts = new Map<string, number>()
+  for (const asset of assets) {
+    const ext = asset.extension.toLowerCase()
+    extensionCounts.set(ext, (extensionCounts.get(ext) || 0) + 1)
+  }
+
   const stats: AssetStats = {
     total: assets.length,
     byType: {
@@ -295,7 +361,8 @@ async function handleGetStats(
     directories: [...new Set(assets.map(a => a.directory))].length,
     unused: assets.filter(a => a.importersCount === 0).length,
     duplicateGroups: dupStats.duplicateGroups,
-    duplicateFiles: dupStats.duplicateFiles
+    duplicateFiles: dupStats.duplicateFiles,
+    extensionBreakdown: Object.fromEntries(extensionCounts)
   }
 
   sendJson(res, stats)

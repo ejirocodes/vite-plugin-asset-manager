@@ -77,6 +77,38 @@ export interface AssetStats {
   unused: number
   duplicateGroups: number
   duplicateFiles: number
+  extensionBreakdown?: Record<string, number>
+}
+
+export type SizeFilterPreset = 'any' | 'small' | 'medium' | 'large' | 'xlarge'
+export type DateFilterPreset =
+  | 'any'
+  | 'today'
+  | 'last7days'
+  | 'last30days'
+  | 'last90days'
+  | 'thisYear'
+
+export interface SizeFilter {
+  preset: SizeFilterPreset
+  minBytes?: number
+  maxBytes?: number
+}
+
+export interface DateFilter {
+  preset: DateFilterPreset
+  startDate?: number
+  endDate?: number
+}
+
+export interface ExtensionFilter {
+  extensions: string[]
+}
+
+export interface AdvancedFilters {
+  size?: SizeFilter
+  date?: DateFilter
+  extensions?: ExtensionFilter
 }
 
 export interface AssetManagerOptions {
