@@ -75,8 +75,8 @@ Start your dev server and visit `/__asset_manager__/` or press **`⌥⇧A`** (Op
 | React | ✅ |
 | Preact | ✅ |
 | Lit | ✅ |
-| Svelte | 🚧 |
-| Solid | 🚧 |
+| Svelte | ✅ |
+| Solid | ✅ |
 | Qwik | 🚧 |
 
 ## Configuration
@@ -163,6 +163,8 @@ pnpm run playground:vue
 pnpm run playground:vanilla
 pnpm run playground:preact
 pnpm run playground:lit
+pnpm run playground:svelte
+pnpm run playground:solid
 ```
 
 ## License

@@ -4,9 +4,7 @@ import assetManager from '../../src/index'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [svelte(), assetManager({
-    watch: false
-  })],
+  plugins: [svelte(), assetManager()],
   server: {
     open: true
   }

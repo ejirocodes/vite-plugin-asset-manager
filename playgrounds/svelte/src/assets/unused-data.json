@@ -1,0 +1,5 @@
+{
+  "name": "Unused Data File",
+  "description": "This JSON file is intentionally not imported anywhere to test unused asset detection",
+  "version": "1.0.0"
+}
