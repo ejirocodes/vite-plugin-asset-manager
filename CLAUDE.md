@@ -9,7 +9,7 @@ Vite Plugin Asset Manager is a visual asset management dashboard for Vite projec
 - Node requirement: >=22
 - Vite compatibility: >=5.0.0
 - Package type: ESM module with CJS support
-- Package manager: pnpm (workspace includes `playground/`)
+- Package manager: pnpm (workspace includes `playgrounds/*`)
 
 ## Vite Framework Support
 
@@ -34,16 +34,21 @@ pnpm run dev           # Watch mode for plugin development using tsup
 
 The build order matters: UI must build first to `dist/client/` so the plugin can embed it. The tsup config uses `clean: false` to preserve the UI build.
 
-## Testing with the Playground
+## Testing with the Playgrounds
 
-The `playground/` directory is a pnpm workspace containing a demo Vite+React project:
+The `playgrounds/` directory contains framework-specific demo projects. Currently available:
+
+- `playgrounds/react/` - Vite+React demo
 
 ```bash
-cd playground
+cd playgrounds/react
 pnpm run dev           # Start dev server with asset manager at /__asset_manager__/
+
+# Or from root:
+pnpm run playground:react
 ```
 
-The playground imports the plugin directly from `../src/index` (no pnpm link needed). It also includes `vite-plugin-inspect` for debugging Vite internals.
+Each playground imports the plugin directly from `../../src/index` (no pnpm link needed). They also include `vite-plugin-inspect` for debugging Vite internals.
 
 **Keyboard shortcut**: Press `⌥⇧A` (Option+Shift+A) in the host app to toggle the asset manager panel. Press `Escape` to close.
 
