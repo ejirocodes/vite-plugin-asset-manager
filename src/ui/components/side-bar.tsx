@@ -323,11 +323,11 @@ const NavItem = memo(function NavItem({
     <button
       onClick={onClick}
       className={`
-        w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all
+        w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm transition-all border
         ${
           active
-            ? 'bg-primary/10 text-primary border border-primary/20'
-            : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
+            ? 'bg-primary/10 text-primary border-primary/20'
+            : 'text-muted-foreground hover:text-foreground hover:bg-card/50 border-transparent'
         }
       `}
     >
