@@ -1,4 +1,4 @@
-import { DEFAULT_POSITION, DRAG, STORAGE_KEYS, type Edge, type Position } from './constants'
+import { DEFAULT_POSITION, DRAG, STORAGE_KEYS, type Edge, type Position, type Size } from './constants'
 
 function loadPosition(): Position {
   try {
@@ -41,6 +41,33 @@ function loadOpenState(): boolean {
 function saveOpenState(isOpen: boolean): void {
   try {
     localStorage.setItem(STORAGE_KEYS.OPEN, String(isOpen))
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
+function loadSize(): Size | null {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.SIZE)
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      if (parsed && typeof parsed.width === 'number' && typeof parsed.height === 'number') {
+        return parsed as Size
+      }
+    }
+  } catch {
+    // Ignore localStorage errors
+  }
+  return null
+}
+
+function saveSize(size: Size | null): void {
+  try {
+    if (size === null) {
+      localStorage.removeItem(STORAGE_KEYS.SIZE)
+    } else {
+      localStorage.setItem(STORAGE_KEYS.SIZE, JSON.stringify(size))
+    }
   } catch {
     // Ignore localStorage errors
   }
@@ -152,6 +179,66 @@ export function createDragState(): DragState {
         return true
       }
       return false
+    }
+  }
+}
+
+export interface SizeState {
+  get: () => Size | null
+  set: (size: Size | null) => void
+  save: () => void
+  resetToDefault: () => void
+}
+
+export function createSizeState(): SizeState {
+  let size = loadSize()
+
+  return {
+    get: () => size,
+    set: (newSize: Size | null) => {
+      size = newSize
+    },
+    save: () => {
+      saveSize(size)
+    },
+    resetToDefault: () => {
+      size = null
+      saveSize(null)
+    }
+  }
+}
+
+export type ResizeDirection = 'horizontal' | 'vertical' | 'both'
+
+export interface ResizeState {
+  isResizing: () => boolean
+  direction: () => ResizeDirection | null
+  startPos: () => { x: number; y: number }
+  startSize: () => Size
+  start: (x: number, y: number, dir: ResizeDirection, currentSize: Size) => void
+  end: () => void
+}
+
+export function createResizeState(): ResizeState {
+  let isResizing = false
+  let direction: ResizeDirection | null = null
+  let startPos = { x: 0, y: 0 }
+  let startSize: Size = { width: 0, height: 0 }
+
+  return {
+    isResizing: () => isResizing,
+    direction: () => direction,
+    startPos: () => startPos,
+    startSize: () => startSize,
+    start: (x: number, y: number, dir: ResizeDirection, currentSize: Size) => {
+      isResizing = true
+      direction = dir
+      startPos = { x, y }
+      startSize = { ...currentSize }
+    },
+    end: () => {
+      isResizing = false
+      direction = null
     }
   }
 }

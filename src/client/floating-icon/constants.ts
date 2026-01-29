@@ -1,6 +1,7 @@
 export const STORAGE_KEYS = {
   POSITION: 'vite-asset-manager-position',
-  OPEN: 'vite-asset-manager-open'
+  OPEN: 'vite-asset-manager-open',
+  SIZE: 'vite-asset-manager-size'
 } as const
 
 export const Z_INDEX = {
@@ -71,6 +72,13 @@ export const DRAG = {
   MAX_OFFSET: 90
 } as const
 
+export const RESIZE = {
+  MIN_WIDTH: 400,
+  MIN_HEIGHT: 300,
+  HANDLE_SIZE: 8,
+  HANDLE_HIT_AREA: 16
+} as const
+
 export const ELEMENT_IDS = {
   CONTAINER: 'vam-container',
   TRIGGER: 'vam-trigger',
@@ -84,6 +92,11 @@ export type Edge = 'top' | 'bottom' | 'left' | 'right'
 export interface Position {
   edge: Edge
   offset: number
+}
+
+export interface Size {
+  width: number
+  height: number
 }
 
 export const DEFAULT_POSITION: Position = {

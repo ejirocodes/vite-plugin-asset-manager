@@ -6,7 +6,7 @@ import {
   updatePanelState
 } from './dom'
 import { setupAllHandlers, type CleanupFn } from './events'
-import { createPanelState, createPositionState } from './state'
+import { createPanelState, createPositionState, createSizeState } from './state'
 import { injectStyles, removeStyles } from './styles'
 
 export interface FloatingIconOptions {
@@ -24,6 +24,7 @@ export function initFloatingIcon(options: FloatingIconOptions): FloatingIconInst
 
   const positionState = createPositionState()
   const panelState = createPanelState()
+  const sizeState = createSizeState()
   const elements = createElements(baseUrl)
 
   applyPosition(elements.container, positionState.get())
@@ -32,12 +33,13 @@ export function initFloatingIcon(options: FloatingIconOptions): FloatingIconInst
   const cleanup: CleanupFn = setupAllHandlers({
     elements,
     positionState,
-    panelState
+    panelState,
+    sizeState
   })
 
   if (panelState.isOpen()) {
     requestAnimationFrame(() => {
-      updatePanelState(elements, true, positionState.get().edge)
+      updatePanelState(elements, true, positionState.get().edge, sizeState.get())
     })
   }
 
@@ -60,5 +62,5 @@ if (typeof window !== 'undefined' && window.__VAM_BASE_URL__) {
   initFloatingIcon({ baseUrl: window.__VAM_BASE_URL__ })
 }
 
-export { type Position } from './constants'
-export { type PanelState, type PositionState } from './state'
+export { type Position, type Size } from './constants'
+export { type PanelState, type PositionState, type SizeState } from './state'

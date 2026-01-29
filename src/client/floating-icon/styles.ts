@@ -1,4 +1,4 @@
-import { CSS_TRANSITIONS, DARK_COLORS, LIGHT_COLORS, DIMENSIONS, ELEMENT_IDS, Z_INDEX } from './constants'
+import { CSS_TRANSITIONS, DARK_COLORS, LIGHT_COLORS, DIMENSIONS, ELEMENT_IDS, RESIZE, Z_INDEX } from './constants'
 
 const STYLES = `
 :root {
@@ -174,6 +174,101 @@ const STYLES = `
   border: none;
   width: 100%;
   height: 100%;
+}
+
+/* Resize handles */
+.vam-resize-handle {
+  position: absolute;
+  background: transparent;
+  z-index: ${Z_INDEX.PANEL + 1};
+  touch-action: none;
+}
+
+.vam-resize-handle:hover {
+  background: rgba(65, 209, 255, 0.3);
+}
+
+.vam-resize-handle:active {
+  background: rgba(65, 209, 255, 0.5);
+}
+
+/* Horizontal resize handle (width) */
+.vam-resize-handle[data-direction="horizontal"] {
+  cursor: ew-resize;
+  width: ${RESIZE.HANDLE_SIZE}px;
+  top: ${RESIZE.HANDLE_SIZE}px;
+  bottom: ${RESIZE.HANDLE_SIZE}px;
+}
+
+.vam-resize-handle[data-direction="horizontal"][data-position="left"] {
+  left: 0;
+  border-radius: 4px 0 0 4px;
+}
+
+.vam-resize-handle[data-direction="horizontal"][data-position="right"] {
+  right: 0;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Vertical resize handle (height) */
+.vam-resize-handle[data-direction="vertical"] {
+  cursor: ns-resize;
+  height: ${RESIZE.HANDLE_SIZE}px;
+  left: ${RESIZE.HANDLE_SIZE}px;
+  right: ${RESIZE.HANDLE_SIZE}px;
+}
+
+.vam-resize-handle[data-direction="vertical"][data-position="top"] {
+  top: 0;
+  border-radius: 4px 4px 0 0;
+}
+
+.vam-resize-handle[data-direction="vertical"][data-position="bottom"] {
+  bottom: 0;
+  border-radius: 0 0 4px 4px;
+}
+
+/* Corner resize handle (diagonal) */
+.vam-resize-handle[data-direction="both"] {
+  width: ${RESIZE.HANDLE_HIT_AREA}px;
+  height: ${RESIZE.HANDLE_HIT_AREA}px;
+}
+
+.vam-resize-handle[data-direction="both"][data-position="bottom-right"] {
+  cursor: nwse-resize;
+  right: 0;
+  bottom: 0;
+  border-radius: 0 0 8px 0;
+}
+
+.vam-resize-handle[data-direction="both"][data-position="bottom-left"] {
+  cursor: nesw-resize;
+  left: 0;
+  bottom: 0;
+  border-radius: 0 0 0 8px;
+}
+
+.vam-resize-handle[data-direction="both"][data-position="top-right"] {
+  cursor: nesw-resize;
+  right: 0;
+  top: 0;
+  border-radius: 0 8px 0 0;
+}
+
+.vam-resize-handle[data-direction="both"][data-position="top-left"] {
+  cursor: nwse-resize;
+  left: 0;
+  top: 0;
+  border-radius: 8px 0 0 0;
+}
+
+/* Panel resizing state */
+#${ELEMENT_IDS.PANEL}[data-resizing="true"] {
+  transition: none;
+}
+
+#${ELEMENT_IDS.PANEL}[data-resizing="true"] #${ELEMENT_IDS.IFRAME} {
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
