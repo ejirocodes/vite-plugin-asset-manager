@@ -2,11 +2,14 @@
 
 ## Commands
 ```bash
-# Build everything (UI + plugin)
+# Build everything (UI + floating icon + plugin)
 pnpm run build
 
 # Build UI only
 pnpm run build:ui
+
+# Build floating icon only
+pnpm run build:floating-icon
 
 # Build plugin only
 pnpm run build:plugin
@@ -38,8 +41,18 @@ pnpm run test:client   # UI tests only (jsdom environment)
 ```
 src/
 ├── index.ts          # Entry point, exports plugin function
-├── plugin.ts         # Vite plugin hooks (configureServer)
+├── plugin.ts         # Vite plugin hooks (configureServer, transformIndexHtml)
 ├── shared/types.ts   # Shared TypeScript types (Asset, Importer, EditorType, DuplicateInfo, etc.)
+├── client/
+│   └── floating-icon/      # Framework-agnostic floating button (IIFE)
+│       ├── index.ts            # Entry point with auto-init
+│       ├── constants.ts        # Z-index, dimensions, colors, drag config
+│       ├── dom.ts              # DOM element creation and manipulation
+│       ├── events.ts           # Event handlers (drag, click, keyboard)
+│       ├── state.ts            # Composable state managers
+│       ├── styles.ts           # CSS injection
+│       ├── icons.ts            # Embedded SVG icons
+│       └── tsconfig.json       # ES2020 DOM targeting
 ├── server/
 │   ├── index.ts            # Middleware setup (sirv + API router)
 │   ├── api.ts              # REST endpoints + SSE handling

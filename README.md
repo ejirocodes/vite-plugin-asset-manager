@@ -50,7 +50,10 @@ export default defineConfig({
 })
 ```
 
-Start your dev server and visit `/__asset_manager__/` or press **`⌥⇧A`** (Option+Shift+A) to toggle the floating panel.
+Start your dev server and access the Asset Manager in three ways:
+- Visit `/__asset_manager__/` directly in your browser
+- Press **`⌥⇧A`** (Option+Shift+A) to toggle the floating panel
+- Click the floating icon button injected into your app (drag to reposition)
 
 ## Features
 
@@ -58,6 +61,7 @@ Start your dev server and visit `/__asset_manager__/` or press **`⌥⇧A`** (Op
 |---------|-------------|
 | **Asset Discovery** | Automatically scans and catalogs images, videos, audio, fonts, documents, and data files |
 | **Real-time Updates** | File changes reflected instantly via Server-Sent Events |
+| **Floating Icon** | Draggable overlay button for quick access with keyboard shortcuts (⌥⇧A) |
 | **Thumbnail Generation** | Sharp-powered thumbnails with dual-tier caching |
 | **Import Tracking** | See which files import each asset with click-to-open-in-editor |
 | **Duplicate Detection** | Content-based deduplication using MD5 hashing |

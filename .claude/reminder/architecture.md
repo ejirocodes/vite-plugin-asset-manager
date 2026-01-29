@@ -9,6 +9,7 @@ A Vite plugin that provides a visual dashboard for browsing assets in Vite proje
 - **Dev-only plugin**: Uses `apply: 'serve'` to run only during development
 - **Middleware injection**: Uses `configureServer` hook to inject custom middleware before Vite's internal handlers
 - **Pre-built UI**: React UI is compiled at build time and served as static files (not compiled at runtime)
+- **Floating icon injection**: Uses `transformIndexHtml` hook to inject overlay button into host app HTML
 
 ### 2. Asset Scanner (`src/server/scanner.ts`)
 - **fast-glob** chosen over native `fs.readdir` for performance on large codebases
@@ -51,6 +52,54 @@ A Vite plugin that provides a visual dashboard for browsing assets in Vite proje
 - **Windows**: Uses `explorer /select,` command (reveals in Explorer)
 - **Linux**: Uses `xdg-open` to open parent directory
 - Returns Promise that resolves on success or rejects with error
+
+### 2e. Floating Icon Component (`src/client/floating-icon/`)
+Framework-agnostic overlay button that opens the Asset Manager panel. Built as self-executing IIFE, injectable into any Vite app.
+
+**Architecture** (8 files):
+- **index.ts**: Entry point with `initFloatingIcon()` function and auto-initialization
+- **constants.ts**: Z-index values (99998-100000), dimensions, colors, drag thresholds (5px)
+- **dom.ts**: DOM element creation and manipulation
+  - 5 elements: container, trigger button, overlay, panel, iframe
+  - Functions: `createElements()`, `mountElements()`, `unmountElements()`, `applyPosition()`, `updatePanelState()`
+- **state.ts**: Composable-style state managers
+  - `createPositionState()` - Position (left/right edge, vertical offset, localStorage)
+  - `createPanelState()` - Panel open/closed state (localStorage)
+  - `createDragState()` - Drag state for click vs drag detection
+- **events.ts**: Event handler setup
+  - Drag handlers: Pointer events with 5px threshold, momentum-based edge snapping
+  - Click handlers: Distinguishes drag from click, triggers panel toggle
+  - Keyboard handlers: Escape to close, Option+Shift+A to toggle
+- **styles.ts**: CSS injection with CSS variables, responsive design, backdrop blur
+- **icons.ts**: Embedded Vite gradient SVG icon (VITE_ICON constant)
+- **tsconfig.json**: ES2020 target with DOM libs
+
+**Build Configuration** (`vite.config.floating-icon.ts`):
+- Format: IIFE (self-executing)
+- Output: `dist/client/floating-icon.js`
+- Options: `emptyOutDir: false` (preserves UI build), `inlineDynamicImports: true`
+- Build command: `pnpm run build:floating-icon`
+
+**Plugin Integration** (`src/plugin.ts`):
+- Injects via `transformIndexHtml()` hook when `floatingIcon: true`
+- Two script tags injected into HTML body:
+  1. Inline script: Sets `window.__VAM_BASE_URL__` with base path
+  2. Module script: Loads `floating-icon.js` from base URL
+- Auto-initialization: Triggered when `__VAM_BASE_URL__` global exists
+
+**Features**:
+- Draggable with momentum-based edge snapping
+- localStorage persistence (position + panel state)
+- Keyboard shortcuts (⌥⇧A toggle, Escape close)
+- Modal overlay with backdrop blur
+- Cursor feedback (grab/grabbing)
+- Cross-browser (Pointer Events API)
+- Framework-agnostic (no dependencies)
+
+**State Management Pattern**:
+- Composable-style inspired by Vue DevTools
+- Separate state managers for position, panel, drag
+- Getter/setter pattern with localStorage sync
 
 ### 3. Thumbnail Service (`src/server/thumbnail.ts`)
 - **Sharp** for image processing (faster than ImageMagick, pure JS alternatives)

@@ -25,14 +25,15 @@ Vite Plugin Asset Manager is a visual asset management dashboard for Vite projec
 ## Build Commands
 
 ```bash
-pnpm install           # Install all deps (root + playground workspace)
-pnpm run build         # Build both UI and plugin (runs build:ui then build:plugin)
-pnpm run build:ui      # Build React dashboard using Vite → dist/client/
-pnpm run build:plugin  # Build plugin using tsup → dist/index.js, dist/index.cjs
-pnpm run dev           # Watch mode for plugin development using tsup
+pnpm install                  # Install all deps (root + playground workspace)
+pnpm run build                # Build everything (runs build:ui → build:floating-icon → build:plugin)
+pnpm run build:ui             # Build React dashboard using Vite → dist/client/
+pnpm run build:floating-icon  # Build floating icon component → dist/client/floating-icon.js
+pnpm run build:plugin         # Build plugin using tsup → dist/index.js, dist/index.cjs
+pnpm run dev                  # Watch mode for plugin development using tsup
 ```
 
-The build order matters: UI must build first to `dist/client/` so the plugin can embed it. The tsup config uses `clean: false` to preserve the UI build.
+The build order matters: UI must build first, then floating icon, then plugin. The tsup config uses `clean: false` to preserve the UI and floating icon builds. The floating icon uses `emptyOutDir: false` to preserve the UI build.
 
 ## Testing with the Playgrounds
 
@@ -68,14 +69,22 @@ Each playground imports the plugin directly from `../../src/index` (no pnpm link
 
 ## Architecture
 
-### Three-Layer Structure
+### Four-Layer Structure
 
 1. **Plugin Layer** (`src/index.ts`, `src/plugin.ts`)
    - Vite plugin entry point, only active in 'serve' mode
    - Provides virtual module `virtual:asset-manager-config` for build-time config
    - Broadcasts SSE events when assets/importers change via `broadcastSSE()`
+   - Injects floating icon script via `transformIndexHtml()` hook
 
-2. **Server Layer** (`src/server/`)
+2. **Client Layer** (`src/client/floating-icon/`)
+   - Framework-agnostic floating button that opens the Asset Manager panel
+   - Built as self-executing IIFE, injectable into any Vite app
+   - Composable-style state management inspired by Vue DevTools architecture
+   - Features: drag support, edge snapping, localStorage persistence, keyboard shortcuts
+   - See "Floating Icon Component" section below for details
+
+3. **Server Layer** (`src/server/`)
    - `scanner.ts` - EventEmitter-based file scanner using fast-glob + chokidar for watching
    - `thumbnail.ts` - Sharp-based thumbnail generation with dual-tier caching (memory + disk in OS temp)
    - `importer-scanner.ts` - Detects which source files import each asset (ES imports, dynamic imports, require, CSS url, HTML attributes)
@@ -85,7 +94,7 @@ Each playground imports the plugin directly from `../../src/index` (no pnpm link
    - `api.ts` - HTTP API router with endpoints: `/assets`, `/assets/grouped`, `/search`, `/thumbnail`, `/file`, `/stats`, `/importers`, `/duplicates`, `/open-in-editor`, `/reveal-in-finder`, `/bulk-download`, `/bulk-delete`, `/events` (SSE)
    - `index.ts` - Middleware setup, serves API at `{base}/api/*` and dashboard UI via sirv
 
-3. **UI Layer** (`src/ui/`)
+4. **UI Layer** (`src/ui/`)
    - Self-contained React dashboard with its own `tsconfig.json`
    - Uses Tailwind CSS v4 and shadcn/ui (base-mira style with Phosphor icons)
    - Structure:
@@ -104,10 +113,70 @@ Each playground imports the plugin directly from `../../src/index` (no pnpm link
      - `lib/utils.ts` - Tailwind `cn()` utility, `lib/code-snippets.ts` - Import snippet generators
      - `styles/globals.css` - Tailwind entry point with CSS variables
 
+### Floating Icon Component
+
+The floating icon is a framework-agnostic overlay button that provides quick access to the Asset Manager from any Vite app.
+
+**Architecture** (`src/client/floating-icon/` - 8 files):
+- `index.ts` - Entry point with `initFloatingIcon()` function and auto-initialization
+- `constants.ts` - Configuration (Z-index values 99998-100000, dimensions, colors, drag thresholds)
+- `dom.ts` - DOM element creation and manipulation (5 elements: container, trigger button, overlay, panel, iframe)
+- `state.ts` - Composable-style state managers:
+  - `createPositionState()` - Position (left/right edge, vertical offset, localStorage persistence)
+  - `createPanelState()` - Panel open/closed state (localStorage persistence)
+  - `createDragState()` - Drag state for distinguishing clicks from drags
+- `events.ts` - Event handler setup:
+  - Drag handlers (pointer events with 5px threshold, momentum-based edge snapping)
+  - Click handlers (distinguishes drag vs click, triggers panel toggle)
+  - Keyboard handlers (Escape to close, Option+Shift+A to toggle)
+- `styles.ts` - CSS injection with CSS variables, responsive design, backdrop blur effects
+- `icons.ts` - Embedded Vite gradient SVG icon (VITE_ICON constant)
+- `tsconfig.json` - TypeScript config targeting ES2020 with DOM libs
+
+**Build Process**:
+- **Dedicated Vite config**: `vite.config.floating-icon.ts`
+- **Format**: IIFE (Immediately Invoked Function Expression) with self-execution
+- **Output**: `dist/client/floating-icon.js` (minified with esbuild)
+- **Build command**: `pnpm run build:floating-icon`
+- **Build order**: `build:ui` → `build:floating-icon` → `build:plugin`
+- **Config option**: `emptyOutDir: false` to preserve UI build
+
+**Plugin Integration** (`src/plugin.ts`):
+- Conditional injection in `transformIndexHtml()` hook based on `resolvedOptions.floatingIcon`
+- Injects two `<script>` tags into HTML body:
+  1. Inline script setting `window.__VAM_BASE_URL__` with the asset manager base path
+  2. Module script loading `floating-icon.js` from base URL
+- Auto-initialization triggered when `__VAM_BASE_URL__` global variable exists
+
+**Features**:
+- Draggable floating button with momentum-based snapping to left/right edges
+- Smooth panel slide-in animation from left/right edge
+- Dark overlay backdrop with blur effect
+- Position and open state persisted to localStorage
+- Keyboard shortcuts:
+  - `Option+Shift+A` (⌥⇧A) - Toggle panel
+  - `Escape` - Close panel
+- Cursor feedback (grab/grabbing on drag)
+- Visual effects (drop-shadow on active state, backdrop blur on overlay)
+- Cross-browser compatible (uses Pointer Events API)
+- Framework-agnostic (no React/Vue/etc. dependencies)
+
+**UI Integration**:
+- Dashboard loads via iframe from `{baseUrl}?embedded=true` query param
+- Modal overlay pattern with z-index layering
+- Responsive panel sizing (adapts to viewport)
+
+**State Management Pattern**:
+- Composable-style inspired by Vue DevTools
+- Separate state managers for position, panel, and drag
+- localStorage persistence with JSON serialization
+- Getter/setter pattern for state access
+
 ### TypeScript Configuration
 
-- Root `tsconfig.json` - Plugin code (excludes `src/ui/`), uses `@/*` → `./src/*` alias
+- Root `tsconfig.json` - Plugin code (excludes `src/ui/` and `src/client/`), uses `@/*` → `./src/*` alias
 - `src/ui/tsconfig.json` - Dashboard code with DOM libs, uses `@/*` → `./src/*` alias (baseUrl: `../..`)
+- `src/client/floating-icon/tsconfig.json` - Floating icon code targeting ES2020 with DOM libs
 
 ### shadcn/ui Configuration (`components.json`)
 
