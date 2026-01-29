@@ -1,17 +1,14 @@
 import { defineConfig } from 'vite'
+import type { Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
-import Inspect from 'vite-plugin-inspect'
 import assetManager from '../../src/index'
 
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    Inspect(),
-    assetManager({
-      launchEditor: 'cursor'
-    })
+  plugins: [react(), 
+    assetManager() as Plugin
   ],
-  server: {
+    server: {
     open: true
   }
 })
