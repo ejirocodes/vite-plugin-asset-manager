@@ -124,64 +124,31 @@ const STYLES = `
 
 #${ELEMENT_IDS.PANEL} {
   position: fixed;
-  top: 0;
-  bottom: 0;
-  width: min(calc(${DIMENSIONS.PANEL_WIDTH_PERCENT}vw - var(--vam-icon-width)), ${DIMENSIONS.PANEL_MAX_WIDTH}px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  width: min(${DIMENSIONS.PANEL_WIDTH_PERCENT}vw, ${DIMENSIONS.PANEL_MAX_WIDTH}px);
+  height: min(${DIMENSIONS.PANEL_HEIGHT_PERCENT}vh, ${DIMENSIONS.PANEL_MAX_HEIGHT}px);
   background: ${CSS_VARS.PANEL_BG};
+  border: 1px solid var(--vam-border);
+  border-radius: 12px;
   z-index: ${Z_INDEX.PANEL};
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 0.25s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.25s ease,
+    visibility 0.25s ease;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-#${ELEMENT_IDS.PANEL}[data-edge="left"] {
-  left: var(--vam-icon-width);
-  right: auto;
-  border-right: 1px solid var(--vam-border);
-  transform: translateX(-100%);
-}
-
-#${ELEMENT_IDS.PANEL}[data-edge="right"] {
-  right: var(--vam-icon-width);
-  left: auto;
-  border-left: 1px solid var(--vam-border);
-  transform: translateX(100%);
-}
-
-#${ELEMENT_IDS.PANEL}[data-edge="left"][data-open="true"],
-#${ELEMENT_IDS.PANEL}[data-edge="right"][data-open="true"] {
-  transform: translateX(0);
-}
-
-#${ELEMENT_IDS.PANEL}[data-edge="top"] {
-  top: 0;
-  bottom: auto;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: min(90vh, 800px);
-  border-bottom: 1px solid var(--vam-border);
-  border-left: none;
-  border-right: none;
-  transform: translateY(-100%);
-}
-
-#${ELEMENT_IDS.PANEL}[data-edge="bottom"] {
-  bottom: 0;
-  top: auto;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: min(90vh, 800px);
-  border-top: 1px solid var(--vam-border);
-  border-left: none;
-  border-right: none;
-  transform: translateY(100%);
-}
-
-#${ELEMENT_IDS.PANEL}[data-edge="top"][data-open="true"],
-#${ELEMENT_IDS.PANEL}[data-edge="bottom"][data-open="true"] {
-  transform: translateY(0);
+#${ELEMENT_IDS.PANEL}[data-open="true"] {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  visibility: visible;
 }
 
 #${ELEMENT_IDS.IFRAME} {
