@@ -47,7 +47,7 @@ export default defineConfig({
           environment: 'jsdom',
           include: ['src/ui/**/*.test.{ts,tsx}'],
           setupFiles: ['./tests/setup.ts', './tests/setup-ui.ts'],
-          pool: 'threads'
+          pool: 'forks'
         }
       }
     ],
