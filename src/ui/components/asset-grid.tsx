@@ -30,7 +30,7 @@ export const AssetGrid = memo(function AssetGrid({
     items: assets,
     columns,
     scrollElement: scrollContainerRef,
-    rowHeight: ROW_HEIGHT,
+    rowHeight: ROW_HEIGHT + 25,
     gap: GAP,
     overscan: 2
   })
