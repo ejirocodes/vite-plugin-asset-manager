@@ -13,8 +13,6 @@ export function useAssets(
   const [error, setError] = useState<string | null>(null)
   const { subscribe } = useSSE()
 
-  // Use primitive string for dependency comparison to prevent unnecessary re-renders
-  // Vercel best practice: rerender-dependencies
   const advancedParamsString = advancedParams?.toString() ?? ''
 
   const fetchAssets = useCallback(async () => {

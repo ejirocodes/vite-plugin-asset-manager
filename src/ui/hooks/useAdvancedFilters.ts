@@ -40,8 +40,6 @@ export function useAdvancedFilters() {
     setExtensionFilter(undefined)
   }, [])
 
-  // Return stable string for primitive dependency comparison
-  // Vercel best practice: rerender-dependencies
   const filterParamsString = useMemo(() => {
     const params = new URLSearchParams()
     if (sizeFilter && sizeFilter.preset !== 'any') {
