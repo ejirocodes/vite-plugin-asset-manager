@@ -14,7 +14,7 @@ interface AssetGridProps {
 }
 
 const ROW_HEIGHT = 200
-const GAP = 12
+const GAP = 20
 const MIN_CARD_WIDTH = 180
 
 export const AssetGrid = memo(function AssetGrid({

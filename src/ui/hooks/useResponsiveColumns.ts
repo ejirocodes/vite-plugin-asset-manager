@@ -1,7 +1,7 @@
 import { useState, useEffect, RefObject } from 'react'
 
 const MIN_CARD_WIDTH = 180
-const GAP = 12
+const GAP = 20
 
 function getColumns(containerWidth: number): number {
   if (containerWidth <= 0) return 1

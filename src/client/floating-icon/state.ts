@@ -7,7 +7,10 @@ function loadPosition(): Position {
       const parsed = JSON.parse(stored)
       if (
         parsed &&
-        (parsed.edge === 'left' || parsed.edge === 'right' || parsed.edge === 'top' || parsed.edge === 'bottom') &&
+        (parsed.edge === 'left' ||
+          parsed.edge === 'right' ||
+          parsed.edge === 'top' ||
+          parsed.edge === 'bottom') &&
         typeof parsed.offset === 'number'
       ) {
         return parsed as Position

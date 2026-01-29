@@ -57,10 +57,7 @@ interface SidebarProps {
   }
 }
 
-const statusConfig: Record<
-  SSEConnectionStatus,
-  { dotClass: string; label: string }
-> = {
+const statusConfig: Record<SSEConnectionStatus, { dotClass: string; label: string }> = {
   connecting: {
     dotClass: 'bg-amber-500 animate-pulse',
     label: 'Connecting...'

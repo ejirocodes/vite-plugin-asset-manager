@@ -1,4 +1,10 @@
-import { applyPosition, createElements, mountElements, unmountElements, updatePanelState } from './dom'
+import {
+  applyPosition,
+  createElements,
+  mountElements,
+  unmountElements,
+  updatePanelState
+} from './dom'
 import { setupAllHandlers, type CleanupFn } from './events'
 import { createPanelState, createPositionState } from './state'
 import { injectStyles, removeStyles } from './styles'
