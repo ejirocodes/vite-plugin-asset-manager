@@ -15,7 +15,8 @@ pnpm run build:plugin
 pnpm run dev
 
 # Test in playground
-cd playground && pnpm run dev
+cd playgrounds/react && pnpm run dev
+# Or from root: pnpm run playground:react
 # Then visit: http://localhost:5173/__asset_manager__
 
 # Testing (14 test files: 6 server + 8 UI)
@@ -227,8 +228,8 @@ pnpm publish
 ```
 
 ## Playground Assets
-The playground includes a variety of test assets:
-- Images: `02.png`, `Avatar.png`, `logo.svg`, `favicon.svg`
+The `playgrounds/react/` playground includes a variety of test assets:
+- Images: `logo.svg`, `favicon.svg`
 - Fonts: `public/font/` directory
 - Media files: `public/media/` directory
 - Data files: `src/data/` directory
