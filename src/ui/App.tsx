@@ -383,17 +383,16 @@ export default function App() {
             LoadingSpinner
           ) : (
             <>
-              {selectedAssets.size > 0 && (
-                <BulkActionsBar
-                  selectedCount={selectedAssets.size}
-                  totalCount={totalVisibleAssets}
-                  selectedAssets={selectedAssetsArray}
-                  onSelectAll={handleSelectAll}
-                  onDeselectAll={handleDeselectAll}
-                  onDelete={handleBulkDelete}
-                  isDeleting={isDeleting}
-                />
-              )}
+              <BulkActionsBar
+                selectedCount={selectedAssets.size}
+                totalCount={totalVisibleAssets}
+                selectedAssets={selectedAssetsArray}
+                onSelectAll={handleSelectAll}
+                onDeselectAll={handleDeselectAll}
+                onDelete={handleBulkDelete}
+                isDeleting={isDeleting}
+                visible={selectedAssets.size > 0}
+              />
               <div className="p-6 pt-2 space-y-4">
                 <div className="flex items-center justify-end gap-2">
                   <AdvancedFilters

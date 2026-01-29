@@ -30,6 +30,7 @@ interface BulkActionsBarProps {
   onDeselectAll: () => void
   onDelete: () => Promise<void>
   isDeleting: boolean
+  visible: boolean
 }
 
 export const BulkActionsBar = memo(function BulkActionsBar({
@@ -39,7 +40,8 @@ export const BulkActionsBar = memo(function BulkActionsBar({
   onSelectAll,
   onDeselectAll,
   onDelete,
-  isDeleting
+  isDeleting,
+  visible
 }: BulkActionsBarProps) {
   const [isDownloading, setIsDownloading] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -92,7 +94,12 @@ export const BulkActionsBar = memo(function BulkActionsBar({
   const allSelected = selectedCount === totalCount && totalCount > 0
 
   return (
-    <div className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between animate-fade-in-up">
+    <div
+      className={`sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border px-4 flex items-center justify-between transition-all duration-300 ease-out ${
+        visible ? 'h-[52px] py-3 opacity-100 translate-y-0' : 'h-0 py-0 opacity-0 -translate-y-full pointer-events-none overflow-hidden'
+      }`}
+      aria-hidden={!visible}
+    >
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
