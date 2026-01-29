@@ -102,6 +102,7 @@ export default function App() {
   const [focusedAssetId, setFocusedAssetId] = useState<string | null>(null)
   const [isGridFocused, setIsGridFocused] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const mainRef = useRef<HTMLElement>(null)
   const [srAnnouncement, setSrAnnouncement] = useState('')
 
   const handlePreview = useCallback((asset: Asset) => {
@@ -410,7 +411,7 @@ export default function App() {
           onDuplicatesFilterToggle={handleDuplicatesFilterToggle}
           stats={adjustedStats}
         />
-        <main className="flex-1 overflow-auto">
+        <main ref={mainRef} className="flex-1 overflow-auto">
           {loading ? (
             LoadingSpinner
           ) : (
@@ -478,11 +479,11 @@ export default function App() {
                         <div className="border-t border-border">
                           <AssetGrid
                             assets={group.assets}
+                            scrollContainerRef={mainRef}
                             onPreview={handlePreview}
                             selectedAssets={selectedAssets}
                             focusedAssetId={focusedAssetId}
                             onToggleSelect={handleToggleSelect}
-                            onGridFocus={() => setIsGridFocused(true)}
                           />
                         </div>
                       </div>

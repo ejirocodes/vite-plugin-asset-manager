@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useResponsiveColumns } from './useResponsiveColumns'
 import type { Asset } from '../types'
 
 interface UseKeyboardNavigationOptions {
@@ -47,6 +48,8 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
     onRevealInFinder
   } = options
 
+  const columns = useResponsiveColumns()
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement
@@ -65,16 +68,6 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
         return []
       }
 
-      const getGridColumns = (): number => {
-        const width = window.innerWidth
-        if (width >= 1536) return 6 // 2xl
-        if (width >= 1280) return 5 // xl
-        if (width >= 1024) return 4 // lg
-        if (width >= 768) return 3 // md
-        if (width >= 640) return 2 // sm
-        return 1 // xs
-      }
-
       const handleGridNavigation = (key: string) => {
         if (flatAssetList.length === 0) return
 
@@ -89,11 +82,9 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
         } else if (key === 'ArrowLeft') {
           newIndex = Math.max(currentIndex - 1, 0)
         } else if (key === 'ArrowDown' || key === 'j') {
-          const cols = getGridColumns()
-          newIndex = Math.min(currentIndex + cols, flatAssetList.length - 1)
+          newIndex = Math.min(currentIndex + columns, flatAssetList.length - 1)
         } else if (key === 'ArrowUp' || key === 'k') {
-          const cols = getGridColumns()
-          newIndex = Math.max(currentIndex - cols, 0)
+          newIndex = Math.max(currentIndex - columns, 0)
         }
 
         // If no item focused yet, start at first item
@@ -263,6 +254,7 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
     onCopyPaths,
     onDelete,
     onOpenInEditor,
-    onRevealInFinder
+    onRevealInFinder,
+    columns
   ])
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo, useCallback } from 'react'
+import { useState, useRef, memo, useCallback } from 'react'
 import { FileIcon, getFileTypeColor } from './file-icon'
 import { VideoCardPreview, FontCardPreview } from './card-previews'
 import { AssetContextMenu } from './asset-context-menu'
@@ -16,11 +16,9 @@ interface AssetCardProps {
   onToggleSelect?: (assetId: string, shiftKey: boolean) => void
 }
 
-// Module-level cache for formatBytes to prevent recalculation
-// Vercel best practice: js-cache-function-results
+
 const formatBytesCache = new Map<number, string>()
 function formatBytes(bytes: number): string {
-  // Early return with cache lookup - Vercel best practice: js-early-exit
   const cached = formatBytesCache.get(bytes)
   if (cached) return cached
 
@@ -50,16 +48,6 @@ export const AssetCard = memo(function AssetCard({
   const ignored = isIgnored(asset.path)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  // Scroll focused card into view
-  useEffect(() => {
-    if (isFocused && cardRef.current) {
-      cardRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'nearest'
-      })
-    }
-  }, [isFocused])
 
   const isImage = asset.type === 'image'
   const thumbnailUrl = `/__asset_manager__/api/thumbnail?path=${encodeURIComponent(asset.path)}`
