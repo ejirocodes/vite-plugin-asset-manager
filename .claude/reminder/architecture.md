@@ -1,7 +1,7 @@
 # Vite Plugin Asset Manager - Architecture & Design Decisions
 
 ## Overview
-A Vite plugin that provides a visual dashboard for browsing assets in Vite projects (supports React, Vue, Svelte, Solid, Preact, Lit, and vanilla JS), accessible at `/__asset_manager__` during development.
+A Vite plugin that provides a visual dashboard for browsing assets in Vite projects (supports React, Vue, Svelte, Solid, Preact, Lit, Qwik, and vanilla JS), accessible at `/__asset_manager__` during development.
 
 ## Key Design Decisions
 
