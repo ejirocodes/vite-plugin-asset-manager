@@ -114,7 +114,6 @@ export function updatePanelState(
     const margin = DIMENSIONS.VIEWPORT_MARGIN
     const overlap = 8
 
-    // Calculate actual panel dimensions (matching CSS min() logic)
     const panelWidth = Math.min(
       window.innerWidth * (DIMENSIONS.PANEL_WIDTH_PERCENT / 100),
       DIMENSIONS.PANEL_MAX_WIDTH
@@ -128,7 +127,6 @@ export function updatePanelState(
     let panelLeft: number
     let panelTop: number
 
-    // Calculate ideal position based on edge
     if (edge === 'left') {
       panelLeft = containerRect.right - overlap
       panelTop = containerRect.top - overlap
@@ -139,16 +137,13 @@ export function updatePanelState(
       panelLeft = containerRect.left - overlap
       panelTop = containerRect.bottom - overlap
     } else {
-      // bottom
       panelLeft = containerRect.left - overlap
       panelTop = containerRect.top - panelHeight + overlap
     }
 
-    // Clamp to viewport bounds with margin
     panelLeft = Math.max(margin, Math.min(panelLeft, window.innerWidth - panelWidth - margin))
     panelTop = Math.max(margin, Math.min(panelTop, window.innerHeight - panelHeight - margin))
 
-    // Apply position using left/top exclusively for predictable behavior
     elements.panel.style.left = `${panelLeft}px`
     elements.panel.style.top = `${panelTop}px`
     elements.panel.style.right = 'auto'
