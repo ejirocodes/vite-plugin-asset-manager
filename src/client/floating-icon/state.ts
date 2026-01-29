@@ -15,7 +15,7 @@ function loadPosition(): Position {
       const parsed = JSON.parse(stored)
       if (
         parsed &&
-        (parsed.edge === 'left' || parsed.edge === 'right') &&
+        (parsed.edge === 'left' || parsed.edge === 'right' || parsed.edge === 'top' || parsed.edge === 'bottom') &&
         typeof parsed.offset === 'number'
       ) {
         return parsed as Position
@@ -62,13 +62,31 @@ function saveOpenState(isOpen: boolean): void {
 
 /**
  * Calculate which edge to snap to based on pointer position
+ * Snaps to the closest of all 4 edges (top, bottom, left, right)
  */
 export function snapToEdge(x: number, y: number): Position {
   const vw = window.innerWidth
   const vh = window.innerHeight
-  const edge: Edge = x < vw / 2 ? 'left' : 'right'
-  const offset = Math.max(DRAG.MIN_OFFSET, Math.min(DRAG.MAX_OFFSET, (y / vh) * 100))
-  return { edge, offset }
+
+  // Calculate distances to each edge
+  const distances: Record<Edge, number> = {
+    left: x,
+    right: vw - x,
+    top: y,
+    bottom: vh - y
+  }
+
+  // Find closest edge
+  const entries = Object.entries(distances) as [Edge, number][]
+  const [edge] = entries.reduce((a, b) => (b[1] < a[1] ? b : a))
+
+  // Calculate offset along that edge (percentage)
+  // For left/right edges: vertical offset (y position)
+  // For top/bottom edges: horizontal offset (x position)
+  const offset =
+    edge === 'left' || edge === 'right' ? (y / vh) * 100 : (x / vw) * 100
+
+  return { edge, offset: Math.max(DRAG.MIN_OFFSET, Math.min(DRAG.MAX_OFFSET, offset)) }
 }
 
 export interface PositionState {

@@ -97,19 +97,39 @@ export function unmountElements(elements: FloatingIconElements): void {
 
 /**
  * Apply position to container element
+ * Supports all 4 edges: top, bottom, left, right
  */
 export function applyPosition(container: HTMLDivElement, position: Position): void {
   const { edge, offset } = position
   container.dataset.edge = edge
-  container.style.top = offset + '%'
-  container.style.transform = 'translateY(-50%)'
 
-  if (edge === 'left') {
-    container.style.left = '0'
-    container.style.right = 'auto'
-  } else {
-    container.style.right = '0'
-    container.style.left = 'auto'
+  // Reset all positioning
+  container.style.top = 'auto'
+  container.style.bottom = 'auto'
+  container.style.left = 'auto'
+  container.style.right = 'auto'
+
+  switch (edge) {
+    case 'left':
+      container.style.left = '0'
+      container.style.top = `${offset}%`
+      container.style.transform = 'translateY(-50%)'
+      break
+    case 'right':
+      container.style.right = '0'
+      container.style.top = `${offset}%`
+      container.style.transform = 'translateY(-50%)'
+      break
+    case 'top':
+      container.style.top = '0'
+      container.style.left = `${offset}%`
+      container.style.transform = 'translateX(-50%)'
+      break
+    case 'bottom':
+      container.style.bottom = '0'
+      container.style.left = `${offset}%`
+      container.style.transform = 'translateX(-50%)'
+      break
   }
 }
 
@@ -119,7 +139,7 @@ export function applyPosition(container: HTMLDivElement, position: Position): vo
 export function updatePanelState(
   elements: FloatingIconElements,
   isOpen: boolean,
-  edge: 'left' | 'right'
+  edge: 'top' | 'bottom' | 'left' | 'right'
 ): void {
   elements.overlay.dataset.open = String(isOpen)
   elements.panel.dataset.open = String(isOpen)
@@ -141,18 +161,44 @@ export function setDragging(container: HTMLDivElement, isDragging: boolean): voi
 
 /**
  * Update container position during drag
+ * Shows real-time snapping feedback to nearest of all 4 edges
  */
 export function updateDragPosition(container: HTMLDivElement, y: number, x: number): void {
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+
+  // Calculate distances to find nearest edge
+  const distLeft = x
+  const distRight = vw - x
+  const distTop = y
+  const distBottom = vh - y
+  const minDist = Math.min(distLeft, distRight, distTop, distBottom)
+
+  // Reset all positioning
+  container.style.top = 'auto'
+  container.style.bottom = 'auto'
   container.style.left = 'auto'
   container.style.right = 'auto'
-  container.style.top = y + 'px'
-  container.style.transform = 'translateY(-50%)'
 
-  if (x < window.innerWidth / 2) {
+  if (minDist === distLeft) {
     container.style.left = '0'
+    container.style.top = y + 'px'
+    container.style.transform = 'translateY(-50%)'
     container.dataset.edge = 'left'
-  } else {
+  } else if (minDist === distRight) {
     container.style.right = '0'
+    container.style.top = y + 'px'
+    container.style.transform = 'translateY(-50%)'
     container.dataset.edge = 'right'
+  } else if (minDist === distTop) {
+    container.style.top = '0'
+    container.style.left = x + 'px'
+    container.style.transform = 'translateX(-50%)'
+    container.dataset.edge = 'top'
+  } else {
+    container.style.bottom = '0'
+    container.style.left = x + 'px'
+    container.style.transform = 'translateX(-50%)'
+    container.dataset.edge = 'bottom'
   }
 }

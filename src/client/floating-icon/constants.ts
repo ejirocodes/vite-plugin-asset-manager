@@ -48,7 +48,7 @@ export const ELEMENT_IDS = {
   IFRAME: 'vam-iframe'
 } as const
 
-export type Edge = 'left' | 'right'
+export type Edge = 'top' | 'bottom' | 'left' | 'right'
 
 export interface Position {
   edge: Edge
