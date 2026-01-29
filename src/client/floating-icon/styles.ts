@@ -1,7 +1,3 @@
-/**
- * CSS styles for the floating icon component
- */
-
 import { CSS_VARS, DIMENSIONS, ELEMENT_IDS, Z_INDEX } from './constants'
 
 const STYLES = `
@@ -168,20 +164,13 @@ const STYLES = `
 
 let injectedStyleElement: HTMLStyleElement | null = null
 
-/**
- * Inject styles into the document head
- */
 export function injectStyles(): void {
   if (injectedStyleElement) return
-
   injectedStyleElement = document.createElement('style')
   injectedStyleElement.textContent = STYLES
   document.head.appendChild(injectedStyleElement)
 }
 
-/**
- * Remove injected styles from the document
- */
 export function removeStyles(): void {
   if (injectedStyleElement) {
     injectedStyleElement.remove()

@@ -1,7 +1,3 @@
-/**
- * Configuration constants for the floating icon component
- */
-
 export const STORAGE_KEYS = {
   POSITION: 'vite-asset-manager-position',
   OPEN: 'vite-asset-manager-open'

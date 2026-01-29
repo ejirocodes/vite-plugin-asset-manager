@@ -19,7 +19,7 @@ export default [
   },
   {
     files: ['src/**/*.ts'],
-    ignores: ['src/ui/**'],
+    ignores: ['src/ui/**', 'src/client/**'],
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
@@ -49,6 +49,42 @@ export default [
         { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
+      'no-unused-vars': 'off',
+      'no-empty': ['error', { allowEmptyCatch: true }]
+    }
+  },
+  {
+    files: ['src/client/**/*.ts'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module'
+      },
+      globals: {
+        console: 'readonly',
+        document: 'readonly',
+        window: 'readonly',
+        localStorage: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        HTMLIFrameElement: 'readonly',
+        HTMLStyleElement: 'readonly',
+        PointerEvent: 'readonly',
+        MouseEvent: 'readonly',
+        KeyboardEvent: 'readonly',
+        requestAnimationFrame: 'readonly'
+      }
+    },
+    plugins: {
+      '@typescript-eslint': typescript
+    },
+    rules: {
+      ...typescript.configs.recommended.rules,
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }
+      ],
       'no-unused-vars': 'off',
       'no-empty': ['error', { allowEmptyCatch: true }]
     }

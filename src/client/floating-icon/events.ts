@@ -1,7 +1,3 @@
-/**
- * Event handlers for the floating icon component
- */
-
 import {
   applyPosition,
   setDragging,
@@ -25,9 +21,6 @@ export interface EventHandlerContext {
 
 export type CleanupFn = () => void
 
-/**
- * Setup drag handlers for the floating icon
- */
 export function setupDragHandlers(context: EventHandlerContext): CleanupFn {
   const { elements, positionState } = context
   const dragState: DragState = createDragState()
@@ -41,9 +34,7 @@ export function setupDragHandlers(context: EventHandlerContext): CleanupFn {
 
   const onPointerMove = (e: PointerEvent) => {
     if (!dragState.isDragging()) return
-
     if (!dragState.checkThreshold(e.clientX, e.clientY)) return
-
     updateDragPosition(elements.container, e.clientY, e.clientX)
   }
 
@@ -73,16 +64,11 @@ export function setupDragHandlers(context: EventHandlerContext): CleanupFn {
   }
 }
 
-/**
- * Setup click handlers for the floating icon
- */
 export function setupClickHandlers(context: EventHandlerContext): CleanupFn {
   const { elements, positionState, panelState } = context
   const dragState: DragState = createDragState()
 
-  // Track drag state for click detection
   const onPointerDown = (e: PointerEvent) => {
-    // Must capture actual position to correctly detect drag vs click
     dragState.start(e.clientX, e.clientY)
   }
 
@@ -97,12 +83,8 @@ export function setupClickHandlers(context: EventHandlerContext): CleanupFn {
   }
 
   const onTriggerClick = () => {
-    console.log('[VAM] Trigger clicked, hasMoved:', dragState.hasMoved())
-    // Don't toggle if we just finished dragging
     if (dragState.hasMoved()) return
-
     panelState.toggle()
-    console.log('[VAM] Panel toggled, isOpen:', panelState.isOpen())
     updatePanelState(elements, panelState.isOpen(), positionState.get().edge)
   }
 
@@ -128,14 +110,10 @@ export function setupClickHandlers(context: EventHandlerContext): CleanupFn {
   }
 }
 
-/**
- * Setup keyboard handlers for the floating icon
- */
 export function setupKeyboardHandlers(context: EventHandlerContext): CleanupFn {
   const { elements, positionState, panelState } = context
 
   const onKeyDown = (e: KeyboardEvent) => {
-    // Escape to close
     if (e.key === 'Escape' && panelState.isOpen()) {
       panelState.close()
       updatePanelState(elements, false, positionState.get().edge)
@@ -157,9 +135,6 @@ export function setupKeyboardHandlers(context: EventHandlerContext): CleanupFn {
   }
 }
 
-/**
- * Setup all event handlers and return a cleanup function
- */
 export function setupAllHandlers(context: EventHandlerContext): CleanupFn {
   const cleanupFns = [
     setupDragHandlers(context),

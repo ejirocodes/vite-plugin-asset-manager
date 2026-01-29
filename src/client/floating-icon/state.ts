@@ -1,13 +1,5 @@
-/**
- * State management for the floating icon component
- * Uses a composable-style pattern similar to Vue DevTools
- */
-
 import { DEFAULT_POSITION, DRAG, STORAGE_KEYS, type Edge, type Position } from './constants'
 
-/**
- * Load position from localStorage
- */
 function loadPosition(): Position {
   try {
     const stored = localStorage.getItem(STORAGE_KEYS.POSITION)
@@ -27,9 +19,6 @@ function loadPosition(): Position {
   return { ...DEFAULT_POSITION }
 }
 
-/**
- * Save position to localStorage
- */
 function savePosition(position: Position): void {
   try {
     localStorage.setItem(STORAGE_KEYS.POSITION, JSON.stringify(position))
@@ -38,9 +27,6 @@ function savePosition(position: Position): void {
   }
 }
 
-/**
- * Load open state from localStorage
- */
 function loadOpenState(): boolean {
   try {
     return localStorage.getItem(STORAGE_KEYS.OPEN) === 'true'
@@ -49,9 +35,6 @@ function loadOpenState(): boolean {
   }
 }
 
-/**
- * Save open state to localStorage
- */
 function saveOpenState(isOpen: boolean): void {
   try {
     localStorage.setItem(STORAGE_KEYS.OPEN, String(isOpen))
@@ -60,15 +43,10 @@ function saveOpenState(isOpen: boolean): void {
   }
 }
 
-/**
- * Calculate which edge to snap to based on pointer position
- * Snaps to the closest of all 4 edges (top, bottom, left, right)
- */
 export function snapToEdge(x: number, y: number): Position {
   const vw = window.innerWidth
   const vh = window.innerHeight
 
-  // Calculate distances to each edge
   const distances: Record<Edge, number> = {
     left: x,
     right: vw - x,
@@ -76,15 +54,11 @@ export function snapToEdge(x: number, y: number): Position {
     bottom: vh - y
   }
 
-  // Find closest edge
   const entries = Object.entries(distances) as [Edge, number][]
   const [edge] = entries.reduce((a, b) => (b[1] < a[1] ? b : a))
 
-  // Calculate offset along that edge (percentage)
-  // For left/right edges: vertical offset (y position)
-  // For top/bottom edges: horizontal offset (x position)
-  const offset =
-    edge === 'left' || edge === 'right' ? (y / vh) * 100 : (x / vw) * 100
+  // For left/right: vertical offset, for top/bottom: horizontal offset
+  const offset = edge === 'left' || edge === 'right' ? (y / vh) * 100 : (x / vw) * 100
 
   return { edge, offset: Math.max(DRAG.MIN_OFFSET, Math.min(DRAG.MAX_OFFSET, offset)) }
 }
@@ -95,9 +69,6 @@ export interface PositionState {
   save: () => void
 }
 
-/**
- * Create a position state manager (composable-style)
- */
 export function createPositionState(): PositionState {
   let position = loadPosition()
 
@@ -119,9 +90,6 @@ export interface PanelState {
   toggle: () => void
 }
 
-/**
- * Create a panel state manager (composable-style)
- */
 export function createPanelState(): PanelState {
   let isOpen = loadOpenState()
 
@@ -152,9 +120,6 @@ export interface DragState {
   checkThreshold: (x: number, y: number) => boolean
 }
 
-/**
- * Create a drag state manager (composable-style)
- */
 export function createDragState(): DragState {
   let isDragging = false
   let hasMoved = false
