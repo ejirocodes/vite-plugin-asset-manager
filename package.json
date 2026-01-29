@@ -37,7 +37,8 @@
     "test:coverage": "vitest run --coverage",
     "test:server": "vitest run --project server",
     "test:client": "vitest run --project ui",
-    "playground:react": "pnpm --filter playground-react dev"
+    "playground:react": "pnpm --filter playground-react dev",
+    "playground:vue": "pnpm --filter playground-vue dev"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
