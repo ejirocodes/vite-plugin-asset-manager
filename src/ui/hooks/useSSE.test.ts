@@ -3,34 +3,33 @@ import { renderHook, act } from '@testing-library/react'
 import { useSSE, __resetForTesting } from './useSSE'
 
 describe('useSSE', () => {
-  let mockEventSource: {
+  let lastCreatedInstance: {
     readyState: number
     onopen: ((event: Event) => void) | null
     onmessage: ((event: MessageEvent) => void) | null
     onerror: ((event: Event) => void) | null
     close: ReturnType<typeof vi.fn>
-  }
+  } | null
   let eventSourceCallCount: number
 
   beforeEach(() => {
     eventSourceCallCount = 0
-
-    mockEventSource = {
-      readyState: 0,
-      onopen: null,
-      onmessage: null,
-      onerror: null,
-      close: vi.fn()
-    }
+    lastCreatedInstance = null
 
     class MockEventSource {
       static CONNECTING = 0
       static OPEN = 1
       static CLOSED = 2
 
+      readyState = 0
+      onopen: ((event: Event) => void) | null = null
+      onmessage: ((event: MessageEvent) => void) | null = null
+      onerror: ((event: Event) => void) | null = null
+      close = vi.fn()
+
       constructor() {
         eventSourceCallCount++
-        Object.assign(this, mockEventSource)
+        lastCreatedInstance = this
       }
     }
 
@@ -62,15 +61,17 @@ describe('useSSE', () => {
     })
 
     act(() => {
-      mockEventSource.readyState = 1
-      mockEventSource.onopen?.(new Event('open'))
+      if (lastCreatedInstance) {
+        lastCreatedInstance.readyState = 1
+        lastCreatedInstance.onopen?.(new Event('open'))
+      }
     })
 
     act(() => {
       const event = new MessageEvent('message', {
         data: JSON.stringify({ event: 'test-event', data: { foo: 'bar' } })
       })
-      mockEventSource.onmessage?.(event)
+      lastCreatedInstance?.onmessage?.(event)
     })
 
     expect(handler).toHaveBeenCalledWith({ foo: 'bar' })
@@ -93,7 +94,7 @@ describe('useSSE', () => {
       const event = new MessageEvent('message', {
         data: JSON.stringify({ event: 'test-event', data: {} })
       })
-      mockEventSource.onmessage?.(event)
+      lastCreatedInstance?.onmessage?.(event)
     })
 
     expect(handler).not.toHaveBeenCalled()
@@ -111,7 +112,7 @@ describe('useSSE', () => {
       const event = new MessageEvent('message', {
         data: JSON.stringify({ type: 'connected' })
       })
-      mockEventSource.onmessage?.(event)
+      lastCreatedInstance?.onmessage?.(event)
     })
 
     expect(handler).not.toHaveBeenCalled()
@@ -129,12 +130,13 @@ describe('useSSE', () => {
     const { unmount: unmount2 } = renderHook(() => useSSE())
 
     expect(eventSourceCallCount).toBe(1)
+    const instance = lastCreatedInstance
 
     unmount1()
-    expect(mockEventSource.close).not.toHaveBeenCalled()
+    expect(instance?.close).not.toHaveBeenCalled()
 
     unmount2()
-    expect(mockEventSource.close).toHaveBeenCalled()
+    expect(instance?.close).toHaveBeenCalled()
   })
 
   it('should handle multiple event handlers for same event', () => {
@@ -151,7 +153,7 @@ describe('useSSE', () => {
       const event = new MessageEvent('message', {
         data: JSON.stringify({ event: 'test-event', data: { test: true } })
       })
-      mockEventSource.onmessage?.(event)
+      lastCreatedInstance?.onmessage?.(event)
     })
 
     expect(handler1).toHaveBeenCalledWith({ test: true })
@@ -171,7 +173,7 @@ describe('useSSE', () => {
         const event = new MessageEvent('message', {
           data: 'invalid json {'
         })
-        mockEventSource.onmessage?.(event)
+        lastCreatedInstance?.onmessage?.(event)
       })
     }).not.toThrow()
 
@@ -185,12 +187,14 @@ describe('useSSE', () => {
     const initialCount = eventSourceCallCount
 
     act(() => {
-      mockEventSource.readyState = 1
-      mockEventSource.onopen?.(new Event('open'))
+      if (lastCreatedInstance) {
+        lastCreatedInstance.readyState = 1
+        lastCreatedInstance.onopen?.(new Event('open'))
+      }
     })
 
     act(() => {
-      mockEventSource.onerror?.(new Event('error'))
+      lastCreatedInstance?.onerror?.(new Event('error'))
     })
 
     await act(async () => {

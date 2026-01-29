@@ -24,6 +24,8 @@ export default defineConfig({
     reporters: ['default'],
     testTimeout: 10000,
     hookTimeout: 10000,
+    teardownTimeout: 5000,
+    pool: 'threads',
     projects: [
       {
         ...sharedConfig,
@@ -32,7 +34,8 @@ export default defineConfig({
           globals: true,
           environment: 'node',
           include: ['tests/**/*.test.ts'],
-          setupFiles: ['./tests/setup.ts']
+          setupFiles: ['./tests/setup.ts'],
+          pool: 'threads'
         }
       },
       {
@@ -43,7 +46,8 @@ export default defineConfig({
           globals: true,
           environment: 'jsdom',
           include: ['src/ui/**/*.test.{ts,tsx}'],
-          setupFiles: ['./tests/setup.ts', './tests/setup-ui.ts']
+          setupFiles: ['./tests/setup.ts', './tests/setup-ui.ts'],
+          pool: 'threads'
         }
       }
     ],
