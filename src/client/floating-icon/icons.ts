@@ -2,7 +2,7 @@
  * SVG icons used in the floating icon component
  */
 
-export const VITE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 257" style="display:block">
+export const VITE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 257" style="display:block">
   <defs>
     <linearGradient id="vam-icon-grad-1" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%">
       <stop offset="0%" stop-color="#41D1FF"/>

@@ -10,25 +10,30 @@ export const Z_INDEX = {
 } as const
 
 export const CSS_VARS = {
-  BG: 'rgba(15, 15, 17, 0.95)',
-  BORDER: 'rgba(255, 255, 255, 0.08)',
-  HOVER: 'rgba(255, 255, 255, 0.1)',
-  TRANSITION: '0.3s cubic-bezier(0.32, 0.72, 0, 1)',
-  SHADOW: '0 8px 32px rgba(0, 0, 0, 0.4)',
-  SHADOW_DRAGGING: '0 12px 48px rgba(0, 0, 0, 0.5)',
+  BG: 'rgba(10, 10, 12, 0.92)',
+  BORDER: 'rgba(255, 255, 255, 0.06)',
+  BORDER_HOVER: 'rgba(255, 255, 255, 0.12)',
+  HOVER: 'rgba(255, 255, 255, 0.08)',
+  TRANSITION: '0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  TRANSITION_SPRING: '0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+  SHADOW: '0 4px 16px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2)',
+  SHADOW_HOVER: '0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2)',
+  SHADOW_DRAGGING: '0 12px 32px rgba(0, 0, 0, 0.5)',
+  GLOW_ACTIVE: '0 0 20px rgba(65, 209, 255, 0.3), 0 0 40px rgba(189, 52, 254, 0.2)',
   PANEL_BG: '#09090b'
 } as const
 
 export const DIMENSIONS = {
-  TRIGGER_HEIGHT: 36,
+  TRIGGER_SIZE: 28,
+  ICON_SIZE: 16,
   PANEL_MAX_WIDTH: 1200,
   PANEL_WIDTH_PERCENT: 90,
-  CONTAINER_PADDING: 8,
-  BORDER_RADIUS: 14,
-  TRIGGER_BORDER_RADIUS: 10,
-  BACKDROP_BLUR: 12,
+  CONTAINER_PADDING: 5,
+  BORDER_RADIUS: 10,
+  TRIGGER_BORDER_RADIUS: 6,
+  BACKDROP_BLUR: 8,
   OVERLAY_BLUR: 4,
-  ICON_CONTAINER_WIDTH: 52
+  ICON_CONTAINER_WIDTH: 38
 } as const
 
 export const DRAG = {

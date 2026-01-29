@@ -4,9 +4,13 @@ const STYLES = `
 :root {
   --vam-bg: ${CSS_VARS.BG};
   --vam-border: ${CSS_VARS.BORDER};
+  --vam-border-hover: ${CSS_VARS.BORDER_HOVER};
   --vam-hover: ${CSS_VARS.HOVER};
   --vam-transition: ${CSS_VARS.TRANSITION};
+  --vam-transition-spring: ${CSS_VARS.TRANSITION_SPRING};
   --vam-shadow: ${CSS_VARS.SHADOW};
+  --vam-shadow-hover: ${CSS_VARS.SHADOW_HOVER};
+  --vam-glow-active: ${CSS_VARS.GLOW_ACTIVE};
   --vam-icon-width: ${DIMENSIONS.ICON_CONTAINER_WIDTH}px;
 }
 
@@ -16,10 +20,20 @@ const STYLES = `
   padding: ${DIMENSIONS.CONTAINER_PADDING}px;
   background: var(--vam-bg);
   backdrop-filter: blur(${DIMENSIONS.BACKDROP_BLUR}px);
+  -webkit-backdrop-filter: blur(${DIMENSIONS.BACKDROP_BLUR}px);
   border: 1px solid var(--vam-border);
   box-shadow: var(--vam-shadow);
-  transition: var(--vam-transition);
+  transition:
+    box-shadow var(--vam-transition),
+    border-color var(--vam-transition),
+    transform var(--vam-transition-spring);
   touch-action: none;
+  will-change: transform;
+}
+
+#${ELEMENT_IDS.CONTAINER}:hover {
+  border-color: var(--vam-border-hover);
+  box-shadow: var(--vam-shadow-hover);
 }
 
 #${ELEMENT_IDS.CONTAINER}[data-edge="left"] {
@@ -44,13 +58,14 @@ const STYLES = `
 
 #${ELEMENT_IDS.CONTAINER}[data-dragging="true"] {
   cursor: grabbing;
-  opacity: 0.9;
-  box-shadow: ${CSS_VARS.SHADOW_DRAGGING};
+  transform: scale(1.05);
+  box-shadow: var(--vam-shadow-hover);
 }
 
 #${ELEMENT_IDS.TRIGGER} {
-  width: 100%;
-  height: ${DIMENSIONS.TRIGGER_HEIGHT}px;
+  width: ${DIMENSIONS.TRIGGER_SIZE}px;
+  height: ${DIMENSIONS.TRIGGER_SIZE}px;
+  padding: 0;
   border-radius: ${DIMENSIONS.TRIGGER_BORDER_RADIUS}px;
   background: transparent;
   border: none;
@@ -58,34 +73,48 @@ const STYLES = `
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease;
+  transition:
+    background var(--vam-transition),
+    transform var(--vam-transition-spring);
+  will-change: transform;
 }
 
 #${ELEMENT_IDS.TRIGGER}:hover {
   background: var(--vam-hover);
+  transform: scale(1.08);
+}
+
+#${ELEMENT_IDS.TRIGGER}:active {
+  transform: scale(0.95);
 }
 
 #${ELEMENT_IDS.TRIGGER}[data-active="true"] {
-  background: rgba(139, 92, 246, 0.2);
+  background: rgba(65, 209, 255, 0.12);
 }
 
 #${ELEMENT_IDS.TRIGGER}[data-active="true"] svg {
-  filter: drop-shadow(0 0 8px rgba(65, 209, 255, 0.5));
+  filter: drop-shadow(0 0 6px rgba(65, 209, 255, 0.6));
 }
 
 #${ELEMENT_IDS.CONTAINER}[data-dragging="true"] #${ELEMENT_IDS.TRIGGER} {
   cursor: grabbing;
+  transform: none;
+}
+
+#${ELEMENT_IDS.TRIGGER} svg {
+  transition: filter var(--vam-transition), transform var(--vam-transition);
 }
 
 #${ELEMENT_IDS.OVERLAY} {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(${DIMENSIONS.OVERLAY_BLUR}px);
+  -webkit-backdrop-filter: blur(${DIMENSIONS.OVERLAY_BLUR}px);
   z-index: ${Z_INDEX.OVERLAY};
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 #${ELEMENT_IDS.OVERLAY}[data-open="true"] {
@@ -102,7 +131,7 @@ const STYLES = `
   z-index: ${Z_INDEX.PANEL};
   display: flex;
   flex-direction: column;
-  transition: transform var(--vam-transition);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 #${ELEMENT_IDS.PANEL}[data-edge="left"] {
@@ -160,6 +189,16 @@ const STYLES = `
   border: none;
   width: 100%;
   height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #${ELEMENT_IDS.CONTAINER},
+  #${ELEMENT_IDS.TRIGGER},
+  #${ELEMENT_IDS.OVERLAY},
+  #${ELEMENT_IDS.PANEL},
+  #${ELEMENT_IDS.TRIGGER} svg {
+    transition: none;
+  }
 }
 `
 
