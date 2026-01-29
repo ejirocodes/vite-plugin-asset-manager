@@ -1,32 +1,43 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, RefObject } from 'react'
 
-const BREAKPOINTS = {
-  '2xl': 1536,
-  xl: 1280,
-  lg: 1024,
-  md: 768,
-  sm: 640
-} as const
+const MIN_CARD_WIDTH = 180
+const GAP = 12
 
-function getColumns(width: number): number {
-  if (width >= BREAKPOINTS['2xl']) return 6
-  if (width >= BREAKPOINTS.xl) return 5
-  if (width >= BREAKPOINTS.lg) return 4
-  if (width >= BREAKPOINTS.md) return 3
-  if (width >= BREAKPOINTS.sm) return 2
-  return 1
+function getColumns(containerWidth: number): number {
+  if (containerWidth <= 0) return 1
+  const availableWidth = containerWidth - 32 // account for padding
+  const cols = Math.floor((availableWidth + GAP) / (MIN_CARD_WIDTH + GAP))
+  return Math.max(1, cols)
 }
 
-export function useResponsiveColumns(): number {
-  const [columns, setColumns] = useState(() =>
-    getColumns(typeof window !== 'undefined' ? window.innerWidth : 1024)
-  )
+export function useResponsiveColumns(containerRef?: RefObject<HTMLElement | null>): number {
+  const [columns, setColumns] = useState(() => {
+    if (typeof window === 'undefined') return 3
+    return getColumns(window.innerWidth)
+  })
 
   useEffect(() => {
-    const handleResize = () => setColumns(getColumns(window.innerWidth))
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+    const container = containerRef?.current
+
+    const updateColumns = () => {
+      if (container) {
+        setColumns(getColumns(container.clientWidth))
+      } else {
+        setColumns(getColumns(window.innerWidth))
+      }
+    }
+
+    updateColumns()
+
+    if (container && typeof ResizeObserver !== 'undefined') {
+      const resizeObserver = new ResizeObserver(updateColumns)
+      resizeObserver.observe(container)
+      return () => resizeObserver.disconnect()
+    } else {
+      window.addEventListener('resize', updateColumns)
+      return () => window.removeEventListener('resize', updateColumns)
+    }
+  }, [containerRef])
 
   return columns
 }

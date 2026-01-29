@@ -119,40 +119,42 @@ export const AssetCard = memo(function AssetCard({
           </div>
         )}
 
-        <div className="relative overflow-hidden h-[200px]">
-          <div className="absolute inset-0 checkerboard" />
+        <div className="flex items-center justify-center p-3 bg-card">
+          <div className="relative w-28.25 h-28.25 rounded-lg overflow-hidden shrink-0">
+            <div className="absolute inset-0 checkerboard" />
 
-          {isImage && !imageError ? (
-            <img
-              src={thumbnailUrl}
-              alt={asset.name}
-              className="relative w-full h-full object-cover"
-              loading="lazy"
-              onError={handleImageError}
-            />
-          ) : asset.type === 'video' ? (
-            <VideoCardPreview asset={asset} />
-          ) : asset.type === 'font' ? (
-            <FontCardPreview asset={asset} />
-          ) : (
-            <div className="relative w-full h-full flex items-center justify-center bg-card">
-              <FileIcon extension={asset.extension} className="w-16 h-16" />
+            {isImage && !imageError ? (
+              <img
+                src={thumbnailUrl}
+                alt={asset.name}
+                className="relative w-full h-full object-contain p-2"
+                loading="lazy"
+                onError={handleImageError}
+              />
+            ) : asset.type === 'video' ? (
+              <VideoCardPreview asset={asset} />
+            ) : asset.type === 'font' ? (
+              <FontCardPreview asset={asset} />
+            ) : (
+              <div className="relative w-full h-full flex items-center justify-center bg-card">
+                <FileIcon extension={asset.extension} className="w-10 h-10" />
+              </div>
+            )}
+
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-lg">
+              <button
+                onClick={handleCopyPath}
+                className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
+                title="Copy path"
+                aria-label="Copy file path"
+              >
+                {copied ? (
+                  <CheckIcon weight="bold" className="w-3.5 h-3.5 text-emerald-400" />
+                ) : (
+                  <CopyIcon weight="bold" className="w-3.5 h-3.5 text-white" />
+                )}
+              </button>
             </div>
-          )}
-
-          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-            <button
-              onClick={handleCopyPath}
-              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-              title="Copy path"
-              aria-label="Copy file path"
-            >
-              {copied ? (
-                <CheckIcon weight="bold" className="w-4 h-4 text-emerald-400" />
-              ) : (
-                <CopyIcon weight="bold" className="w-4 h-4 text-white" />
-              )}
-            </button>
           </div>
         </div>
 

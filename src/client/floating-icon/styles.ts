@@ -124,11 +124,9 @@ const STYLES = `
 
 #${ELEMENT_IDS.PANEL} {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.95);
   width: min(${DIMENSIONS.PANEL_WIDTH_PERCENT}vw, ${DIMENSIONS.PANEL_MAX_WIDTH}px);
   height: min(${DIMENSIONS.PANEL_HEIGHT_PERCENT}vh, ${DIMENSIONS.PANEL_MAX_HEIGHT}px);
+  max-height: calc(100vh - 40px);
   background: ${CSS_VARS.PANEL_BG};
   border: 1px solid var(--vam-border);
   border-radius: 12px;
@@ -137,16 +135,16 @@ const STYLES = `
   flex-direction: column;
   opacity: 0;
   visibility: hidden;
+  transform: scale(0.95);
   transition:
-    transform 0.25s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity 0.25s ease,
-    visibility 0.25s ease;
+    transform 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.2s ease,
+    visibility 0.2s ease;
   overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 #${ELEMENT_IDS.PANEL}[data-open="true"] {
-  transform: translate(-50%, -50%) scale(1);
+  transform: scale(1);
   opacity: 1;
   visibility: visible;
 }

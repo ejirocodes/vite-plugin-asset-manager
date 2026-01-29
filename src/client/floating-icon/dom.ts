@@ -108,6 +108,33 @@ export function updatePanelState(
   elements.panel.dataset.open = String(isOpen)
   elements.panel.dataset.edge = edge
   elements.trigger.dataset.active = String(isOpen)
+
+  if (isOpen) {
+    const containerRect = elements.container.getBoundingClientRect()
+    const overlap = 8
+
+    if (edge === 'left') {
+      elements.panel.style.left = `${containerRect.right - overlap}px`
+      elements.panel.style.top = `${containerRect.top - overlap}px`
+      elements.panel.style.right = 'auto'
+      elements.panel.style.bottom = 'auto'
+    } else if (edge === 'right') {
+      elements.panel.style.right = `${window.innerWidth - containerRect.left - overlap}px`
+      elements.panel.style.top = `${containerRect.top - overlap}px`
+      elements.panel.style.left = 'auto'
+      elements.panel.style.bottom = 'auto'
+    } else if (edge === 'top') {
+      elements.panel.style.top = `${containerRect.bottom - overlap}px`
+      elements.panel.style.left = `${containerRect.left - overlap}px`
+      elements.panel.style.right = 'auto'
+      elements.panel.style.bottom = 'auto'
+    } else {
+      elements.panel.style.bottom = `${window.innerHeight - containerRect.top - overlap}px`
+      elements.panel.style.left = `${containerRect.left - overlap}px`
+      elements.panel.style.right = 'auto'
+      elements.panel.style.top = 'auto'
+    }
+  }
 }
 
 export function setDragging(container: HTMLDivElement, isDragging: boolean): void {

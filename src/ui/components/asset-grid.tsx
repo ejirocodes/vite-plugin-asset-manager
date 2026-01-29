@@ -13,8 +13,9 @@ interface AssetGridProps {
   onToggleSelect?: (assetId: string, shiftKey: boolean) => void
 }
 
-const ROW_HEIGHT = 244
-const GAP = 16
+const ROW_HEIGHT = 200
+const GAP = 12
+const MIN_CARD_WIDTH = 180
 
 export const AssetGrid = memo(function AssetGrid({
   assets,
@@ -24,7 +25,7 @@ export const AssetGrid = memo(function AssetGrid({
   focusedAssetId,
   onToggleSelect
 }: AssetGridProps) {
-  const columns = useResponsiveColumns()
+  const columns = useResponsiveColumns(scrollContainerRef)
 
   const { virtualRows, totalHeight, getRowItems, scrollToItem } = useVirtualGrid({
     items: assets,
@@ -65,7 +66,7 @@ export const AssetGrid = memo(function AssetGrid({
                 width: '100%',
                 transform: `translateY(${virtualRow.start}px)`,
                 display: 'grid',
-                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                gridTemplateColumns: `repeat(${columns}, minmax(${MIN_CARD_WIDTH}px, 1fr))`,
                 gap: GAP
               }}
             >
