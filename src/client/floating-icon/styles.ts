@@ -1,17 +1,37 @@
-import { CSS_VARS, DIMENSIONS, ELEMENT_IDS, Z_INDEX } from './constants'
+import { CSS_TRANSITIONS, DARK_COLORS, LIGHT_COLORS, DIMENSIONS, ELEMENT_IDS, Z_INDEX } from './constants'
 
 const STYLES = `
 :root {
-  --vam-bg: ${CSS_VARS.BG};
-  --vam-border: ${CSS_VARS.BORDER};
-  --vam-border-hover: ${CSS_VARS.BORDER_HOVER};
-  --vam-hover: ${CSS_VARS.HOVER};
-  --vam-transition: ${CSS_VARS.TRANSITION};
-  --vam-transition-spring: ${CSS_VARS.TRANSITION_SPRING};
-  --vam-shadow: ${CSS_VARS.SHADOW};
-  --vam-shadow-hover: ${CSS_VARS.SHADOW_HOVER};
-  --vam-glow-active: ${CSS_VARS.GLOW_ACTIVE};
+  --vam-bg: ${LIGHT_COLORS.BG};
+  --vam-border: ${LIGHT_COLORS.BORDER};
+  --vam-border-hover: ${LIGHT_COLORS.BORDER_HOVER};
+  --vam-hover: ${LIGHT_COLORS.HOVER};
+  --vam-shadow: ${LIGHT_COLORS.SHADOW};
+  --vam-shadow-hover: ${LIGHT_COLORS.SHADOW_HOVER};
+  --vam-shadow-dragging: ${LIGHT_COLORS.SHADOW_DRAGGING};
+  --vam-glow-active: ${LIGHT_COLORS.GLOW_ACTIVE};
+  --vam-trigger-active-bg: ${LIGHT_COLORS.TRIGGER_ACTIVE_BG};
+  --vam-overlay-bg: ${LIGHT_COLORS.OVERLAY_BG};
+  --vam-panel-bg: ${LIGHT_COLORS.PANEL_BG};
+  --vam-transition: ${CSS_TRANSITIONS.DEFAULT};
+  --vam-transition-spring: ${CSS_TRANSITIONS.SPRING};
   --vam-icon-width: ${DIMENSIONS.ICON_CONTAINER_WIDTH}px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --vam-bg: ${DARK_COLORS.BG};
+    --vam-border: ${DARK_COLORS.BORDER};
+    --vam-border-hover: ${DARK_COLORS.BORDER_HOVER};
+    --vam-hover: ${DARK_COLORS.HOVER};
+    --vam-shadow: ${DARK_COLORS.SHADOW};
+    --vam-shadow-hover: ${DARK_COLORS.SHADOW_HOVER};
+    --vam-shadow-dragging: ${DARK_COLORS.SHADOW_DRAGGING};
+    --vam-glow-active: ${DARK_COLORS.GLOW_ACTIVE};
+    --vam-trigger-active-bg: ${DARK_COLORS.TRIGGER_ACTIVE_BG};
+    --vam-overlay-bg: ${DARK_COLORS.OVERLAY_BG};
+    --vam-panel-bg: ${DARK_COLORS.PANEL_BG};
+  }
 }
 
 #${ELEMENT_IDS.CONTAINER} {
@@ -59,7 +79,7 @@ const STYLES = `
 #${ELEMENT_IDS.CONTAINER}[data-dragging="true"] {
   cursor: grabbing;
   transform: scale(1.05);
-  box-shadow: var(--vam-shadow-hover);
+  box-shadow: var(--vam-shadow-dragging);
 }
 
 #${ELEMENT_IDS.TRIGGER} {
@@ -89,7 +109,7 @@ const STYLES = `
 }
 
 #${ELEMENT_IDS.TRIGGER}[data-active="true"] {
-  background: rgba(65, 209, 255, 0.12);
+  background: var(--vam-trigger-active-bg);
 }
 
 #${ELEMENT_IDS.TRIGGER}[data-active="true"] svg {
@@ -108,7 +128,7 @@ const STYLES = `
 #${ELEMENT_IDS.OVERLAY} {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--vam-overlay-bg);
   backdrop-filter: blur(${DIMENSIONS.OVERLAY_BLUR}px);
   -webkit-backdrop-filter: blur(${DIMENSIONS.OVERLAY_BLUR}px);
   z-index: ${Z_INDEX.OVERLAY};
@@ -127,7 +147,7 @@ const STYLES = `
   width: min(${DIMENSIONS.PANEL_WIDTH_PERCENT}vw, ${DIMENSIONS.PANEL_MAX_WIDTH}px);
   height: min(${DIMENSIONS.PANEL_HEIGHT_PERCENT}vh, ${DIMENSIONS.PANEL_MAX_HEIGHT}px);
   max-height: calc(100vh - 40px);
-  background: ${CSS_VARS.PANEL_BG};
+  background: var(--vam-panel-bg);
   border: 1px solid var(--vam-border);
   border-radius: 12px;
   z-index: ${Z_INDEX.PANEL};
