@@ -22,7 +22,7 @@ export interface EventHandlerContext {
 export type CleanupFn = () => void
 
 export function setupDragHandlers(context: EventHandlerContext): CleanupFn {
-  const { elements, positionState } = context
+  const { elements, positionState, panelState } = context
   const dragState: DragState = createDragState()
 
   const onPointerDown = (e: PointerEvent) => {
@@ -50,6 +50,10 @@ export function setupDragHandlers(context: EventHandlerContext): CleanupFn {
       positionState.set(newPosition)
       positionState.save()
       applyPosition(elements.container, newPosition)
+
+      if (panelState.isOpen()) {
+        updatePanelState(elements, true, newPosition.edge)
+      }
     }
   }
 

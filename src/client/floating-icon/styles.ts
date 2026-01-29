@@ -7,6 +7,7 @@ const STYLES = `
   --vam-hover: ${CSS_VARS.HOVER};
   --vam-transition: ${CSS_VARS.TRANSITION};
   --vam-shadow: ${CSS_VARS.SHADOW};
+  --vam-icon-width: ${DIMENSIONS.ICON_CONTAINER_WIDTH}px;
 }
 
 #${ELEMENT_IDS.CONTAINER} {
@@ -96,7 +97,7 @@ const STYLES = `
   position: fixed;
   top: 0;
   bottom: 0;
-  width: min(${DIMENSIONS.PANEL_WIDTH_PERCENT}vw, ${DIMENSIONS.PANEL_MAX_WIDTH}px);
+  width: min(calc(${DIMENSIONS.PANEL_WIDTH_PERCENT}vw - var(--vam-icon-width)), ${DIMENSIONS.PANEL_MAX_WIDTH}px);
   background: ${CSS_VARS.PANEL_BG};
   z-index: ${Z_INDEX.PANEL};
   display: flex;
@@ -105,14 +106,14 @@ const STYLES = `
 }
 
 #${ELEMENT_IDS.PANEL}[data-edge="left"] {
-  left: 0;
+  left: var(--vam-icon-width);
   right: auto;
   border-right: 1px solid var(--vam-border);
   transform: translateX(-100%);
 }
 
 #${ELEMENT_IDS.PANEL}[data-edge="right"] {
-  right: 0;
+  right: var(--vam-icon-width);
   left: auto;
   border-left: 1px solid var(--vam-border);
   transform: translateX(100%);

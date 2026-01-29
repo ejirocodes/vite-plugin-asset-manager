@@ -4,8 +4,8 @@ export const STORAGE_KEYS = {
 } as const
 
 export const Z_INDEX = {
-  CONTAINER: 99998,
-  OVERLAY: 99999,
+  OVERLAY: 99998,
+  CONTAINER: 99999,
   PANEL: 100000
 } as const
 
@@ -27,7 +27,8 @@ export const DIMENSIONS = {
   BORDER_RADIUS: 14,
   TRIGGER_BORDER_RADIUS: 10,
   BACKDROP_BLUR: 12,
-  OVERLAY_BLUR: 4
+  OVERLAY_BLUR: 4,
+  ICON_CONTAINER_WIDTH: 52
 } as const
 
 export const DRAG = {
