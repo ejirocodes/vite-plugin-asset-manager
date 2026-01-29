@@ -12,7 +12,7 @@ The plugin provides a comprehensive asset management solution with:
 - Asset sorting (8 sort options via dropdown)
 - Search functionality with debouncing
 - Importer detection with click-to-open-in-editor
-- Floating icon integration with keyboard shortcuts (⌥⇧A)
+- Framework-agnostic floating icon with drag support and keyboard shortcuts (⌥⇧A)
 - Comprehensive test suite (3,623 lines across 17 test files)
 
 ---
@@ -587,6 +587,47 @@ Applied Vercel React best practices without breaking changes.
 - Reduced unnecessary re-renders
 - Stable hook execution across renders
 - O(n) instead of O(2n) filtering operations
+
+---
+
+### 10. ~~Floating Icon Component~~ ✓ IMPLEMENTED (New Feature)
+**Status**: ✅ Complete
+**Impact**: High (User Experience)
+
+Framework-agnostic overlay button that provides quick access to the Asset Manager from any Vite app.
+
+**Implementation**:
+- `src/client/floating-icon/` - 8 files with composable state management
+- `vite.config.floating-icon.ts` - Dedicated IIFE build configuration
+- `src/plugin.ts` - HTML transformation hook for script injection
+
+**Features**:
+- Draggable button with momentum-based edge snapping (left/right)
+- localStorage persistence (position + panel state)
+- Keyboard shortcuts: `⌥⇧A` to toggle, `Escape` to close
+- Modal overlay with backdrop blur effects
+- Smooth panel slide-in animations
+- 5px drag threshold to distinguish clicks from drags
+- Cursor feedback (grab/grabbing states)
+- Cross-browser compatible (Pointer Events API)
+- Framework-agnostic (no React/Vue dependencies)
+- Self-executing IIFE for easy injection
+
+**Build Process**:
+- Dedicated Vite config builds to `dist/client/floating-icon.js`
+- Build order: `build:ui` → `build:floating-icon` → `build:plugin`
+- `emptyOutDir: false` to preserve UI build
+- Minified with esbuild
+
+**Plugin Integration**:
+- Injected via `transformIndexHtml()` hook when `floatingIcon: true` (default)
+- Sets `window.__VAM_BASE_URL__` global variable
+- Auto-initialization when loaded as script
+
+**State Management**:
+- Composable-style pattern inspired by Vue DevTools
+- Separate managers: position, panel, drag
+- Getter/setter pattern with localStorage sync
 
 ---
 

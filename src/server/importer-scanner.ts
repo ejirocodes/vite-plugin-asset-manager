@@ -54,6 +54,15 @@ const ASSET_EXTENSIONS = [
 
 const ASSET_EXT_PATTERN = ASSET_EXTENSIONS.join('|')
 
+function stripComments(content: string, isHtml: boolean): string {
+  let result = content
+  result = result.replace(/\/\*[\s\S]*?\*\//g, match => ' '.repeat(match.length))
+  if (isHtml) {
+    result = result.replace(/<!--[\s\S]*?-->/g, match => ' '.repeat(match.length))
+  }
+  return result
+}
+
 /**
  * Regex patterns to find asset imports in source files.
  * Each pattern captures the asset path in group 1.
@@ -150,6 +159,11 @@ export class ImporterScanner extends EventEmitter {
       const batch = entries.slice(i, i + BATCH_SIZE)
       await Promise.all(batch.map(filePath => this.scanFile(filePath)))
     }
+
+    try {
+      await fs.access(path.join(this.root, 'index.html'))
+      await this.scanFile('index.html')
+    } catch {}
   }
 
   private async scanFile(relativePath: string): Promise<void> {
@@ -199,7 +213,11 @@ export class ImporterScanner extends EventEmitter {
     absolutePath: string
   ): Importer[] {
     const importers: Importer[] = []
-    const lines = content.split('\n')
+    const ext = path.extname(relativePath).slice(1).toLowerCase()
+    const isHtml = ext === 'html'
+    const strippedContent = stripComments(content, isHtml)
+    const lines = strippedContent.split('\n')
+    const originalLines = content.split('\n')
     const fileDir = path.dirname(relativePath)
 
     for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
@@ -210,6 +228,13 @@ export class ImporterScanner extends EventEmitter {
 
         let match
         while ((match = pattern.exec(line)) !== null) {
+          if (!isHtml) {
+            const lineCommentIndex = line.indexOf('//')
+            if (lineCommentIndex !== -1 && match.index >= lineCommentIndex) {
+              continue
+            }
+          }
+
           const importPath = match[1]
           const resolvedAssetPath = this.resolveImportPath(importPath, fileDir)
 
@@ -220,7 +245,7 @@ export class ImporterScanner extends EventEmitter {
               line: lineIndex + 1,
               column: match.index + 1,
               importType: type,
-              snippet: line.trim().slice(0, 100)
+              snippet: originalLines[lineIndex].trim().slice(0, 100)
             })
           }
         }
@@ -314,7 +339,10 @@ export class ImporterScanner extends EventEmitter {
   }
 
   private initWatcher(): void {
-    const watchPaths = this.options.include.map(dir => path.join(this.root, dir))
+    const watchPaths = [
+      ...this.options.include.map(dir => path.join(this.root, dir)),
+      path.join(this.root, 'index.html')
+    ]
 
     this.watcher = chokidar.watch(watchPaths, {
       ignored: [

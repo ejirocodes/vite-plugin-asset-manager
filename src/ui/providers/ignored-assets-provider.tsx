@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  type ReactNode
+} from 'react'
 
 interface IgnoredAssetsContextType {
   ignoredPaths: Set<string>

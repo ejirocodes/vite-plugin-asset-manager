@@ -96,7 +96,9 @@ export const BulkActionsBar = memo(function BulkActionsBar({
   return (
     <div
       className={`sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border px-4 flex items-center justify-between transition-all duration-300 ease-out ${
-        visible ? 'h-[52px] py-3 opacity-100 translate-y-0' : 'h-0 py-0 opacity-0 -translate-y-full pointer-events-none overflow-hidden'
+        visible
+          ? 'h-[52px] py-3 opacity-100 translate-y-0'
+          : 'h-0 py-0 opacity-0 -translate-y-full pointer-events-none overflow-hidden'
       }`}
       aria-hidden={!visible}
     >

@@ -80,9 +80,7 @@ export const AdvancedFilters = memo(function AdvancedFilters({
 
   const handleExtensionToggle = (ext: string) => {
     const current = extensionFilter?.extensions || []
-    const updated = current.includes(ext)
-      ? current.filter(e => e !== ext)
-      : [...current, ext]
+    const updated = current.includes(ext) ? current.filter(e => e !== ext) : [...current, ext]
     onExtensionChange(updated.length > 0 ? { extensions: updated } : undefined)
   }
 
@@ -151,9 +149,7 @@ export const AdvancedFilters = memo(function AdvancedFilters({
                   onClick={() => handleSizeSelect(option.value)}
                 >
                   <span className="font-medium">{option.label}</span>
-                  <span className="text-[10px] text-muted-foreground/80">
-                    {option.description}
-                  </span>
+                  <span className="text-[10px] text-muted-foreground/80">{option.description}</span>
                 </FilterChip>
               ))}
             </div>

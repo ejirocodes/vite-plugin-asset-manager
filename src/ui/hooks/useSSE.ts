@@ -3,11 +3,7 @@ import { useEffect, useCallback, useSyncExternalStore } from 'react'
 
 type MessageHandler = (data: unknown) => void
 
-export type SSEConnectionStatus =
-  | 'connecting'
-  | 'connected'
-  | 'disconnected'
-  | 'reconnecting'
+export type SSEConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'reconnecting'
 
 interface SSEHook {
   subscribe: (event: string, handler: MessageHandler) => () => void

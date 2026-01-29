@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
-import assetManager from '../../src/index'
+import AssetManager from '../../src/index'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [assetManager()],
+  plugins: [AssetManager()],
   server: {
     open: true
   }

@@ -23,8 +23,9 @@
   ],
   "scripts": {
     "build:ui": "vite build --config vite.config.ui.ts",
+    "build:floating-icon": "vite build --config vite.config.floating-icon.ts",
     "build:plugin": "tsup",
-    "build": "pnpm run build:ui && pnpm run build:plugin",
+    "build": "pnpm run build:ui && pnpm run build:floating-icon && pnpm run build:plugin",
     "dev": "tsup --watch",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",

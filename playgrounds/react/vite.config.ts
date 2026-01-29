@@ -1,10 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import assetManager from '../../src/index'
+import AssetManager from '../../src/index'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), assetManager()],
+  plugins: [react(), AssetManager()],
   server: {
     open: true
   }
