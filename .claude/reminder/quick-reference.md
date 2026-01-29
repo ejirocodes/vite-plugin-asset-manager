@@ -14,9 +14,10 @@ pnpm run build:plugin
 # Watch mode (plugin)
 pnpm run dev
 
-# Test in playground
-cd playgrounds/react && pnpm run dev
-# Or from root: pnpm run playground:react
+# Test in playgrounds
+pnpm run playground:react    # React playground
+pnpm run playground:vue      # Vue playground
+pnpm run playground:vanilla  # Vanilla playground
 # Then visit: http://localhost:5173/__asset_manager__
 
 # Testing (14 test files: 6 server + 8 UI)
@@ -227,13 +228,13 @@ pnpm run build
 pnpm publish
 ```
 
-## Playground Assets
-The `playgrounds/react/` playground includes a variety of test assets:
-- Images: `logo.svg`, `favicon.svg`
-- Fonts: `public/font/` directory
-- Media files: `public/media/` directory
-- Data files: `src/data/` directory
-- React assets: `src/assets/` directory
+## Playgrounds
+Three framework playgrounds are available:
+- `playgrounds/react/` - Vite+React
+- `playgrounds/vue/` - Vite+Vue
+- `playgrounds/vanilla/` - Vite+Vanilla (no framework)
+
+Each includes test assets in `src/assets/` and `public/` directories.
 
 ## New Features Quick Reference
 

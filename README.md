@@ -56,9 +56,9 @@ assetManager({
 
 ## Vite Framework Support
 
-- [ ] Vanilla
-- [ ] Vue
-- [ ] React
+- [x] Vanilla
+- [x] Vue
+- [x] React
 - [ ] Preact
 - [ ] Lit
 - [ ] Svelte
@@ -124,8 +124,10 @@ pnpm run test         # Run all tests
 pnpm run test:watch   # Watch mode
 pnpm run test:coverage
 
-# Playground
-cd playground && pnpm run dev
+# Playgrounds
+pnpm run playground:react    # React
+pnpm run playground:vue      # Vue
+pnpm run playground:vanilla  # Vanilla
 ```
 
 ## License
