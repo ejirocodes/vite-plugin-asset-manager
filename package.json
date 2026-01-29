@@ -38,7 +38,8 @@
     "test:server": "vitest run --project server",
     "test:client": "vitest run --project ui",
     "playground:react": "pnpm --filter playground-react dev",
-    "playground:vue": "pnpm --filter playground-vue dev"
+    "playground:vue": "pnpm --filter playground-vue dev",
+    "playground:vanilla": "pnpm --filter playground-vanilla dev"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
