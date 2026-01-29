@@ -2,12 +2,18 @@ import { useState, useEffect, useCallback } from 'react'
 import type { AssetGroup, AssetType, UseAssetsResult } from '../types'
 import { useSSE } from './useSSE'
 
-export function useAssets(typeFilter?: AssetType | null, unusedFilter?: boolean): UseAssetsResult {
+export function useAssets(
+  typeFilter?: AssetType | null,
+  unusedFilter?: boolean,
+  advancedParams?: URLSearchParams
+): UseAssetsResult {
   const [groups, setGroups] = useState<AssetGroup[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { subscribe } = useSSE()
+
+  const advancedParamsString = advancedParams?.toString() ?? ''
 
   const fetchAssets = useCallback(async () => {
     try {
@@ -17,6 +23,9 @@ export function useAssets(typeFilter?: AssetType | null, unusedFilter?: boolean)
       const params = new URLSearchParams()
       if (typeFilter) params.append('type', typeFilter)
       if (unusedFilter) params.append('unused', 'true')
+      if (advancedParams) {
+        advancedParams.forEach((value, key) => params.append(key, value))
+      }
 
       const queryString = params.toString()
       const url = queryString
@@ -33,7 +42,7 @@ export function useAssets(typeFilter?: AssetType | null, unusedFilter?: boolean)
     } finally {
       setLoading(false)
     }
-  }, [typeFilter, unusedFilter])
+  }, [typeFilter, unusedFilter, advancedParamsString])
 
   useEffect(() => {
     fetchAssets()

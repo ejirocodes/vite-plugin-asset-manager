@@ -35,7 +35,20 @@ export interface AssetStats {
   byType: Record<AssetType, number>
   totalSize: number
   directories: number
+  unused?: number
+  duplicateGroups?: number
+  duplicateFiles?: number
+  extensionBreakdown?: Record<string, number>
 }
+
+export type {
+  SizeFilter,
+  SizeFilterPreset,
+  DateFilter,
+  DateFilterPreset,
+  ExtensionFilter,
+  AdvancedFilters
+} from '@/shared/types'
 
 export interface UseAssetsResult {
   groups: AssetGroup[]

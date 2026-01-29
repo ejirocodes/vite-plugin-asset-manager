@@ -19,6 +19,51 @@ vi.mock('@phosphor-icons/react', () => ({
     <span data-testid="eye-slash-icon" className={className}>
       EyeSlash
     </span>
+  ),
+  EyeIcon: ({ className }: { className?: string }) => (
+    <span data-testid="eye-icon" className={className}>
+      Eye
+    </span>
+  ),
+  CopySimpleIcon: ({ className }: { className?: string }) => (
+    <span data-testid="copy-simple-icon" className={className}>
+      CopySimple
+    </span>
+  ),
+  CodeIcon: ({ className }: { className?: string }) => (
+    <span data-testid="code-icon" className={className}>
+      Code
+    </span>
+  ),
+  FileHtmlIcon: ({ className }: { className?: string }) => (
+    <span data-testid="file-html-icon" className={className}>
+      FileHtml
+    </span>
+  ),
+  FramerLogoIcon: ({ className }: { className?: string }) => (
+    <span data-testid="framer-logo-icon" className={className}>
+      FramerLogo
+    </span>
+  ),
+  FileVueIcon: ({ className }: { className?: string }) => (
+    <span data-testid="file-vue-icon" className={className}>
+      FileVue
+    </span>
+  ),
+  CodeBlockIcon: ({ className }: { className?: string }) => (
+    <span data-testid="code-block-icon" className={className}>
+      CodeBlock
+    </span>
+  ),
+  FolderOpenIcon: ({ className }: { className?: string }) => (
+    <span data-testid="folder-open-icon" className={className}>
+      FolderOpen
+    </span>
+  ),
+  TrashIcon: ({ className }: { className?: string }) => (
+    <span data-testid="trash-icon" className={className}>
+      Trash
+    </span>
   )
 }))
 

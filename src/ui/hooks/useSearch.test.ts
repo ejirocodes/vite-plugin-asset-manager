@@ -58,7 +58,8 @@ describe('useSearch', () => {
       await result.current.search('test image')
     })
 
-    expect(fetch).toHaveBeenCalledWith('/__asset_manager__/api/search?q=test%20image')
+    // URLSearchParams encodes spaces as + (application/x-www-form-urlencoded)
+    expect(fetch).toHaveBeenCalledWith('/__asset_manager__/api/search?q=test+image')
   })
 
   it('should not search with empty query', async () => {

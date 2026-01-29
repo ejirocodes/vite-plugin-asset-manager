@@ -14,6 +14,7 @@ interface Stats {
   unused: number
   duplicateGroups: number
   duplicateFiles: number
+  extensionBreakdown: Record<string, number>
 }
 
 interface UseStatsResult {
@@ -35,7 +36,8 @@ export function useStats(): UseStatsResult {
     other: 0,
     unused: 0,
     duplicateGroups: 0,
-    duplicateFiles: 0
+    duplicateFiles: 0,
+    extensionBreakdown: {}
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -59,7 +61,8 @@ export function useStats(): UseStatsResult {
         other: data.byType.other,
         unused: data.unused,
         duplicateGroups: data.duplicateGroups ?? 0,
-        duplicateFiles: data.duplicateFiles ?? 0
+        duplicateFiles: data.duplicateFiles ?? 0,
+        extensionBreakdown: data.extensionBreakdown ?? {}
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')

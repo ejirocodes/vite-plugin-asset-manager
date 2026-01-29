@@ -4,11 +4,13 @@ import { AssetGrid } from './components/asset-grid'
 import { PreviewPanel } from './components/preview-panel'
 import { SortControls } from './components/sort-controls'
 import { BulkActionsBar } from './components/bulk-actions-bar'
+import { AdvancedFilters } from './components/advanced-filters'
 import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
 import { useStats } from './hooks/useStats'
 import { useBulkOperations } from './hooks/useBulkOperations'
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation'
+import { useAdvancedFilters } from './hooks/useAdvancedFilters'
 import { useIgnoredAssets } from './providers/ignored-assets-provider'
 import { sortAssets, type SortOption } from '@/ui/lib/sort-utils'
 import {
@@ -40,9 +42,24 @@ export default function App() {
   const [selectedType, setSelectedType] = useState<AssetType | null>(null)
   const [showUnusedOnly, setShowUnusedOnly] = useState(false)
   const [showDuplicatesOnly, setShowDuplicatesOnly] = useState(false)
-  const { groups, loading } = useAssets(selectedType)
+
+  const {
+    sizeFilter,
+    setSizeFilter,
+    dateFilter,
+    setDateFilter,
+    extensionFilter,
+    setExtensionFilter,
+    activeFilterCount,
+    clearAll: clearAdvancedFilters,
+    toQueryParams
+  } = useAdvancedFilters()
+
+  const filterParams = useMemo(() => toQueryParams(), [toQueryParams])
+
+  const { groups, loading } = useAssets(selectedType, undefined, filterParams)
   const { stats } = useStats()
-  const { results, searching, search, clear } = useSearch()
+  const { results, searching, search, clear } = useSearch(filterParams)
   const { isIgnored } = useIgnoredAssets()
   const { isDeleting, bulkDelete } = useBulkOperations()
   const [searchQuery, setSearchQuery] = useState('')
@@ -80,7 +97,7 @@ export default function App() {
   useEffect(() => {
     setSelectedAssets(new Set())
     setLastSelectedId(null)
-  }, [selectedType, showUnusedOnly, showDuplicatesOnly, searchQuery])
+  }, [selectedType, showUnusedOnly, showDuplicatesOnly, searchQuery, filterParams])
 
   useEffect(() => {
     if (groups.length > 0 && expandedDirs.size === 0) {
@@ -309,7 +326,8 @@ export default function App() {
     return {
       ...stats,
       unused: Math.max(0, (stats.unused || 0) - ignoredUnusedCount),
-      duplicateFiles: stats.duplicateFiles || 0
+      duplicateFiles: stats.duplicateFiles || 0,
+      extensionBreakdown: stats.extensionBreakdown || {}
     }
   }, [stats, groups, isIgnored])
 
@@ -367,7 +385,18 @@ export default function App() {
                 />
               )}
               <div className="p-6 pt-2 space-y-4">
-                <div className="flex items-center justify-end">
+                <div className="flex items-center justify-end gap-2">
+                  <AdvancedFilters
+                    sizeFilter={sizeFilter}
+                    dateFilter={dateFilter}
+                    extensionFilter={extensionFilter}
+                    onSizeChange={setSizeFilter}
+                    onDateChange={setDateFilter}
+                    onExtensionChange={setExtensionFilter}
+                    onClearAll={clearAdvancedFilters}
+                    activeCount={activeFilterCount}
+                    availableExtensions={Object.keys(adjustedStats.extensionBreakdown || {})}
+                  />
                   <SortControls value={sortOption} onChange={setSortOption} />
                 </div>
                 {displayGroups.map(group => (

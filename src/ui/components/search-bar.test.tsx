@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SearchBar } from './search-bar'
 
@@ -18,11 +18,6 @@ vi.mock('@phosphor-icons/react', () => ({
     <span data-testid="spinner-icon" className={className}>
       Loading
     </span>
-  ),
-  CommandIcon: ({ className }: { className?: string }) => (
-    <span data-testid="command-icon" className={className}>
-      ⌘
-    </span>
   )
 }))
 
@@ -37,19 +32,17 @@ describe('SearchBar', () => {
     vi.clearAllMocks()
   })
 
-  afterEach(() => {})
-
   it('should render search input', () => {
     render(<SearchBar {...defaultProps} />)
 
-    const input = screen.getByPlaceholderText('Search assets...')
+    const input = screen.getByPlaceholderText('Search assets... (/)')
     expect(input).toBeInTheDocument()
   })
 
   it('should display current value', () => {
     render(<SearchBar {...defaultProps} value="logo" />)
 
-    const input = screen.getByPlaceholderText('Search assets...') as HTMLInputElement
+    const input = screen.getByPlaceholderText('Search assets... (/)') as HTMLInputElement
     expect(input.value).toBe('logo')
   })
 
@@ -59,12 +52,10 @@ describe('SearchBar', () => {
 
     render(<SearchBar {...defaultProps} onChange={onChange} />)
 
-    const input = screen.getByPlaceholderText('Search assets...')
+    const input = screen.getByPlaceholderText('Search assets... (/)')
     await user.type(input, 'test')
 
-    // For a controlled component where value doesn't update, each character
-    // triggers onChange with just that character
-    expect(onChange).toHaveBeenCalledTimes(4) // Once for each character
+    expect(onChange).toHaveBeenCalledTimes(4)
     expect(onChange).toHaveBeenNthCalledWith(1, 't')
     expect(onChange).toHaveBeenNthCalledWith(2, 'e')
     expect(onChange).toHaveBeenNthCalledWith(3, 's')
@@ -88,15 +79,19 @@ describe('SearchBar', () => {
   it('should show keyboard shortcut hint when empty', () => {
     render(<SearchBar {...defaultProps} />)
 
-    expect(screen.getByTestId('command-icon')).toBeInTheDocument()
-    expect(screen.getByText('K')).toBeInTheDocument()
+    expect(screen.getByText('/')).toBeInTheDocument()
   })
 
   it('should show clear button when value is not empty', () => {
     render(<SearchBar {...defaultProps} value="test" />)
 
     expect(screen.getByRole('button', { name: /clear search/i })).toBeInTheDocument()
-    expect(screen.queryByTestId('command-icon')).not.toBeInTheDocument()
+  })
+
+  it('should hide keyboard shortcut when value is not empty', () => {
+    render(<SearchBar {...defaultProps} value="test" />)
+
+    expect(screen.queryByText('/')).not.toBeInTheDocument()
   })
 
   it('should call onChange with empty string when clear button is clicked', async () => {
@@ -111,80 +106,23 @@ describe('SearchBar', () => {
     expect(onChange).toHaveBeenCalledWith('')
   })
 
-  it('should focus input on Cmd+K', () => {
-    render(<SearchBar {...defaultProps} />)
+  it('should call onFocus when input is focused', async () => {
+    const onFocus = vi.fn()
+    const user = userEvent.setup()
 
-    const input = screen.getByPlaceholderText('Search assets...')
+    render(<SearchBar {...defaultProps} onFocus={onFocus} />)
 
-    // Simulate Cmd+K
-    fireEvent.keyDown(document, { key: 'k', metaKey: true })
+    const input = screen.getByPlaceholderText('Search assets... (/)')
+    await user.click(input)
 
-    expect(document.activeElement).toBe(input)
+    expect(onFocus).toHaveBeenCalled()
   })
 
-  it('should focus input on Ctrl+K', () => {
-    render(<SearchBar {...defaultProps} />)
+  it('should forward ref to input element', () => {
+    const ref = { current: null as HTMLInputElement | null }
+    render(<SearchBar {...defaultProps} ref={ref} />)
 
-    const input = screen.getByPlaceholderText('Search assets...')
-
-    // Simulate Ctrl+K
-    fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
-
-    expect(document.activeElement).toBe(input)
-  })
-
-  it('should blur input and clear value on Escape', async () => {
-    const onChange = vi.fn()
-
-    render(<SearchBar {...defaultProps} value="test" onChange={onChange} />)
-
-    const input = screen.getByPlaceholderText('Search assets...')
-
-    input.focus()
-    expect(document.activeElement).toBe(input)
-
-    fireEvent.keyDown(document, { key: 'Escape' })
-
-    expect(document.activeElement).not.toBe(input)
-    expect(onChange).toHaveBeenCalledWith('')
-  })
-
-  it('should not clear value on Escape when input is not focused', () => {
-    const onChange = vi.fn()
-
-    render(<SearchBar {...defaultProps} value="test" onChange={onChange} />)
-
-    fireEvent.keyDown(document, { key: 'Escape' })
-
-    expect(onChange).not.toHaveBeenCalled()
-  })
-
-  it('should clean up event listeners on unmount', () => {
-    const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener')
-
-    const { unmount } = render(<SearchBar {...defaultProps} />)
-
-    unmount()
-
-    expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function))
-
-    removeEventListenerSpy.mockRestore()
-  })
-
-  it('should prevent default on Cmd+K to avoid browser shortcut', () => {
-    render(<SearchBar {...defaultProps} />)
-
-    const event = new KeyboardEvent('keydown', {
-      key: 'k',
-      metaKey: true,
-      bubbles: true,
-      cancelable: true
-    })
-
-    const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
-
-    document.dispatchEvent(event)
-
-    expect(preventDefaultSpy).toHaveBeenCalled()
+    expect(ref.current).toBeInstanceOf(HTMLInputElement)
+    expect(ref.current?.placeholder).toBe('Search assets... (/)')
   })
 })
