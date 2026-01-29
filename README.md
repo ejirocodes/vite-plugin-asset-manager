@@ -43,10 +43,10 @@ yarn add vite-plugin-asset-manager -D
 ```ts
 // vite.config.ts
 import { defineConfig } from 'vite'
-import assetManager from 'vite-plugin-asset-manager'
+import AssetManager from 'vite-plugin-asset-manager'
 
 export default defineConfig({
-  plugins: [assetManager()],
+  plugins: [AssetManager()],
 })
 ```
 

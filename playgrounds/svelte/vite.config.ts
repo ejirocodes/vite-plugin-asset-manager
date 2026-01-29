@@ -1,10 +1,10 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
-import assetManager from '../../src/index'
+import AssetManager from '../../src/index'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [svelte(), assetManager()],
+  plugins: [svelte(), AssetManager()],
   server: {
     open: true
   }

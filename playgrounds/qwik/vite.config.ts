@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import { qwikVite } from '@builder.io/qwik/optimizer'
-import assetManager from '../../src/index'
+import AssetManager from '../../src/index'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -8,7 +8,7 @@ export default defineConfig({
     qwikVite({
       csr: true,
     }),
-    assetManager()
+    AssetManager()
   ],
   server: {
     open: true
