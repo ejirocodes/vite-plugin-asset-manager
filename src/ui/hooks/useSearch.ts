@@ -5,6 +5,8 @@ export function useSearch(advancedParams?: URLSearchParams): UseSearchResult {
   const [results, setResults] = useState<Asset[]>([])
   const [searching, setSearching] = useState(false)
 
+  // Use primitive string for dependency comparison to prevent unnecessary re-renders
+  // Vercel best practice: rerender-dependencies
   const advancedParamsString = advancedParams?.toString() ?? ''
 
   const search = useCallback(
@@ -18,8 +20,10 @@ export function useSearch(advancedParams?: URLSearchParams): UseSearchResult {
       try {
         const params = new URLSearchParams()
         params.append('q', query)
-        if (advancedParams) {
-          advancedParams.forEach((value, key) => params.append(key, value))
+        if (advancedParamsString) {
+          // Reconstruct URLSearchParams from string
+          const advancedUrlParams = new URLSearchParams(advancedParamsString)
+          advancedUrlParams.forEach((value, key) => params.append(key, value))
         }
 
         const res = await fetch(`/__asset_manager__/api/search?${params.toString()}`)

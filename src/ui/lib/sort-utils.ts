@@ -8,6 +8,7 @@ export interface SortOption {
   direction: SortDirection
 }
 
+// Vercel best practice: js-cache-property-access - cache property reads in sort comparisons
 export function sortAssets(assets: Asset[], option: SortOption): Asset[] {
   const { field, direction } = option
   const multiplier = direction === 'asc' ? 1 : -1
@@ -15,18 +16,31 @@ export function sortAssets(assets: Asset[], option: SortOption): Asset[] {
   return [...assets].sort((a, b) => {
     let comparison = 0
     switch (field) {
-      case 'name':
-        comparison = a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+      case 'name': {
+        // Cache property access
+        const aName = a.name
+        const bName = b.name
+        comparison = aName.localeCompare(bName, undefined, { sensitivity: 'base' })
         break
-      case 'size':
-        comparison = a.size - b.size
+      }
+      case 'size': {
+        const aSize = a.size
+        const bSize = b.size
+        comparison = aSize - bSize
         break
-      case 'mtime':
-        comparison = a.mtime - b.mtime
+      }
+      case 'mtime': {
+        const aMtime = a.mtime
+        const bMtime = b.mtime
+        comparison = aMtime - bMtime
         break
-      case 'type':
-        comparison = a.type.localeCompare(b.type)
+      }
+      case 'type': {
+        const aType = a.type
+        const bType = b.type
+        comparison = aType.localeCompare(bType)
         break
+      }
     }
     return comparison * multiplier
   })

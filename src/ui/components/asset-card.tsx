@@ -16,8 +16,11 @@ interface AssetCardProps {
   onToggleSelect?: (assetId: string, shiftKey: boolean) => void
 }
 
+// Module-level cache for formatBytes to prevent recalculation
+// Vercel best practice: js-cache-function-results
 const formatBytesCache = new Map<number, string>()
 function formatBytes(bytes: number): string {
+  // Early return with cache lookup - Vercel best practice: js-early-exit
   const cached = formatBytesCache.get(bytes)
   if (cached) return cached
 

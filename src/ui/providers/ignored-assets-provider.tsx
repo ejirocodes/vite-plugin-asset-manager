@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react'
 
 interface IgnoredAssetsContextType {
   ignoredPaths: Set<string>
@@ -23,16 +23,22 @@ export function IgnoredAssetsProvider({ children }: { children: ReactNode }) {
     }
   })
 
+  // Keep a ref to the current set for stable callback
+  // Vercel best practice: advanced-use-latest for stable callback refs
+  const ignoredPathsRef = useRef(ignoredPaths)
+  useEffect(() => {
+    ignoredPathsRef.current = ignoredPaths
+  }, [ignoredPaths])
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...ignoredPaths]))
   }, [ignoredPaths])
 
-  const isIgnored = useCallback(
-    (assetPath: string) => {
-      return ignoredPaths.has(assetPath)
-    },
-    [ignoredPaths]
-  )
+  // Stable callback that won't cause re-renders in consumers
+  // Vercel best practice: rerender-use-ref-transient-values
+  const isIgnored = useCallback((assetPath: string) => {
+    return ignoredPathsRef.current.has(assetPath)
+  }, [])
 
   const addIgnored = useCallback((assetPath: string) => {
     setIgnoredPaths(prev => new Set(prev).add(assetPath))

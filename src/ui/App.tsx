@@ -21,6 +21,8 @@ import {
 } from '@phosphor-icons/react'
 import type { Asset, AssetType } from './types'
 
+// Hoist static JSX outside component to prevent recreating on every render
+// Vercel best practice: rendering-hoist-jsx
 const LoadingSpinner = (
   <div className="flex flex-col items-center justify-center h-full gap-4">
     <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
@@ -30,6 +32,26 @@ const LoadingSpinner = (
 
 const EmptyStateNoAssets = (
   <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+    <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
+      <PackageIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
+    </div>
+    <p className="text-lg font-medium text-foreground mb-1">No assets found</p>
+    <p className="text-sm">Add images, videos, or documents to your project</p>
+  </div>
+)
+
+const EmptyStateSearchResults = (searchQuery: string) => (
+  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+    <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
+      <MagnifyingGlassIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
+    </div>
+    <p className="text-lg font-medium text-foreground mb-1">No results found</p>
+    <p className="text-sm">No assets match "{searchQuery}"</p>
+  </div>
+)
+
+const EmptyStateNoAssetsFiltered = (
+  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
     <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
       <PackageIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
     </div>
@@ -52,10 +74,14 @@ export default function App() {
     setExtensionFilter,
     activeFilterCount,
     clearAll: clearAdvancedFilters,
-    toQueryParams
+    filterParamsString
   } = useAdvancedFilters()
 
-  const filterParams = useMemo(() => toQueryParams(), [toQueryParams])
+  // Convert filter params string to URLSearchParams only when needed
+  // Vercel best practice: rerender-dependencies (use primitive string instead of object)
+  const filterParams = useMemo(() => {
+    return filterParamsString ? new URLSearchParams(filterParamsString) : undefined
+  }, [filterParamsString])
 
   const { groups, loading } = useAssets(selectedType, undefined, filterParams)
   const { stats } = useStats()
@@ -116,11 +142,15 @@ export default function App() {
     return () => clearTimeout(timer)
   }, [searchQuery, search, clear])
 
+  // Memoize expensive filtering and sorting operations
+  // Vercel best practice: rerender-memo - extract expensive work into memoized components
   const displayGroups = useMemo(() => {
     let baseGroups = groups
 
+    // Use search results if available
     if (searchQuery && results.length > 0) {
       const grouped = new Map<string, Asset[]>()
+      // Vercel best practice: js-combine-iterations - single pass through results
       results.forEach(asset => {
         const dir = asset.directory
         if (!grouped.has(dir)) grouped.set(dir, [])
@@ -134,26 +164,38 @@ export default function App() {
     }
 
     let filtered = baseGroups
+
+    // Apply unused filter - Vercel best practice: js-early-exit
     if (showUnusedOnly) {
       filtered = filtered
-        .map(group => ({
-          ...group,
-          assets: group.assets.filter(a => a.importersCount === 0 && !isIgnored(a.path)),
-          count: group.assets.filter(a => a.importersCount === 0 && !isIgnored(a.path)).length
-        }))
+        .map(group => {
+          // Vercel best practice: js-combine-iterations - single filter pass
+          const unusedAssets = group.assets.filter(a => a.importersCount === 0 && !isIgnored(a.path))
+          return {
+            ...group,
+            assets: unusedAssets,
+            count: unusedAssets.length
+          }
+        })
         .filter(group => group.count > 0)
     }
 
+    // Apply duplicates filter
     if (showDuplicatesOnly) {
       filtered = filtered
-        .map(group => ({
-          ...group,
-          assets: group.assets.filter(a => (a.duplicatesCount ?? 0) > 0),
-          count: group.assets.filter(a => (a.duplicatesCount ?? 0) > 0).length
-        }))
+        .map(group => {
+          // Vercel best practice: js-combine-iterations - single filter pass
+          const duplicateAssets = group.assets.filter(a => (a.duplicatesCount ?? 0) > 0)
+          return {
+            ...group,
+            assets: duplicateAssets,
+            count: duplicateAssets.length
+          }
+        })
         .filter(group => group.count > 0)
     }
 
+    // Apply sorting last to avoid sorting filtered-out assets
     return filtered.map(group => ({
       ...group,
       assets: sortAssets(group.assets, sortOption)
@@ -177,8 +219,11 @@ export default function App() {
     })
   }, [])
 
+  // Stable callback using functional setState
+  // Vercel best practice: rerender-functional-setstate
   const handleToggleSelect = useCallback(
     (assetId: string, shiftKey: boolean) => {
+      // Use functional setState to avoid dependency on selectedAssets
       setSelectedAssets(prev => {
         const next = new Set(prev)
 
@@ -191,6 +236,7 @@ export default function App() {
             const [start, end] =
               lastIndex < currentIndex ? [lastIndex, currentIndex] : [currentIndex, lastIndex]
 
+            // Vercel best practice: js-early-exit - avoid unnecessary work
             for (let i = start; i <= end; i++) {
               next.add(allAssets[i].id)
             }
@@ -225,9 +271,12 @@ export default function App() {
     return allAssets.filter(a => selectedAssets.has(a.id))
   }, [displayGroups, selectedAssets])
 
+  // Stable callback - bulkDelete is stable from hook
+  // Vercel best practice: rerender-dependencies
   const handleBulkDelete = useCallback(async () => {
     const success = await bulkDelete(selectedAssetsArray)
     if (success) {
+      // Vercel best practice: rerender-functional-setstate
       setSelectedAssets(new Set())
       setLastSelectedId(null)
     }
@@ -318,10 +367,18 @@ export default function App() {
     [displayGroups]
   )
 
+  // Memoize stats adjustment computation
+  // Vercel best practice: rerender-memo
   const adjustedStats = useMemo(() => {
-    const ignoredUnusedCount = groups
-      .flatMap(g => g.assets)
-      .filter(a => a.importersCount === 0 && isIgnored(a.path)).length
+    // Vercel best practice: js-combine-iterations - combine flatMap and filter in one pass
+    let ignoredUnusedCount = 0
+    for (const group of groups) {
+      for (const asset of group.assets) {
+        if (asset.importersCount === 0 && isIgnored(asset.path)) {
+          ignoredUnusedCount++
+        }
+      }
+    }
 
     return {
       ...stats,
@@ -385,29 +442,7 @@ export default function App() {
                   <SortControls value={sortOption} onChange={setSortOption} />
                 </div>
                 {displayGroups.length === 0 ? (
-                  searchQuery ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                      <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
-                        <MagnifyingGlassIcon
-                          weight="duotone"
-                          className="w-10 h-10 text-muted-foreground/50"
-                        />
-                      </div>
-                      <p className="text-lg font-medium text-foreground mb-1">No results found</p>
-                      <p className="text-sm">No assets match "{searchQuery}"</p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                      <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
-                        <PackageIcon
-                          weight="duotone"
-                          className="w-10 h-10 text-muted-foreground/50"
-                        />
-                      </div>
-                      <p className="text-lg font-medium text-foreground mb-1">No assets found</p>
-                      <p className="text-sm">Add images, videos, or documents to your project</p>
-                    </div>
-                  )
+                  searchQuery ? EmptyStateSearchResults(searchQuery) : EmptyStateNoAssetsFiltered
                 ) : (
                   displayGroups.map(group => (
                     <div

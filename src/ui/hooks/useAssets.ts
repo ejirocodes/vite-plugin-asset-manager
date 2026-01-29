@@ -13,6 +13,8 @@ export function useAssets(
   const [error, setError] = useState<string | null>(null)
   const { subscribe } = useSSE()
 
+  // Use primitive string for dependency comparison to prevent unnecessary re-renders
+  // Vercel best practice: rerender-dependencies
   const advancedParamsString = advancedParams?.toString() ?? ''
 
   const fetchAssets = useCallback(async () => {
@@ -23,8 +25,10 @@ export function useAssets(
       const params = new URLSearchParams()
       if (typeFilter) params.append('type', typeFilter)
       if (unusedFilter) params.append('unused', 'true')
-      if (advancedParams) {
-        advancedParams.forEach((value, key) => params.append(key, value))
+      if (advancedParamsString) {
+        // Reconstruct URLSearchParams from string
+        const advancedUrlParams = new URLSearchParams(advancedParamsString)
+        advancedUrlParams.forEach((value, key) => params.append(key, value))
       }
 
       const queryString = params.toString()

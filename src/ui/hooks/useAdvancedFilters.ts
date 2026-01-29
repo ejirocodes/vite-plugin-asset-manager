@@ -40,7 +40,9 @@ export function useAdvancedFilters() {
     setExtensionFilter(undefined)
   }, [])
 
-  const toQueryParams = useCallback(() => {
+  // Return stable string for primitive dependency comparison
+  // Vercel best practice: rerender-dependencies
+  const filterParamsString = useMemo(() => {
     const params = new URLSearchParams()
     if (sizeFilter && sizeFilter.preset !== 'any') {
       const bounds = SIZE_BOUNDS[sizeFilter.preset] || {}
@@ -55,7 +57,7 @@ export function useAdvancedFilters() {
     if (extensionFilter?.extensions.length) {
       params.append('extensions', extensionFilter.extensions.join(','))
     }
-    return params
+    return params.toString()
   }, [sizeFilter, dateFilter, extensionFilter])
 
   return {
@@ -67,6 +69,6 @@ export function useAdvancedFilters() {
     setExtensionFilter,
     activeFilterCount,
     clearAll,
-    toQueryParams
+    filterParamsString
   }
 }
