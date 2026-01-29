@@ -142,45 +142,6 @@ const FLOATING_ICON_SCRIPT = (base: string) => `
       transform: translateX(0);
     }
 
-    #vam-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--vam-border);
-      background: linear-gradient(135deg, rgba(65, 209, 255, 0.03), rgba(189, 52, 254, 0.03));
-    }
-
-    #vam-title {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 11px;
-      font-weight: 600;
-      color: #a1a1aa;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    #vam-close {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #71717a;
-      font-size: 20px;
-      line-height: 1;
-      transition: all 0.15s ease;
-    }
-
-    #vam-close:hover {
-      background: var(--vam-hover);
-      color: #fafafa;
-    }
-
     #vam-iframe {
       flex: 1;
       border: none;
@@ -210,25 +171,12 @@ const FLOATING_ICON_SCRIPT = (base: string) => `
   const panel = document.createElement('div');
   panel.id = 'vam-panel';
 
-  const header = document.createElement('div');
-  header.id = 'vam-header';
-
-  const title = document.createElement('span');
-  title.id = 'vam-title';
-  title.textContent = 'Asset Manager';
-
-  const closeBtn = document.createElement('button');
-  closeBtn.id = 'vam-close';
-  closeBtn.innerHTML = '×';
-  closeBtn.title = 'Close (Esc)';
-
   const iframe = document.createElement('iframe');
   iframe.id = 'vam-iframe';
   const baseWithSlash = BASE_URL.endsWith('/') ? BASE_URL : BASE_URL + '/';
   iframe.src = window.location.origin + baseWithSlash + '?embedded=true';
 
-  header.append(title, closeBtn);
-  panel.append(header, iframe);
+  panel.appendChild(iframe);
   overlay.appendChild(panel);
   container.appendChild(trigger);
   document.body.append(container, overlay);
@@ -328,8 +276,6 @@ const FLOATING_ICON_SCRIPT = (base: string) => `
     if (hasMoved) return;
     isOpen ? close() : open();
   });
-
-  closeBtn.addEventListener('click', close);
 
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) close();
