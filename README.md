@@ -61,7 +61,8 @@ Start your dev server and access the Asset Manager in three ways:
 |---------|-------------|
 | **Asset Discovery** | Automatically scans and catalogs images, videos, audio, fonts, documents, and data files |
 | **Real-time Updates** | File changes reflected instantly via Server-Sent Events |
-| **Floating Icon** | Draggable overlay button for quick access with keyboard shortcuts (⌥⇧A) |
+| **Floating Icon** | Draggable & resizable overlay panel with keyboard shortcuts (⌥⇧A), snaps to all 4 edges |
+| **Automatic Theming** | Light/dark mode support based on system preferences |
 | **Thumbnail Generation** | Sharp-powered thumbnails with dual-tier caching |
 | **Import Tracking** | See which files import each asset with click-to-open-in-editor |
 | **Duplicate Detection** | Content-based deduplication using MD5 hashing |

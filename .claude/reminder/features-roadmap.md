@@ -602,11 +602,15 @@ Framework-agnostic overlay button that provides quick access to the Asset Manage
 - `src/plugin.ts` - HTML transformation hook for script injection
 
 **Features**:
-- Draggable button with momentum-based edge snapping (left/right)
-- localStorage persistence (position + panel state)
+- Draggable button with momentum-based edge snapping to **all 4 edges** (left/right/top/bottom)
+- **Resizable panel** with drag handles (min: 400x300px, contextual positioning based on trigger edge)
+- Double-click resize handles to reset to default size
+- **Automatic light/dark theme** support based on system preferences (`@media (prefers-color-scheme: dark)`)
+- localStorage persistence (position + panel state + panel size - 3 keys total)
 - Keyboard shortcuts: `⌥⇧A` to toggle, `Escape` to close
 - Modal overlay with backdrop blur effects
 - Smooth panel slide-in animations
+- Viewport margin constraint (20px) ensures panel stays visible
 - 5px drag threshold to distinguish clicks from drags
 - Cursor feedback (grab/grabbing states)
 - Cross-browser compatible (Pointer Events API)
