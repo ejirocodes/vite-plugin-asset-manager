@@ -30,15 +30,15 @@ export const PreviewPanel = memo(function PreviewPanel({
   onAssetChange
 }: PreviewPanelProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
-  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(
-    null
-  )
+  const [dimensionsState, setDimensionsState] = useState<{
+    assetId: string
+    dimensions: { width: number; height: number } | null
+  }>({ assetId: asset.id, dimensions: null })
   const [panelWidth, setPanelWidth] = useState(DEFAULT_WIDTH)
   const [isResizing, setIsResizing] = useState(false)
 
-  useEffect(() => {
-    setImageDimensions(null)
-  }, [asset.id])
+  const imageDimensions =
+    dimensionsState.assetId === asset.id ? dimensionsState.dimensions : null
 
   const handleResizeStart = useCallback(
     (e: React.MouseEvent) => {
@@ -111,9 +111,12 @@ export const PreviewPanel = memo(function PreviewPanel({
     closeButtonRef.current?.focus()
   }, [])
 
-  const handleDimensionsLoad = useCallback((dimensions: { width: number; height: number }) => {
-    setImageDimensions(dimensions)
-  }, [])
+  const handleDimensionsLoad = useCallback(
+    (dimensions: { width: number; height: number }) => {
+      setDimensionsState({ assetId: asset.id, dimensions })
+    },
+    [asset.id]
+  )
 
   return (
     <aside

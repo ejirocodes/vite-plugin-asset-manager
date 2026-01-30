@@ -42,8 +42,9 @@ export function ThemeProvider({
     if (theme === 'system') {
       applyTheme(mediaQuery.matches ? 'dark' : 'light')
 
-      const handleChange = (e: MediaQueryListEvent) => {
-        applyTheme(e.matches ? 'dark' : 'light')
+      const handleChange = (e: Event) => {
+        const mediaEvent = e as unknown as { matches: boolean }
+        applyTheme(mediaEvent.matches ? 'dark' : 'light')
       }
 
       mediaQuery.addEventListener('change', handleChange)

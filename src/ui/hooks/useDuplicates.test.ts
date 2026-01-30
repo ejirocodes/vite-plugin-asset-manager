@@ -1,10 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { useDuplicates } from './useDuplicates'
 
+// Create stable mock functions outside the factory to prevent infinite re-renders
+const mockUnsubscribe = vi.fn()
+const mockSubscribe = vi.fn().mockReturnValue(mockUnsubscribe)
+
 vi.mock('./useSSE', () => ({
   useSSE: () => ({
-    subscribe: vi.fn().mockReturnValue(() => {})
+    subscribe: mockSubscribe
   })
 }))
 
@@ -40,6 +44,8 @@ describe('useDuplicates', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSubscribe.mockClear()
+    mockUnsubscribe.mockClear()
 
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -49,6 +55,10 @@ describe('useDuplicates', () => {
         hash: 'abc123'
       })
     })
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('should fetch duplicates on mount', async () => {
