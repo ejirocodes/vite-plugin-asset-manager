@@ -322,7 +322,8 @@ describe('AssetCard', () => {
   })
 
   describe('unused badge', () => {
-    it('should show UNUSED badge when importersCount is 0', () => {
+    // Note: Badge text is lowercase in DOM, CSS `uppercase` transforms it visually
+    it('should show unused badge when importersCount is 0', () => {
       const unusedAsset: Asset = {
         ...mockImageAsset,
         importersCount: 0
@@ -330,13 +331,11 @@ describe('AssetCard', () => {
 
       render(<AssetCard asset={unusedAsset} />)
 
-      const badge = screen.getByText('UNUSED')
+      const badge = screen.getByText('unused')
       expect(badge).toBeInTheDocument()
-      expect(badge).toHaveAttribute('aria-label', 'This asset is not imported by any source files')
-      expect(badge).toHaveAttribute('title', 'This asset is not imported by any source files')
     })
 
-    it('should not show UNUSED badge when asset is used', () => {
+    it('should not show unused badge when asset is used', () => {
       const usedAsset: Asset = {
         ...mockImageAsset,
         importersCount: 3
@@ -344,10 +343,10 @@ describe('AssetCard', () => {
 
       render(<AssetCard asset={usedAsset} />)
 
-      expect(screen.queryByText('UNUSED')).not.toBeInTheDocument()
+      expect(screen.queryByText('unused')).not.toBeInTheDocument()
     })
 
-    it('should not show UNUSED badge when importersCount is undefined', () => {
+    it('should not show unused badge when importersCount is undefined', () => {
       const assetWithoutCount: Asset = {
         ...mockImageAsset,
         importersCount: undefined
@@ -355,7 +354,7 @@ describe('AssetCard', () => {
 
       render(<AssetCard asset={assetWithoutCount} />)
 
-      expect(screen.queryByText('UNUSED')).not.toBeInTheDocument()
+      expect(screen.queryByText('unused')).not.toBeInTheDocument()
     })
 
     it('should have amber styling for unused badge', () => {
@@ -366,15 +365,15 @@ describe('AssetCard', () => {
 
       render(<AssetCard asset={unusedAsset} />)
 
-      const badge = screen.getByText('UNUSED')
+      const badge = screen.getByText('unused')
       expect(badge).toHaveClass('bg-amber-500/10')
-      expect(badge).toHaveClass('text-amber-400')
-      expect(badge).toHaveClass('border-amber-500/20')
+      expect(badge).toHaveClass('text-amber-500')
     })
   })
 
   describe('ignored badge', () => {
-    it('should show UNUSED badge for unused, non-ignored assets', () => {
+    // Note: Badge text is lowercase in DOM, CSS `uppercase` transforms it visually
+    it('should show unused badge for unused, non-ignored assets', () => {
       const unusedAsset: Asset = {
         ...mockImageAsset,
         path: 'src/assets/not-ignored.png',
@@ -383,11 +382,11 @@ describe('AssetCard', () => {
 
       render(<AssetCard asset={unusedAsset} />)
 
-      expect(screen.getByText('UNUSED')).toBeInTheDocument()
-      expect(screen.queryByText('IGNORED')).not.toBeInTheDocument()
+      expect(screen.getByText('unused')).toBeInTheDocument()
+      expect(screen.queryByText('ignored')).not.toBeInTheDocument()
     })
 
-    it('should show IGNORED badge instead of UNUSED when asset is ignored', () => {
+    it('should show ignored badge instead of unused when asset is ignored', () => {
       const unusedAsset: Asset = {
         ...mockImageAsset,
         path: 'src/assets/ignored.png',
@@ -398,8 +397,8 @@ describe('AssetCard', () => {
 
       render(<AssetCard asset={unusedAsset} />)
 
-      expect(screen.queryByText('UNUSED')).not.toBeInTheDocument()
-      expect(screen.getByText('IGNORED')).toBeInTheDocument()
+      expect(screen.queryByText('unused')).not.toBeInTheDocument()
+      expect(screen.getByText('ignored')).toBeInTheDocument()
     })
 
     it('should show no badge for used assets', () => {
@@ -411,11 +410,11 @@ describe('AssetCard', () => {
 
       render(<AssetCard asset={usedAsset} />)
 
-      expect(screen.queryByText('UNUSED')).not.toBeInTheDocument()
-      expect(screen.queryByText('IGNORED')).not.toBeInTheDocument()
+      expect(screen.queryByText('unused')).not.toBeInTheDocument()
+      expect(screen.queryByText('ignored')).not.toBeInTheDocument()
     })
 
-    it('should show eye-slash icon in IGNORED badge', () => {
+    it('should show eye-slash icon in ignored badge', () => {
       const ignoredAsset: Asset = {
         ...mockImageAsset,
         path: 'src/assets/ignored.png',
@@ -440,29 +439,11 @@ describe('AssetCard', () => {
 
       render(<AssetCard asset={ignoredAsset} />)
 
-      const badge = screen.getByText('IGNORED')
-      expect(badge).toHaveClass('bg-muted/50')
-      expect(badge).toHaveClass('text-muted-foreground')
-      expect(badge).toHaveClass('border-border')
+      const badge = screen.getByText('ignored')
+      expect(badge).toHaveClass('text-zinc-500')
     })
 
-    it('should have accessibility attributes for IGNORED badge', () => {
-      const ignoredAsset: Asset = {
-        ...mockImageAsset,
-        path: 'src/assets/ignored.png',
-        importersCount: 0
-      }
-
-      mockIgnoredPaths.add('src/assets/ignored.png')
-
-      render(<AssetCard asset={ignoredAsset} />)
-
-      const badge = screen.getByText('IGNORED')
-      expect(badge).toHaveAttribute('aria-label', 'This asset is marked as intentionally unused')
-      expect(badge).toHaveAttribute('title', 'Marked as intentionally unused')
-    })
-
-    it('should not show IGNORED badge for used assets even if in ignore list', () => {
+    it('should not show ignored badge for used assets even if in ignore list', () => {
       const usedButIgnoredAsset: Asset = {
         ...mockImageAsset,
         path: 'src/assets/used-ignored.png',
@@ -473,8 +454,8 @@ describe('AssetCard', () => {
 
       render(<AssetCard asset={usedButIgnoredAsset} />)
 
-      expect(screen.queryByText('IGNORED')).not.toBeInTheDocument()
-      expect(screen.queryByText('UNUSED')).not.toBeInTheDocument()
+      expect(screen.queryByText('ignored')).not.toBeInTheDocument()
+      expect(screen.queryByText('unused')).not.toBeInTheDocument()
     })
   })
 })

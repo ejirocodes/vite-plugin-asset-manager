@@ -97,6 +97,7 @@ Each playground imports the plugin directly from `../../src/index` (no pnpm link
 4. **UI Layer** (`src/ui/`)
    - Self-contained React dashboard with its own `tsconfig.json`
    - Uses Tailwind CSS v4 and shadcn/ui (base-mira style with Phosphor icons)
+   - Includes favicon: `src/ui/assets/icon.svg` (referenced in `src/ui/index.html`)
    - Structure:
      - `components/` - App components (Sidebar, SearchBar, AssetGrid, AssetCard, FileIcon, BulkActionsBar, SortControls, AssetContextMenu, AdvancedFilters)
      - `components/ui/` - shadcn primitives (Button, Card, Input, Sheet, Tabs, ContextMenu, etc.)
@@ -119,17 +120,19 @@ The floating icon is a framework-agnostic overlay button that provides quick acc
 
 **Architecture** (`src/client/floating-icon/` - 8 files):
 - `index.ts` - Entry point with `initFloatingIcon()` function and auto-initialization
-- `constants.ts` - Configuration (Z-index values 99998-100000, dimensions, colors, drag thresholds)
-- `dom.ts` - DOM element creation and manipulation (5 elements: container, trigger button, overlay, panel, iframe)
+- `constants.ts` - Configuration (Z-index values 99998-100000, dimensions, colors, drag thresholds, resize constraints: MIN_WIDTH=400px, MIN_HEIGHT=300px, viewport margin=20px)
+- `dom.ts` - DOM element creation and manipulation (5 elements: container, trigger button, overlay, panel, iframe + contextual resize handles)
 - `state.ts` - Composable-style state managers:
-  - `createPositionState()` - Position (left/right edge, vertical offset, localStorage persistence)
+  - `createPositionState()` - Position (left/right/top/bottom edge, vertical/horizontal offset, localStorage persistence)
   - `createPanelState()` - Panel open/closed state (localStorage persistence)
   - `createDragState()` - Drag state for distinguishing clicks from drags
+  - `createSizeState()` - Panel size (width/height, localStorage persistence with key: `vite-asset-manager-size`)
 - `events.ts` - Event handler setup:
-  - Drag handlers (pointer events with 5px threshold, momentum-based edge snapping)
+  - Drag handlers (pointer events with 5px threshold, momentum-based edge snapping to all 4 edges)
   - Click handlers (distinguishes drag vs click, triggers panel toggle)
   - Keyboard handlers (Escape to close, Option+Shift+A to toggle)
-- `styles.ts` - CSS injection with CSS variables, responsive design, backdrop blur effects
+  - Resize handlers (drag handles with min/max constraints, double-click to reset to default size, animation frame throttling)
+- `styles.ts` - CSS injection with CSS variables, responsive design, backdrop blur effects, automatic light/dark theme support via `@media (prefers-color-scheme: dark)`
 - `icons.ts` - Embedded Vite gradient SVG icon (VITE_ICON constant)
 - `tsconfig.json` - TypeScript config targeting ES2020 with DOM libs
 
@@ -149,15 +152,18 @@ The floating icon is a framework-agnostic overlay button that provides quick acc
 - Auto-initialization triggered when `__VAM_BASE_URL__` global variable exists
 
 **Features**:
-- Draggable floating button with momentum-based snapping to left/right edges
-- Smooth panel slide-in animation from left/right edge
+- Draggable floating button with momentum-based snapping to all 4 edges (left/right/top/bottom)
+- Resizable panel with drag handles (contextual positioning based on trigger edge)
+- Smooth panel slide-in animation from trigger edge
+- Automatic light/dark theme support based on system preferences (`@media (prefers-color-scheme: dark)`)
 - Dark overlay backdrop with blur effect
-- Position and open state persisted to localStorage
+- Position, size, and open state persisted to localStorage (3 keys: position, size, panel state)
 - Keyboard shortcuts:
   - `Option+Shift+A` (⌥⇧A) - Toggle panel
   - `Escape` - Close panel
-- Cursor feedback (grab/grabbing on drag)
-- Visual effects (drop-shadow on active state, backdrop blur on overlay)
+  - Double-click resize handles - Reset to default size
+- Cursor feedback (grab/grabbing on drag, resize cursors on handles)
+- Visual effects (drop-shadow on active state, backdrop blur on overlay, theme-aware colors)
 - Cross-browser compatible (uses Pointer Events API)
 - Framework-agnostic (no React/Vue/etc. dependencies)
 
@@ -168,9 +174,11 @@ The floating icon is a framework-agnostic overlay button that provides quick acc
 
 **State Management Pattern**:
 - Composable-style inspired by Vue DevTools
-- Separate state managers for position, panel, and drag
-- localStorage persistence with JSON serialization
+- Separate state managers for position, panel, drag, and size
+- localStorage persistence with JSON serialization (keys: `vite-asset-manager-position`, `vite-asset-manager-open`, `vite-asset-manager-size`)
 - Getter/setter pattern for state access
+- Size constraints enforced (MIN_WIDTH: 400px, MIN_HEIGHT: 300px)
+- Viewport margin constraint (20px) ensures panel stays visible
 
 ### TypeScript Configuration
 

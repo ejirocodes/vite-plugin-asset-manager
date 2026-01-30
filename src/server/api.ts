@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http'
+import type { ParsedUrlQuery } from 'querystring'
 import { parse as parseUrl } from 'url'
 import path from 'path'
 import fs from 'fs'
@@ -12,6 +13,7 @@ import { revealInFileExplorer } from './file-revealer.js'
 import type { AssetStats, AssetType, EditorType } from '../shared/types.js'
 
 type NextFunction = () => void
+type QueryParams = ParsedUrlQuery
 
 const sseClients = new Set<ServerResponse>()
 
@@ -122,11 +124,7 @@ export function createApiRouter(
   }
 }
 
-async function handleGetAssets(
-  res: ServerResponse,
-  scanner: AssetScanner,
-  query: Record<string, any>
-) {
+async function handleGetAssets(res: ServerResponse, scanner: AssetScanner, query: QueryParams) {
   const assets = scanner.getAssets()
 
   let filtered = assets
@@ -149,7 +147,7 @@ async function handleGetAssets(
 async function handleGetGroupedAssets(
   res: ServerResponse,
   scanner: AssetScanner,
-  query: Record<string, any>
+  query: QueryParams
 ) {
   let groups = scanner.getGroupedAssets()
 
@@ -234,11 +232,7 @@ async function handleGetGroupedAssets(
   sendJson(res, { groups, total })
 }
 
-async function handleSearch(
-  res: ServerResponse,
-  scanner: AssetScanner,
-  query: Record<string, any>
-) {
+async function handleSearch(res: ServerResponse, scanner: AssetScanner, query: QueryParams) {
   const q = (query.q as string) || ''
   let results = scanner.search(q)
 
@@ -264,7 +258,7 @@ async function handleThumbnail(
   res: ServerResponse,
   thumbnailService: ThumbnailService,
   root: string,
-  query: Record<string, any>
+  query: QueryParams
 ) {
   const relativePath = query.path as string
   if (!relativePath) {
@@ -301,7 +295,7 @@ async function handleThumbnail(
   }
 }
 
-async function handleServeFile(res: ServerResponse, root: string, query: Record<string, any>) {
+async function handleServeFile(res: ServerResponse, root: string, query: QueryParams) {
   const relativePath = query.path as string
   if (!relativePath) {
     res.statusCode = 400
@@ -372,7 +366,7 @@ async function handleGetDuplicates(
   res: ServerResponse,
   scanner: AssetScanner,
   duplicateScanner: DuplicateScanner,
-  query: Record<string, any>
+  query: QueryParams
 ) {
   const hash = query.hash as string
 
@@ -420,7 +414,7 @@ export function broadcastSSE(event: string, data: unknown) {
 async function handleGetImporters(
   res: ServerResponse,
   importerScanner: ImporterScanner,
-  query: Record<string, any>
+  query: QueryParams
 ) {
   const assetPath = query.path as string
   if (!assetPath) {
@@ -438,7 +432,7 @@ async function handleOpenInEditor(
   res: ServerResponse,
   root: string,
   editor: EditorType,
-  query: Record<string, any>
+  query: QueryParams
 ) {
   if (req.method !== 'POST') {
     res.statusCode = 405
@@ -485,7 +479,7 @@ async function handleRevealInFinder(
   req: IncomingMessage,
   res: ServerResponse,
   root: string,
-  query: Record<string, any>
+  query: QueryParams
 ) {
   if (req.method !== 'POST') {
     res.statusCode = 405

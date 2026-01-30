@@ -3,7 +3,7 @@ import fg from 'fast-glob'
 import path from 'path'
 import fs from 'fs/promises'
 import chokidar from 'chokidar'
-import type { Asset, AssetGroup, AssetType, ResolvedOptions } from '../shared/types.js'
+import type { Asset, AssetGroup, AssetType, Importer, ResolvedOptions } from '../shared/types.js'
 
 export interface ScannerEvents {
   change: [{ event: string; path: string }]
@@ -160,7 +160,7 @@ export class AssetScanner extends EventEmitter {
    * Enrich assets with importer count metadata.
    * Should be called after scanning completes and when importers change.
    */
-  enrichWithImporterCounts(importerScanner: { getImporters: (assetPath: string) => any[] }): void {
+  enrichWithImporterCounts(importerScanner: { getImporters: (assetPath: string) => Importer[] }): void {
     for (const asset of this.cache.values()) {
       const importers = importerScanner.getImporters(asset.path)
       asset.importersCount = importers.length

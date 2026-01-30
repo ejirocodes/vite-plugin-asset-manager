@@ -397,6 +397,71 @@ interface AssetManagerOptions {
 // EditorType supports: 'code' | 'cursor' | 'webstorm' | 'idea' | 'vim' | 'emacs' | 'sublime' | 'atom' | etc.
 ```
 
+## Floating Icon System (`src/client/floating-icon/`)
+
+Framework-agnostic overlay button providing quick access to the Asset Manager dashboard.
+
+### Architecture (8 files)
+- **`index.ts`** - Entry point with `initFloatingIcon()` and auto-initialization
+- **`constants.ts`** - Configuration constants
+  - Z-index layers: 99998-100000
+  - Resize constraints: MIN_WIDTH=400px, MIN_HEIGHT=300px
+  - VIEWPORT_MARGIN=20px (prevents panel going off-screen)
+  - Drag threshold: 5px
+  - Light/dark color schemes
+- **`dom.ts`** - DOM element creation and manipulation
+  - 5 base elements: container, trigger button, overlay, panel, iframe
+  - Contextual resize handles based on trigger edge position
+  - Functions: `createResizeHandles()`, `updatePanelSize()`, `constrainSize()`
+- **`state.ts`** - Composable-style state managers (Vue DevTools pattern)
+  - `createPositionState()` - Trigger position (left/right/top/bottom edge + offset)
+  - `createPanelState()` - Panel open/closed state
+  - `createDragState()` - Drag interaction state
+  - `createSizeState()` - Panel dimensions (width/height)
+  - All persist to localStorage with JSON serialization
+- **`events.ts`** - Event handler setup
+  - Pointer events for drag (5px threshold to distinguish from clicks)
+  - Momentum-based edge snapping to all 4 edges
+  - Resize handlers with min/max constraints
+  - Double-click on resize handles to reset size
+  - Keyboard: Escape to close, Option+Shift+A to toggle
+- **`styles.ts`** - CSS injection
+  - CSS variables for theming
+  - `@media (prefers-color-scheme: dark)` for automatic theme switching
+  - Backdrop blur, drop-shadow effects
+  - Resize handle cursors: `ew-resize`, `ns-resize`, `nwse-resize`, `nesw-resize`
+- **`icons.ts`** - Embedded Vite gradient SVG icon
+- **`tsconfig.json`** - TypeScript config targeting ES2020 with DOM libs
+
+### Features
+- **Positioning**: Snaps to all 4 edges (left, right, top, bottom) with momentum-based detection
+- **Resizing**: Drag handles on panel edges/corners with min/max constraints
+  - MIN_WIDTH: 400px, MIN_HEIGHT: 300px
+  - Double-click handles to reset to default size
+  - Animation frame throttling for smooth resizing
+- **Theming**: Automatic light/dark mode based on system preferences
+  - Light colors: Light gray backgrounds, subtle shadows
+  - Dark colors: Dark gray backgrounds, stronger shadows
+- **Persistence**: 3 localStorage keys
+  - `vite-asset-manager-position` - Trigger button position
+  - `vite-asset-manager-open` - Panel open/closed state
+  - `vite-asset-manager-size` - Panel dimensions
+- **Interactions**:
+  - Drag trigger button with 5px threshold (prevents accidental drags)
+  - Click trigger to toggle panel
+  - Keyboard shortcuts (⌥⇧A to toggle, Escape to close)
+  - Resize handles appear contextually based on trigger edge
+- **Integration**: Injected via `transformIndexHtml()` hook in `src/plugin.ts`
+  - Sets `window.__VAM_BASE_URL__` global variable
+  - Loads floating-icon.js as module script
+  - Auto-initializes when global variable detected
+
+### Build Process
+- **Config**: `vite.config.floating-icon.ts`
+- **Format**: IIFE (self-executing) with `emptyOutDir: false` to preserve UI build
+- **Output**: `dist/client/floating-icon.js` (minified with esbuild)
+- **Build order**: `build:ui` → `build:floating-icon` → `build:plugin`
+
 ## Future Considerations / In Progress
 
 ### Completed

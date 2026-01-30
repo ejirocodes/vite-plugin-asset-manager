@@ -17,7 +17,6 @@ import {
   type DragState,
   type PanelState,
   type PositionState,
-  type ResizeDirection,
   type SizeState
 } from './state'
 export interface EventHandlerContext {
@@ -184,7 +183,7 @@ export function setupPanelResizeHandlers(context: EventHandlerContext): CleanupF
     if (!resizeState.isResizing()) return
 
     if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId)
+      window.cancelAnimationFrame(animationFrameId)
     }
 
     animationFrameId = requestAnimationFrame(() => {
@@ -229,7 +228,7 @@ export function setupPanelResizeHandlers(context: EventHandlerContext): CleanupF
     if (!resizeState.isResizing()) return
 
     if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId)
+      window.cancelAnimationFrame(animationFrameId)
       animationFrameId = null
     }
 
@@ -237,7 +236,6 @@ export function setupPanelResizeHandlers(context: EventHandlerContext): CleanupF
     elements.panel.dataset.resizing = 'false'
     elements.iframe.style.pointerEvents = ''
 
-    // Save the final size
     sizeState.save()
   }
 
@@ -245,22 +243,18 @@ export function setupPanelResizeHandlers(context: EventHandlerContext): CleanupF
     e.preventDefault()
     e.stopPropagation()
 
-    // Reset to default size
     sizeState.resetToDefault()
     updatePanelState(elements, true, positionState.get().edge, null)
   }
 
   const setupHandleListeners = () => {
-    // Clean up old handlers
     currentHandles.forEach(handle => {
       handle.element.remove()
     })
 
-    // Create new handles based on current edge
     const edge = positionState.get().edge
     currentHandles = createResizeHandles(elements.panel, edge)
 
-    // Add listeners to each handle
     currentHandles.forEach(handle => {
       const handlePointerDown = (e: PointerEvent) => onPointerDown(e, handle)
       handle.element.addEventListener('pointerdown', handlePointerDown)
@@ -268,15 +262,13 @@ export function setupPanelResizeHandlers(context: EventHandlerContext): CleanupF
     })
   }
 
-  // Set up initial handles when panel opens
   const checkAndSetupHandles = () => {
     if (panelState.isOpen() && currentHandles.length === 0) {
       setupHandleListeners()
     }
   }
 
-  // Observer to detect panel open state changes
-  const observer = new MutationObserver(mutations => {
+  const observer = new window.MutationObserver(mutations => {
     mutations.forEach(mutation => {
       if (mutation.type === 'attributes' && mutation.attributeName === 'data-open') {
         const isOpen = elements.panel.dataset.open === 'true'
@@ -289,11 +281,9 @@ export function setupPanelResizeHandlers(context: EventHandlerContext): CleanupF
 
   observer.observe(elements.panel, { attributes: true })
 
-  // Set up document-level listeners
   document.addEventListener('pointermove', onPointerMove)
   document.addEventListener('pointerup', onPointerUp)
 
-  // Initial setup if panel is already open
   checkAndSetupHandles()
 
   return () => {
@@ -302,7 +292,7 @@ export function setupPanelResizeHandlers(context: EventHandlerContext): CleanupF
     document.removeEventListener('pointerup', onPointerUp)
 
     if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId)
+      window.cancelAnimationFrame(animationFrameId)
     }
 
     currentHandles.forEach(handle => {

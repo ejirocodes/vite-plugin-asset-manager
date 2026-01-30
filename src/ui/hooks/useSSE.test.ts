@@ -29,6 +29,7 @@ describe('useSSE', () => {
 
       constructor() {
         eventSourceCallCount++
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         lastCreatedInstance = this
       }
     }

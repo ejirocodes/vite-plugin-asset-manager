@@ -1,10 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { useImporters } from './useImporters'
 
+// Create stable mock functions outside the factory to prevent infinite re-renders
+const mockUnsubscribe = vi.fn()
+const mockSubscribe = vi.fn().mockReturnValue(mockUnsubscribe)
+
 vi.mock('./useSSE', () => ({
   useSSE: () => ({
-    subscribe: vi.fn().mockReturnValue(() => {})
+    subscribe: mockSubscribe
   })
 }))
 
@@ -30,6 +34,8 @@ describe('useImporters', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    mockSubscribe.mockClear()
+    mockUnsubscribe.mockClear()
 
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -38,6 +44,10 @@ describe('useImporters', () => {
         total: 1
       })
     })
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('should fetch importers on mount', async () => {
