@@ -575,6 +575,13 @@ Applied Vercel React best practices without breaking changes.
 - 7 files modified with no API changes
 
 **Optimizations applied**:
+- **Code Splitting**: Manual chunk splitting in `vite.config.ui.ts` (commit 2b66494)
+  - Main bundle reduced from 711 KB to 75 KB
+  - Eliminates "chunks larger than 500 KB" build warning
+  - Separate vendor chunks: react (193 KB), ui (254 KB), icons (155 KB), virtual (15 KB)
+- **Lazy Loading**: PreviewPanel loaded on-demand with React.lazy() and Suspense
+  - Reduces initial bundle size for faster time-to-interactive
+  - Fallback loading spinner during chunk fetch
 - `rendering-hoist-jsx` - Static JSX hoisted outside render (LoadingSpinner, EmptyState)
 - `rerender-dependencies` - Primitive string dependencies in hooks
 - `rerender-memo` - Single-pass filtering in displayGroups
@@ -584,6 +591,7 @@ Applied Vercel React best practices without breaking changes.
 - `rerender-functional-setstate` - Documented functional setState patterns
 
 **Impact**:
+- 89% reduction in main bundle size (711 KB → 75 KB)
 - Reduced unnecessary re-renders
 - Stable hook execution across renders
 - O(n) instead of O(2n) filtering operations
