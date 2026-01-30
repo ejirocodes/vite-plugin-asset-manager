@@ -1,5 +1,5 @@
 import { DIMENSIONS, ELEMENT_IDS, RESIZE, type Edge, type Position, type Size } from './constants'
-import { VITE_ICON } from './icons'
+import { ASSET_MANAGER_ICON } from './icons'
 import type { ResizeDirection } from './state'
 
 export interface FloatingIconElements {
@@ -24,7 +24,7 @@ function createContainer(): HTMLDivElement {
 function createTrigger(): HTMLButtonElement {
   const trigger = document.createElement('button')
   trigger.id = ELEMENT_IDS.TRIGGER
-  trigger.innerHTML = VITE_ICON
+  trigger.innerHTML = ASSET_MANAGER_ICON
   trigger.title = 'Asset Manager (\u2325\u21E7A)'
   return trigger
 }

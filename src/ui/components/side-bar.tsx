@@ -12,7 +12,8 @@ import {
   ArticleIcon,
   FileIcon,
   WarningCircleIcon,
-  CopyIcon
+  CopyIcon,
+  LightningIcon
 } from '@phosphor-icons/react'
 import packageJson from '../../../package.json'
 import type { AssetType } from '../types'
@@ -100,7 +101,7 @@ export const Sidebar = memo(function Sidebar({
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="w-9 h-9 rounded-lg bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-              <PackageIcon weight="bold" className="w-5 h-5 text-white" />
+              <LightningIcon weight="fill" />
             </div>
             <div
               className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-sidebar ${dotClass}`}

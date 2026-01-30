@@ -21,6 +21,7 @@ const STYLES = `
   --vam-trigger-active-bg: ${LIGHT_COLORS.TRIGGER_ACTIVE_BG};
   --vam-overlay-bg: ${LIGHT_COLORS.OVERLAY_BG};
   --vam-panel-bg: ${LIGHT_COLORS.PANEL_BG};
+  --vam-icon-color: ${LIGHT_COLORS.ICON_COLOR};
   --vam-transition: ${CSS_TRANSITIONS.DEFAULT};
   --vam-transition-spring: ${CSS_TRANSITIONS.SPRING};
   --vam-icon-width: ${DIMENSIONS.ICON_CONTAINER_WIDTH}px;
@@ -39,6 +40,7 @@ const STYLES = `
     --vam-trigger-active-bg: ${DARK_COLORS.TRIGGER_ACTIVE_BG};
     --vam-overlay-bg: ${DARK_COLORS.OVERLAY_BG};
     --vam-panel-bg: ${DARK_COLORS.PANEL_BG};
+    --vam-icon-color: ${DARK_COLORS.ICON_COLOR};
   }
 }
 
@@ -131,6 +133,7 @@ const STYLES = `
 
 #${ELEMENT_IDS.TRIGGER} svg {
   transition: filter var(--vam-transition), transform var(--vam-transition);
+  color: var(--vam-icon-color);
 }
 
 #${ELEMENT_IDS.OVERLAY} {

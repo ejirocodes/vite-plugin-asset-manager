@@ -26,7 +26,8 @@ export const DARK_COLORS = {
   GLOW_ACTIVE: '0 0 20px rgba(65, 209, 255, 0.3), 0 0 40px rgba(189, 52, 254, 0.2)',
   TRIGGER_ACTIVE_BG: 'rgba(65, 209, 255, 0.12)',
   OVERLAY_BG: 'rgba(0, 0, 0, 0.5)',
-  PANEL_BG: '#09090b'
+  PANEL_BG: '#09090b',
+  ICON_COLOR: '#ffffff'
 } as const
 
 export const LIGHT_COLORS = {
@@ -40,7 +41,8 @@ export const LIGHT_COLORS = {
   GLOW_ACTIVE: '0 0 20px rgba(65, 209, 255, 0.25), 0 0 40px rgba(189, 52, 254, 0.15)',
   TRIGGER_ACTIVE_BG: 'rgba(65, 209, 255, 0.15)',
   OVERLAY_BG: 'rgba(0, 0, 0, 0.3)',
-  PANEL_BG: '#ffffff'
+  PANEL_BG: '#ffffff',
+  ICON_COLOR: '#000000'
 } as const
 
 // Keep CSS_VARS for backward compatibility
