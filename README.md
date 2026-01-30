@@ -70,6 +70,7 @@ Start your dev server and access the Asset Manager in three ways:
 | **Bulk Operations** | Multi-select for batch download (ZIP), copy paths, or delete |
 | **Keyboard Navigation** | Full keyboard support with vim-style bindings |
 | **Context Menu** | Right-click for quick actions (copy, reveal in Finder, delete, etc.) |
+| **Performance** | Code splitting reduces main bundle to 75 KB, lazy loading for optimal speed |
 
 ## Framework Support
 

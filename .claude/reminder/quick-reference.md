@@ -355,6 +355,12 @@ Each includes test assets in `src/assets/` and `public/` directories.
 
 ### Performance Optimizations
 - **Applied Vercel best practices** for React rendering optimization
+- **Code Splitting**: Manual chunk splitting reduces main bundle from 711 KB to 75 KB (89% reduction)
+  - vendor-react: React runtime (193 KB)
+  - vendor-ui: UI component libraries (254 KB)
+  - vendor-icons: Phosphor icons (155 KB)
+  - vendor-virtual: TanStack Virtual (15 KB)
+- **Lazy Loading**: PreviewPanel loaded on-demand with React.lazy() and Suspense
 - **Primitive dependencies**: Hooks use strings instead of objects to prevent re-renders
 - **Stable callbacks**: `isIgnored` uses ref pattern for consistent identity
 - **Single-pass filtering**: Combined iterations in `displayGroups` computation

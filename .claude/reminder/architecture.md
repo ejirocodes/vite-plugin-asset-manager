@@ -138,6 +138,12 @@ Framework-agnostic overlay button that opens the Asset Manager panel. Built as s
 - **Dark theme by default**: Matches typical dev tool aesthetics
 - **Real-time updates**: Uses SSE (Server-Sent Events) via `/api/events` endpoint with shared singleton EventSource connection (`useSSE` hook)
 - **Debounced search**: 200ms debounce to avoid excessive API calls
+- **Code Splitting**: Manual chunk splitting in `vite.config.ui.ts` reduces main bundle from 711 KB to 75 KB
+  - vendor-react: React runtime (193 KB)
+  - vendor-ui: UI libraries (@base-ui, class-variance-authority, clsx, tailwind-merge, sonner, next-themes) (254 KB)
+  - vendor-icons: Phosphor icons (155 KB)
+  - vendor-virtual: @tanstack/react-virtual (15 KB)
+- **Lazy Loading**: PreviewPanel component loaded on-demand with React.lazy() and Suspense
 
 ### 6a. Preview Panel Architecture
 The preview panel is a fixed sidebar (not a Sheet/Dialog) with 13 total component files:
@@ -515,15 +521,21 @@ Framework-agnostic overlay button providing quick access to the Asset Manager da
 ### 6m. Performance Optimizations (Vercel Best Practices)
 - **File**: `.claude/REFACTORING_SUMMARY.md` - Detailed documentation
 - **Applied optimizations**:
-  1. **rendering-hoist-jsx**: Static components (`LoadingSpinner`, `EmptyState`) hoisted outside render
-  2. **rerender-dependencies**: Primitive string dependencies instead of objects in hooks
-  3. **rerender-memo**: Single-pass filtering in `displayGroups` computation
-  4. **rerender-use-ref-transient-values**: Stable `isIgnored` callback using ref
-  5. **js-combine-iterations**: Multiple iterations merged into single loops
-  6. **js-cache-property-access**: Property lookups cached in sort comparisons
-  7. **rerender-functional-setstate**: Documented existing functional setState patterns
-- **Files modified**: App.tsx, useAdvancedFilters.ts, useAssets.ts, useSearch.ts, ignored-assets-provider.tsx, asset-card.tsx, sort-utils.ts
-- **Impact**: Reduced re-renders, stable hook execution, O(n) instead of O(2n) filtering
+  1. **Code Splitting & Lazy Loading** (commit 2b66494):
+     - Manual chunk splitting in `vite.config.ui.ts` for vendor dependencies
+     - Main bundle: 711 KB → 75 KB (89% reduction)
+     - Vendor chunks: react (193 KB), ui (254 KB), icons (155 KB), virtual (15 KB)
+     - PreviewPanel lazy loaded with React.lazy() and Suspense
+     - Eliminates "chunks larger than 500 KB" build warning
+  2. **rendering-hoist-jsx**: Static components (`LoadingSpinner`, `EmptyState`) hoisted outside render
+  3. **rerender-dependencies**: Primitive string dependencies instead of objects in hooks
+  4. **rerender-memo**: Single-pass filtering in `displayGroups` computation
+  5. **rerender-use-ref-transient-values**: Stable `isIgnored` callback using ref
+  6. **js-combine-iterations**: Multiple iterations merged into single loops
+  7. **js-cache-property-access**: Property lookups cached in sort comparisons
+  8. **rerender-functional-setstate**: Documented existing functional setState patterns
+- **Files modified**: App.tsx, vite.config.ui.ts, useAdvancedFilters.ts, useAssets.ts, useSearch.ts, ignored-assets-provider.tsx, asset-card.tsx, sort-utils.ts
+- **Impact**: 89% smaller main bundle, reduced re-renders, stable hook execution, O(n) instead of O(2n) filtering
 
 ## UI Component Library
 Key shadcn/ui components in use (19 total):

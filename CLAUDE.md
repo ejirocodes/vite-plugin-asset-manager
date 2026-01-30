@@ -98,6 +98,12 @@ Each playground imports the plugin directly from `../../src/index` (no pnpm link
    - Self-contained React dashboard with its own `tsconfig.json`
    - Uses Tailwind CSS v4 and shadcn/ui (base-mira style with Phosphor icons)
    - Includes favicon: `src/ui/assets/icon.svg` (referenced in `src/ui/index.html`)
+   - **Code Splitting**: Manual chunk splitting reduces main bundle from 711 KB to 75 KB
+     - vendor-react: React runtime (193 KB)
+     - vendor-ui: UI component libraries (254 KB)
+     - vendor-icons: Phosphor icons (155 KB)
+     - vendor-virtual: TanStack Virtual (15 KB)
+   - **Lazy Loading**: PreviewPanel lazy loaded with React.lazy() and Suspense
    - Structure:
      - `components/` - App components (Sidebar, SearchBar, AssetGrid, AssetCard, FileIcon, BulkActionsBar, SortControls, AssetContextMenu, AdvancedFilters)
      - `components/ui/` - shadcn primitives (Button, Card, Input, Sheet, Tabs, ContextMenu, etc.)
@@ -356,6 +362,13 @@ Virtualized grid rendering for handling large asset collections (100+ assets) wi
 
 ### Performance Optimizations (Vercel Best Practices)
 React performance optimizations applied without breaking changes:
+- **Code Splitting**: Manual chunk splitting in `vite.config.ui.ts` separates vendor dependencies
+  - Main bundle reduced from 711 KB to 75 KB (89% reduction)
+  - Eliminates "chunks larger than 500 KB" build warning
+  - Vendor chunks: react (193 KB), ui (254 KB), icons (155 KB), virtual (15 KB)
+- **Lazy Loading**: PreviewPanel loaded on-demand with React.lazy() and Suspense
+  - Reduces initial bundle size for faster time-to-interactive
+  - Fallback loading spinner during chunk fetch
 - **Hoisted JSX**: Static components (`LoadingSpinner`, `EmptyState`) defined outside render
 - **Primitive dependencies**: Hooks return `filterParamsString` (string) instead of objects to prevent re-renders
 - **Stable callbacks**: `isIgnored` uses ref pattern for consistent reference identity
