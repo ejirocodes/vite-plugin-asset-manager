@@ -1,10 +1,13 @@
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import { Sidebar } from './components/side-bar'
 import { AssetGrid } from './components/asset-grid'
-import { PreviewPanel } from './components/preview-panel'
 import { SortControls } from './components/sort-controls'
 import { BulkActionsBar } from './components/bulk-actions-bar'
 import { AdvancedFilters } from './components/advanced-filters'
+
+const PreviewPanel = lazy(() =>
+  import('./components/preview-panel').then(m => ({ default: m.PreviewPanel }))
+)
 import { useAssets } from './hooks/useAssets'
 import { useSearch } from './hooks/useSearch'
 import { useStats } from './hooks/useStats'
@@ -463,13 +466,21 @@ export default function App() {
         </main>
       </div>
       {selectedAsset && (
-        <PreviewPanel
-          asset={selectedAsset}
-          onClose={handleClosePreview}
-          onSelectAsset={handlePreview}
-          flatAssetList={flatAssetList}
-          onAssetChange={setSelectedAsset}
-        />
+        <Suspense
+          fallback={
+            <aside className="fixed top-0 right-0 z-50 h-screen w-96 border-l border-border bg-card/80 backdrop-blur-sm flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+            </aside>
+          }
+        >
+          <PreviewPanel
+            asset={selectedAsset}
+            onClose={handleClosePreview}
+            onSelectAsset={handlePreview}
+            flatAssetList={flatAssetList}
+            onAssetChange={setSelectedAsset}
+          />
+        </Suspense>
       )}
     </>
   )
