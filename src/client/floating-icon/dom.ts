@@ -178,8 +178,14 @@ export function getDefaultPanelSize(): Size {
 }
 
 export function constrainSize(size: Size): Size {
-  const maxWidth = Math.min(DIMENSIONS.PANEL_MAX_WIDTH, window.innerWidth - DIMENSIONS.VIEWPORT_MARGIN * 2)
-  const maxHeight = Math.min(window.innerHeight - 40, window.innerHeight - DIMENSIONS.VIEWPORT_MARGIN * 2)
+  const maxWidth = Math.min(
+    DIMENSIONS.PANEL_MAX_WIDTH,
+    window.innerWidth - DIMENSIONS.VIEWPORT_MARGIN * 2
+  )
+  const maxHeight = Math.min(
+    window.innerHeight - 40,
+    window.innerHeight - DIMENSIONS.VIEWPORT_MARGIN * 2
+  )
 
   return {
     width: Math.max(RESIZE.MIN_WIDTH, Math.min(size.width, maxWidth)),

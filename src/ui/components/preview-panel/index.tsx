@@ -37,8 +37,7 @@ export const PreviewPanel = memo(function PreviewPanel({
   const [panelWidth, setPanelWidth] = useState(DEFAULT_WIDTH)
   const [isResizing, setIsResizing] = useState(false)
 
-  const imageDimensions =
-    dimensionsState.assetId === asset.id ? dimensionsState.dimensions : null
+  const imageDimensions = dimensionsState.assetId === asset.id ? dimensionsState.dimensions : null
 
   const handleResizeStart = useCallback(
     (e: React.MouseEvent) => {

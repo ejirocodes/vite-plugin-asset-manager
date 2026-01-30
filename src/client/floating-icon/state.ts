@@ -1,4 +1,11 @@
-import { DEFAULT_POSITION, DRAG, STORAGE_KEYS, type Edge, type Position, type Size } from './constants'
+import {
+  DEFAULT_POSITION,
+  DRAG,
+  STORAGE_KEYS,
+  type Edge,
+  type Position,
+  type Size
+} from './constants'
 
 function loadPosition(): Position {
   try {

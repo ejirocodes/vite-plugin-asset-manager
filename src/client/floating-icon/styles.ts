@@ -1,4 +1,12 @@
-import { CSS_TRANSITIONS, DARK_COLORS, LIGHT_COLORS, DIMENSIONS, ELEMENT_IDS, RESIZE, Z_INDEX } from './constants'
+import {
+  CSS_TRANSITIONS,
+  DARK_COLORS,
+  LIGHT_COLORS,
+  DIMENSIONS,
+  ELEMENT_IDS,
+  RESIZE,
+  Z_INDEX
+} from './constants'
 
 const STYLES = `
 :root {

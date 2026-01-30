@@ -116,7 +116,7 @@ export default function App() {
     if (groups.length > 0 && expandedDirs.size === 0) {
       setExpandedDirs(new Set(groups.map(g => g.directory)))
     }
-  }, [groups])
+  }, [groups, expandedDirs.size])
 
   useEffect(() => {
     const timer = setTimeout(() => {
