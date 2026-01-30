@@ -1,0 +1,42 @@
+name: "\U0001F680 Feature Request"
+description: Propose a new feature for Vite Plugin Asset Manager
+labels: ["enhancement", "pending triage"]
+type: Feature
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in Vite Plugin Asset Manager and taking the time to propose a new feature!
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Description
+      description: "Clear and concise description of the feature. Please make the reason and use cases as detailed as possible. If you intend to submit a PR for this issue, tell us in the description."
+      placeholder: As a developer using Vite Plugin Asset Manager, I want [goal / wish] so that [benefit].
+    validations:
+      required: true
+  - type: textarea
+    id: suggested-solution
+    attributes:
+      label: Suggested solution
+      description: "Describe how you envision this feature working. Which layer would it affect? (Plugin, Client/Floating Icon, Server, UI)"
+    validations:
+      required: true
+  - type: textarea
+    id: alternative
+    attributes:
+      label: Alternative
+      description: Clear and concise description of any alternative solutions or features you've considered.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Any other context, screenshots, or mockups about the feature request here.
+  - type: checkboxes
+    id: checkboxes
+    attributes:
+      label: Validations
+      description: Before submitting the issue, please make sure you do the following
+      options:
+        - label: Check that there isn't already an issue that requests the same feature to avoid creating a duplicate.
+          required: true
