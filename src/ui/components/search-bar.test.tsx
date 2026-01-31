@@ -35,14 +35,14 @@ describe('SearchBar', () => {
   it('should render search input', () => {
     render(<SearchBar {...defaultProps} />)
 
-    const input = screen.getByPlaceholderText('Search assets... (/)')
+    const input = screen.getByPlaceholderText('Search assets...')
     expect(input).toBeInTheDocument()
   })
 
   it('should display current value', () => {
     render(<SearchBar {...defaultProps} value="logo" />)
 
-    const input = screen.getByPlaceholderText('Search assets... (/)') as HTMLInputElement
+    const input = screen.getByPlaceholderText('Search assets...') as HTMLInputElement
     expect(input.value).toBe('logo')
   })
 
@@ -52,7 +52,7 @@ describe('SearchBar', () => {
 
     render(<SearchBar {...defaultProps} onChange={onChange} />)
 
-    const input = screen.getByPlaceholderText('Search assets... (/)')
+    const input = screen.getByPlaceholderText('Search assets...')
     await user.type(input, 'test')
 
     expect(onChange).toHaveBeenCalledTimes(4)
@@ -112,7 +112,7 @@ describe('SearchBar', () => {
 
     render(<SearchBar {...defaultProps} onFocus={onFocus} />)
 
-    const input = screen.getByPlaceholderText('Search assets... (/)')
+    const input = screen.getByPlaceholderText('Search assets...')
     await user.click(input)
 
     expect(onFocus).toHaveBeenCalled()
@@ -123,6 +123,6 @@ describe('SearchBar', () => {
     render(<SearchBar {...defaultProps} ref={ref} />)
 
     expect(ref.current).toBeInstanceOf(HTMLInputElement)
-    expect(ref.current?.placeholder).toBe('Search assets... (/)')
+    expect(ref.current?.placeholder).toBe('Search assets...')
   })
 })
