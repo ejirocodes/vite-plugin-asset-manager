@@ -13,6 +13,7 @@ Vite Plugin Asset Manager is a visual asset management dashboard for Vite projec
 
 ## Vite Framework Support
 
+**Static HTML Frameworks** (automatic via `transformIndexHtml`):
 - [x] Vanilla
 - [x] Vue
 - [x] React
@@ -21,6 +22,11 @@ Vite Plugin Asset Manager is a visual asset management dashboard for Vite projec
 - [x] Svelte
 - [x] Solid
 - [x] Qwik
+
+**SSR Frameworks** (manual script injection required):
+- [x] TanStack Start
+
+See `docs/SSR_INTEGRATION.md` for setup instructions for TanStack Start, Next.js, Remix, Nuxt, SvelteKit, and Solid Start.
 
 ## Build Commands
 

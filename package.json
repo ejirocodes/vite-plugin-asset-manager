@@ -134,10 +134,6 @@
       "esbuild",
       "msw",
       "sharp"
-    ],
-    "trustedDependencies": [
-      "esbuild",
-      "sharp"
     ]
   }
 }

@@ -49,6 +49,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             }
           ]}
         />
+        <Scripts />
         <script
           dangerouslySetInnerHTML={{
             __html: `window.__VAM_BASE_URL__ = "/__asset_manager__";`
