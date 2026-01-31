@@ -377,6 +377,31 @@ React performance optimizations applied without breaking changes:
 - **Functional setState**: Uses callback form to avoid stale closures
 - **Implementation**: See `.claude/REFACTORING_SUMMARY.md` for detailed changes
 
+### Responsive Design (Mobile-First)
+Comprehensive responsive implementation for all device sizes (320px to 4K+):
+- **Mobile Navigation**: Sticky header with drawer toggle, branding, and asset count (visible <768px)
+- **Sidebar Drawer**:
+  - Desktop (≥768px): Persistent 288px sidebar
+  - Mobile (<768px): Slide-out drawer (280px mobile, 320px tablet) that auto-closes after selection
+- **Bottom Sheet Preview**:
+  - Desktop: Right-side panel (384px default, resizable 300-600px)
+  - Mobile: Bottom sheet at 85vh height with full width, drag indicator, rounded top corners
+- **Touch-Friendly Interactions**: All interactive elements minimum 44×44px (WCAG 2.1 AAA)
+- **Responsive Components**:
+  - Advanced Filters: Adapts from full-width mobile to fixed desktop width
+  - Bulk Actions Bar: Icon-only buttons on mobile, full labels on desktop
+  - Search Bar: Optimized padding and shortened placeholder text
+  - Asset Cards: Touch-optimized overlay controls and larger interaction areas
+  - Sidebar Stats: Responsive spacing, gaps, and typography
+- **Global Optimizations**:
+  - Wider scrollbars on mobile (10px) for easier touch scrolling, compact (6px) on desktop
+  - Reduced motion support via `@media (prefers-reduced-motion: reduce)`
+  - Faster animations on mobile (200ms vs 300ms) for better performance
+  - Responsive base font size (14px on mobile)
+  - Touch-friendly tap targets via `@media (pointer: coarse)`
+- **Breakpoints**: Mobile (<640px), Tablet (640-1023px), Desktop (≥1024px)
+- **Design Patterns**: Mobile Drawer (iOS/Material), Bottom Sheet (Google Maps), 44×44pt touch targets (Apple HIG)
+
 ## Development Notes
 
 - **Adding shadcn components**: Run `npx shadcn@latest add <component>` from project root; components install to `src/ui/components/ui/`

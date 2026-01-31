@@ -59,9 +59,11 @@ Start your dev server and access the Asset Manager in three ways:
 
 | Feature | Description |
 |---------|-------------|
+| **Fully Responsive** | Mobile-first design that works seamlessly from 320px to 4K+ displays |
 | **Asset Discovery** | Automatically scans and catalogs images, videos, audio, fonts, documents, and data files |
 | **Real-time Updates** | File changes reflected instantly via Server-Sent Events |
 | **Floating Icon** | Draggable & resizable overlay panel with keyboard shortcuts (⌥⇧A), snaps to all 4 edges |
+| **Mobile Optimized** | Touch-friendly UI with 44×44px tap targets, bottom sheet preview, drawer navigation |
 | **Automatic Theming** | Light/dark mode support based on system preferences |
 | **Thumbnail Generation** | Sharp-powered thumbnails with dual-tier caching |
 | **Import Tracking** | See which files import each asset with click-to-open-in-editor |
@@ -71,6 +73,7 @@ Start your dev server and access the Asset Manager in three ways:
 | **Keyboard Navigation** | Full keyboard support with vim-style bindings |
 | **Context Menu** | Right-click for quick actions (copy, reveal in Finder, delete, etc.) |
 | **Performance** | Code splitting reduces main bundle to 75 KB, lazy loading for optimal speed |
+| **Accessibility** | WCAG 2.1 Level AAA compliant with reduced motion support |
 
 ## Framework Support
 

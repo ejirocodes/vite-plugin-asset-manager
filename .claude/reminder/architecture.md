@@ -537,6 +537,38 @@ Framework-agnostic overlay button providing quick access to the Asset Manager da
 - **Files modified**: App.tsx, vite.config.ui.ts, useAdvancedFilters.ts, useAssets.ts, useSearch.ts, ignored-assets-provider.tsx, asset-card.tsx, sort-utils.ts
 - **Impact**: 89% smaller main bundle, reduced re-renders, stable hook execution, O(n) instead of O(2n) filtering
 
+### 6n. Responsive Design (Mobile-First)
+Comprehensive responsive implementation for all device sizes (320px to 4K+).
+
+**Architecture**:
+- **Mobile Navigation** (`src/ui/App.tsx`): Sticky header with drawer toggle (visible <768px)
+- **Sidebar Drawer Pattern**:
+  - Desktop (≥768px): Persistent 288px sidebar with `hidden md:block`
+  - Mobile (<768px): Sheet drawer (280px mobile, 320px tablet) with auto-close callbacks
+- **Bottom Sheet Preview** (`src/ui/components/preview-panel/index.tsx`):
+  - Desktop: Right-side panel (384px default, resizable 300-600px)
+  - Mobile: Bottom sheet (`max-md:bottom-0 max-md:h-[85vh] max-md:w-full!`)
+  - Conditional width styling to prevent inline style override
+- **Responsive Components**:
+  - `advanced-filters.tsx`: `w-[calc(100vw-2rem)] sm:w-80 md:w-72`
+  - `bulk-actions-bar.tsx`: Icon-only buttons on mobile, full labels on desktop
+  - `search-bar.tsx`: Responsive padding (`pl-9 sm:pl-10`)
+  - `asset-card.tsx`: Touch targets `min-h-11 min-w-11 md:min-h-0 md:min-w-0`
+  - `side-bar.tsx`: `w-full md:w-72`, responsive gaps and typography
+
+**Global CSS Utilities** (`src/ui/styles/globals.css`):
+- Custom scrollbar widths: 10px mobile, 6px desktop (`@media (min-width: 768px)`)
+- Reduced motion support: `@media (prefers-reduced-motion: reduce)`
+- Touch-friendly tap targets: `@media (pointer: coarse)` applies 44×44px minimum
+- Mobile optimizations: Faster animations (200ms), responsive font size (14px)
+
+**Breakpoints**: Mobile (<640px), Tablet (640-1023px), Desktop (≥1024px)
+
+**Design Patterns**: Mobile Drawer (iOS/Material Design), Bottom Sheet (Google Maps/Apple Music), Touch Targets (Apple HIG 44×44pt)
+
+**Accessibility**: WCAG 2.1 Level AAA compliant, reduced motion, platform-aware interactions
+
+
 ## UI Component Library
 Key shadcn/ui components in use (19 total):
 - `button.tsx` - Button variants (ghost, outline, etc.)
