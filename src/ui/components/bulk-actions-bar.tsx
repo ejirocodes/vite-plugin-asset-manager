@@ -95,14 +95,14 @@ export const BulkActionsBar = memo(function BulkActionsBar({
 
   return (
     <div
-      className={`sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border px-4 flex items-center justify-between transition-all duration-300 ease-out ${
+      className={`sticky top-0 md:top-0 z-10 bg-card/95 backdrop-blur border-b border-border px-3 sm:px-4 flex items-center justify-between transition-all duration-300 ease-out ${
         visible
-          ? 'h-[52px] py-3 opacity-100 translate-y-0'
+          ? 'h-14 sm:h-13 py-2 sm:py-3 opacity-100 translate-y-0'
           : 'h-0 py-0 opacity-0 -translate-y-full pointer-events-none overflow-hidden'
       }`}
       aria-hidden={!visible}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         <Button
           variant="ghost"
           size="icon-sm"
@@ -110,27 +110,38 @@ export const BulkActionsBar = memo(function BulkActionsBar({
           title={allSelected ? 'Deselect all' : 'Select all'}
         >
           {allSelected ? (
-            <CheckSquareIcon weight="fill" className="w-4 h-4 text-primary" />
+            <CheckSquareIcon weight="fill" className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
           ) : (
-            <SquareIcon weight="regular" className="w-4 h-4" />
+            <SquareIcon weight="regular" className="w-4 h-4 sm:w-5 sm:h-5" />
           )}
         </Button>
-        <span className="text-sm font-medium">{selectedCount} selected</span>
-        <Button variant="ghost" size="sm" onClick={onDeselectAll} className="text-muted-foreground">
+        <span className="text-xs sm:text-sm font-medium">{selectedCount} selected</span>
+        <Button variant="ghost" size="sm" onClick={onDeselectAll} className="text-muted-foreground hidden sm:flex">
           <XIcon weight="bold" className="w-3 h-3 mr-1" />
           Clear
         </Button>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         <Button
           variant="outline"
           size="sm"
           onClick={handleCopyPaths}
           disabled={selectedCount === 0}
+          className="hidden sm:flex"
         >
           <CopyIcon weight="bold" className="w-4 h-4 mr-1.5" />
           Copy Paths
+        </Button>
+        <Button
+          variant="outline"
+          size="icon-sm"
+          onClick={handleCopyPaths}
+          disabled={selectedCount === 0}
+          className="sm:hidden"
+          title="Copy paths"
+        >
+          <CopyIcon weight="bold" className="w-4 h-4" />
         </Button>
 
         <Button
@@ -138,17 +149,35 @@ export const BulkActionsBar = memo(function BulkActionsBar({
           size="sm"
           onClick={handleBulkDownload}
           disabled={selectedCount === 0 || isDownloading}
+          className="hidden sm:flex"
         >
           <DownloadSimpleIcon weight="bold" className="w-4 h-4 mr-1.5" />
           {isDownloading ? 'Downloading...' : 'Download ZIP'}
+        </Button>
+        <Button
+          variant="outline"
+          size="icon-sm"
+          onClick={handleBulkDownload}
+          disabled={selectedCount === 0 || isDownloading}
+          className="sm:hidden"
+          title="Download ZIP"
+        >
+          <DownloadSimpleIcon weight="bold" className="w-4 h-4" />
         </Button>
 
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogTrigger
             render={
-              <Button variant="destructive" size="sm" disabled={selectedCount === 0 || isDeleting}>
+              <Button variant="destructive" size="sm" disabled={selectedCount === 0 || isDeleting} className="hidden sm:flex">
                 <TrashIcon weight="bold" className="w-4 h-4 mr-1.5" />
                 Delete
+              </Button>
+            }
+          />
+          <AlertDialogTrigger
+            render={
+              <Button variant="destructive" size="icon-sm" disabled={selectedCount === 0 || isDeleting} className="sm:hidden" title="Delete">
+                <TrashIcon weight="bold" className="w-4 h-4" />
               </Button>
             }
           />

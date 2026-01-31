@@ -121,18 +121,27 @@ export const PreviewPanel = memo(function PreviewPanel({
     <aside
       role="region"
       aria-label={`Preview of ${asset.name}`}
-      style={{ width: panelWidth }}
-      className="fixed top-0 right-0 z-50 h-screen border-l border-border bg-card/80 backdrop-blur-sm flex flex-col overflow-hidden animate-slide-in-right"
+      style={{
+        width: typeof window !== 'undefined' && window.innerWidth >= 768 ? panelWidth : undefined
+      }}
+      className="fixed top-0 right-0 z-50 h-screen md:h-screen border-l border-border bg-card/80 backdrop-blur-sm flex flex-col overflow-hidden animate-slide-in-right
+        max-md:top-auto max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:h-[85vh] max-md:w-full! max-md:rounded-t-2xl max-md:border-l-0 max-md:border-t"
     >
+      {/* Desktop resize handle - hidden on mobile */}
       <div
         onMouseDown={handleResizeStart}
-        className={`absolute left-0 top-0 h-full w-1.5 cursor-col-resize hover:bg-primary/50 active:bg-primary/70 transition-colors z-10 ${
+        className={`absolute left-0 top-0 h-full w-1.5 cursor-col-resize hover:bg-primary/50 active:bg-primary/70 transition-colors z-10 max-md:hidden ${
           isResizing ? 'bg-primary/70' : ''
         }`}
         aria-hidden="true"
       />
-      <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
-        <h2 className="text-sm font-semibold text-foreground truncate pr-2" title={asset.name}>
+
+      {/* Mobile drag indicator */}
+      <div className="md:hidden flex justify-center pt-2 pb-1" aria-hidden="true">
+        <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+      </div>
+      <div className="flex items-center justify-between p-3 md:p-4 border-b border-border shrink-0">
+        <h2 className="text-sm font-semibold text-foreground truncate pr-2 max-w-[80%]" title={asset.name}>
           {asset.name}
         </h2>
         <Button
@@ -141,9 +150,9 @@ export const PreviewPanel = memo(function PreviewPanel({
           size="icon-sm"
           onClick={onClose}
           aria-label="Close preview panel"
-          className="shrink-0"
+          className="shrink-0 min-h-11 min-w-11 md:min-h-0 md:min-w-0"
         >
-          <XIcon weight="bold" className="w-4 h-4" />
+          <XIcon weight="bold" className="w-5 h-5 md:w-4 md:h-4" />
         </Button>
       </div>
 

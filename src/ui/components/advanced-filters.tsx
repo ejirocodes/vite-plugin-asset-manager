@@ -112,7 +112,7 @@ export const AdvancedFilters = memo(function AdvancedFilters({
             <span
               className={cn(
                 'ml-0.5 flex items-center justify-center',
-                'min-w-[18px] h-[18px] px-1 rounded-full',
+                'min-w-4.5 h-4.5 px-1 rounded-full',
                 'bg-primary text-primary-foreground',
                 'text-[10px] font-semibold tabular-nums',
                 'animate-in zoom-in-50 duration-150'
@@ -128,14 +128,14 @@ export const AdvancedFilters = memo(function AdvancedFilters({
         align="end"
         sideOffset={6}
         className={cn(
-          'w-72 p-0 overflow-hidden',
+          'w-[calc(100vw-2rem)] sm:w-80 md:w-72 p-0 overflow-hidden',
           'bg-popover/95 backdrop-blur-xl',
           'border border-border/50',
           'shadow-xl shadow-black/10',
           'animate-in fade-in-0 zoom-in-95 duration-150'
         )}
       >
-        <div className="max-h-[420px] overflow-y-auto overscroll-contain">
+        <div className="max-h-105 sm:max-h-125 overflow-y-auto overscroll-contain">
           {/* Size Filter Section */}
           <FilterSection
             icon={<DatabaseIcon weight="bold" className="w-3.5 h-3.5" />}
@@ -304,7 +304,7 @@ function FilterPill({ selected, onClick, children, mono }: FilterPillProps) {
           : 'bg-muted/40 border-transparent text-muted-foreground hover:bg-muted/70 hover:text-foreground'
       )}
     >
-      {selected && <CheckIcon weight="bold" className="w-2.5 h-2.5 flex-shrink-0" />}
+      {selected && <CheckIcon weight="bold" className="w-2.5 h-2.5 shrink-0" />}
       {children}
     </button>
   )
