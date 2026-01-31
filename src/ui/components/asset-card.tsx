@@ -109,7 +109,9 @@ export const AssetCard = memo(function AssetCard({
         {onToggleSelect && (
           <div
             className={`absolute top-2 left-2 z-10 transition-opacity duration-100 ${
-              isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 sm:group-hover:opacity-100'
+              isSelected
+                ? 'opacity-100'
+                : 'opacity-0 group-hover:opacity-100 sm:group-hover:opacity-100'
             }`}
             onClick={e => e.stopPropagation()}
           >

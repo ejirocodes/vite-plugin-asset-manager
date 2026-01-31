@@ -400,7 +400,7 @@ export default function App() {
               searchInputRef={searchInputRef as React.RefObject<HTMLInputElement>}
               onSearchFocus={() => setIsGridFocused(false)}
               selectedType={selectedType}
-              onTypeSelect={(type) => {
+              onTypeSelect={type => {
                 setSelectedType(type)
                 setSidebarOpen(false)
               }}

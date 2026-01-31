@@ -324,9 +324,13 @@ const StatBadge = memo(function StatBadge({
   color: keyof typeof colorClasses
 }) {
   return (
-    <div className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-md ${colorClasses[color]}`}>
+    <div
+      className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-md ${colorClasses[color]}`}
+    >
       {icon}
-      <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground truncate">{label}</span>
+      <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground truncate">
+        {label}
+      </span>
       <span className="ml-auto font-mono text-xs font-semibold tabular-nums">{count}</span>
     </div>
   )

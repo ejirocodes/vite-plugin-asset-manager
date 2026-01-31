@@ -141,7 +141,10 @@ export const PreviewPanel = memo(function PreviewPanel({
         <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
       </div>
       <div className="flex items-center justify-between p-3 md:p-4 border-b border-border shrink-0">
-        <h2 className="text-sm font-semibold text-foreground truncate pr-2 max-w-[80%]" title={asset.name}>
+        <h2
+          className="text-sm font-semibold text-foreground truncate pr-2 max-w-[80%]"
+          title={asset.name}
+        >
           {asset.name}
         </h2>
         <Button

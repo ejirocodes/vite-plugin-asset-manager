@@ -116,7 +116,12 @@ export const BulkActionsBar = memo(function BulkActionsBar({
           )}
         </Button>
         <span className="text-xs sm:text-sm font-medium">{selectedCount} selected</span>
-        <Button variant="ghost" size="sm" onClick={onDeselectAll} className="text-muted-foreground hidden sm:flex">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onDeselectAll}
+          className="text-muted-foreground hidden sm:flex"
+        >
           <XIcon weight="bold" className="w-3 h-3 mr-1" />
           Clear
         </Button>
@@ -168,7 +173,12 @@ export const BulkActionsBar = memo(function BulkActionsBar({
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogTrigger
             render={
-              <Button variant="destructive" size="sm" disabled={selectedCount === 0 || isDeleting} className="hidden sm:flex">
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={selectedCount === 0 || isDeleting}
+                className="hidden sm:flex"
+              >
                 <TrashIcon weight="bold" className="w-4 h-4 mr-1.5" />
                 Delete
               </Button>
@@ -176,7 +186,13 @@ export const BulkActionsBar = memo(function BulkActionsBar({
           />
           <AlertDialogTrigger
             render={
-              <Button variant="destructive" size="icon-sm" disabled={selectedCount === 0 || isDeleting} className="sm:hidden" title="Delete">
+              <Button
+                variant="destructive"
+                size="icon-sm"
+                disabled={selectedCount === 0 || isDeleting}
+                className="sm:hidden"
+                title="Delete"
+              >
                 <TrashIcon weight="bold" className="w-4 h-4" />
               </Button>
             }
