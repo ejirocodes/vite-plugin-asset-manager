@@ -96,7 +96,7 @@ export const Sidebar = memo(function Sidebar({
   const { dotClass, label } = statusConfig[status]
 
   return (
-    <aside className="w-72 bg-sidebar border-r border-sidebar-border flex flex-col noise-bg">
+    <aside className="w-full md:w-72 bg-sidebar border-r border-sidebar-border flex flex-col noise-bg h-full">
       <div className="p-5 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
           <div className="relative">
@@ -128,19 +128,19 @@ export const Sidebar = memo(function Sidebar({
         />
       </div>
 
-      <div className="px-4 pb-4">
-        <div className="rounded-lg bg-card/50 border border-border p-4">
+      <div className="px-3 sm:px-4 pb-4">
+        <div className="rounded-lg bg-card/50 border border-border p-3 sm:p-4">
           <div className="flex items-baseline justify-between mb-3">
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Total Assets
             </span>
-            <span className="font-mono text-2xl font-bold text-foreground tabular-nums">
+            <span className="font-mono text-xl sm:text-2xl font-bold text-foreground tabular-nums">
               {total}
             </span>
           </div>
 
           {stats && (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
               <StatBadge
                 icon={<ImagesIcon weight="fill" className="w-3.5 h-3.5" />}
                 label="Images"
@@ -324,9 +324,9 @@ const StatBadge = memo(function StatBadge({
   color: keyof typeof colorClasses
 }) {
   return (
-    <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md ${colorClasses[color]}`}>
+    <div className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-md ${colorClasses[color]}`}>
       {icon}
-      <span className="text-[10px] font-medium text-muted-foreground">{label}</span>
+      <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground truncate">{label}</span>
       <span className="ml-auto font-mono text-xs font-semibold tabular-nums">{count}</span>
     </div>
   )

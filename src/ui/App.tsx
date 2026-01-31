@@ -4,6 +4,8 @@ import { AssetGrid } from './components/asset-grid'
 import { SortControls } from './components/sort-controls'
 import { BulkActionsBar } from './components/bulk-actions-bar'
 import { AdvancedFilters } from './components/advanced-filters'
+import { Button } from './components/ui/button'
+import { Sheet, SheetContent } from './components/ui/sheet'
 
 const PreviewPanel = lazy(() =>
   import('./components/preview-panel').then(m => ({ default: m.PreviewPanel }))
@@ -20,7 +22,9 @@ import {
   CaretRightIcon,
   MagnifyingGlassIcon,
   PackageIcon,
-  FolderOpenIcon
+  FolderOpenIcon,
+  ListIcon,
+  LightningIcon
 } from '@phosphor-icons/react'
 import type { Asset, AssetType } from './types'
 
@@ -55,6 +59,7 @@ export default function App() {
   const [selectedType, setSelectedType] = useState<AssetType | null>(null)
   const [showUnusedOnly, setShowUnusedOnly] = useState(false)
   const [showDuplicatesOnly, setShowDuplicatesOnly] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const {
     sizeFilter,
@@ -367,22 +372,84 @@ export default function App() {
         {srAnnouncement}
       </div>
       <div className="flex h-screen bg-background noise-bg">
-        <Sidebar
-          total={adjustedStats.total}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          searching={searching}
-          searchInputRef={searchInputRef as React.RefObject<HTMLInputElement>}
-          onSearchFocus={() => setIsGridFocused(false)}
-          selectedType={selectedType}
-          onTypeSelect={setSelectedType}
-          showUnusedOnly={showUnusedOnly}
-          onUnusedFilterToggle={handleUnusedFilterToggle}
-          showDuplicatesOnly={showDuplicatesOnly}
-          onDuplicatesFilterToggle={handleDuplicatesFilterToggle}
-          stats={adjustedStats}
-        />
-        <main ref={mainRef} className="flex-1 overflow-auto">
+        <div className="hidden md:block">
+          <Sidebar
+            total={adjustedStats.total}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searching={searching}
+            searchInputRef={searchInputRef as React.RefObject<HTMLInputElement>}
+            onSearchFocus={() => setIsGridFocused(false)}
+            selectedType={selectedType}
+            onTypeSelect={setSelectedType}
+            showUnusedOnly={showUnusedOnly}
+            onUnusedFilterToggle={handleUnusedFilterToggle}
+            showDuplicatesOnly={showDuplicatesOnly}
+            onDuplicatesFilterToggle={handleDuplicatesFilterToggle}
+            stats={adjustedStats}
+          />
+        </div>
+
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-70 sm:w-[320px]">
+            <Sidebar
+              total={adjustedStats.total}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              searching={searching}
+              searchInputRef={searchInputRef as React.RefObject<HTMLInputElement>}
+              onSearchFocus={() => setIsGridFocused(false)}
+              selectedType={selectedType}
+              onTypeSelect={(type) => {
+                setSelectedType(type)
+                setSidebarOpen(false)
+              }}
+              showUnusedOnly={showUnusedOnly}
+              onUnusedFilterToggle={() => {
+                handleUnusedFilterToggle()
+                setSidebarOpen(false)
+              }}
+              showDuplicatesOnly={showDuplicatesOnly}
+              onDuplicatesFilterToggle={() => {
+                handleDuplicatesFilterToggle()
+                setSidebarOpen(false)
+              }}
+              stats={adjustedStats}
+            />
+          </SheetContent>
+        </Sheet>
+
+        <main ref={mainRef} className="flex-1 overflow-auto flex flex-col">
+          <header className="md:hidden sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="flex h-14 items-center justify-between px-4">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="md:hidden"
+                  aria-label="Toggle sidebar"
+                  onClick={() => setSidebarOpen(true)}
+                >
+                  <ListIcon weight="bold" className="h-5 w-5" />
+                </Button>
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-md bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-md shadow-violet-500/20">
+                    <LightningIcon weight="fill" className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="font-mono text-xs font-semibold tracking-wide text-foreground">
+                      ASSET MANAGER
+                    </h1>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                  {adjustedStats.total}
+                </span>
+              </div>
+            </div>
+          </header>
           {loading ? (
             LoadingSpinner
           ) : (
@@ -397,8 +464,8 @@ export default function App() {
                 isDeleting={isDeleting}
                 visible={selectedAssets.size > 0}
               />
-              <div className="p-6 pt-2 space-y-4">
-                <div className="flex items-center justify-end gap-2">
+              <div className="p-3 sm:p-4 md:p-6 pt-2 space-y-3 sm:space-y-4">
+                <div className="flex items-center justify-end gap-1.5 sm:gap-2">
                   <AdvancedFilters
                     sizeFilter={sizeFilter}
                     dateFilter={dateFilter}

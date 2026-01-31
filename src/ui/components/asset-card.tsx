@@ -109,14 +109,14 @@ export const AssetCard = memo(function AssetCard({
         {onToggleSelect && (
           <div
             className={`absolute top-2 left-2 z-10 transition-opacity duration-100 ${
-              isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+              isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 sm:group-hover:opacity-100'
             }`}
             onClick={e => e.stopPropagation()}
           >
             <Checkbox
               checked={isSelected}
               onCheckedChange={handleCheckboxChange}
-              className="border-zinc-400 dark:border-zinc-600 data-[state=checked]:bg-violet-500 data-[state=checked]:border-violet-500"
+              className="border-zinc-400 dark:border-zinc-600 data-[state=checked]:bg-violet-500 data-[state=checked]:border-violet-500 min-h-11 min-w-11 sm:min-h-0 sm:min-w-0"
             />
           </div>
         )}
@@ -145,7 +145,7 @@ export const AssetCard = memo(function AssetCard({
           <div className="absolute inset-0 bg-white/70 dark:bg-zinc-950/70 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center backdrop-blur-[2px]">
             <button
               onClick={handleCopyPath}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-zinc-900/10 dark:bg-white/10 hover:bg-zinc-900/20 dark:hover:bg-white/20 transition-colors text-xs text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-2.5 sm:py-1.5 min-h-11 sm:min-h-0 rounded-md bg-zinc-900/10 dark:bg-white/10 hover:bg-zinc-900/20 dark:hover:bg-white/20 transition-colors text-xs text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white"
               title="Copy path"
               aria-label="Copy file path"
             >
