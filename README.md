@@ -77,16 +77,21 @@ Start your dev server and access the Asset Manager in three ways:
 
 ## Framework Support
 
-| Framework | Status |
-|-----------|--------|
-| Vanilla | ✅ |
-| Vue | ✅ |
-| React | ✅ |
-| Preact | ✅ |
-| Lit | ✅ |
-| Svelte | ✅ |
-| Solid | ✅ |
-| Qwik | ✅ |
+| Framework | Status | Notes |
+|-----------|--------|-------|
+| Vanilla | ✅ | Fully automatic |
+| Vue | ✅ | Fully automatic |
+| React | ✅ | Fully automatic |
+| Preact | ✅ | Fully automatic |
+| Lit | ✅ | Fully automatic |
+| Svelte | ✅ | Fully automatic |
+| Solid | ✅ | Fully automatic |
+| Qwik | ✅ | Fully automatic |
+| **TanStack Start** | ✅ | [Manual setup required](./docs/SSR_INTEGRATION.md#tanstack-start-setup) |
+
+### SSR Frameworks
+
+For SSR frameworks (Next.js, Remix, Nuxt, SvelteKit, Solid Start), manual script injection is required. See the **[SSR Integration Guide](./docs/SSR_INTEGRATION.md)** for setup instructions.
 
 ## Configuration
 

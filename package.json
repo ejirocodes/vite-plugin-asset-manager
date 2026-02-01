@@ -19,6 +19,8 @@
     "assets",
     "manager",
     "vite-plugin",
+    "vite-plugin-assets",
+    "vite-plugin-asset-manager",
     "react-vite-plugin"
   ],
   "scripts": {
@@ -45,7 +47,11 @@
     "playground:lit": "pnpm --filter playground-lit dev",
     "playground:svelte": "pnpm --filter playground-svelte dev",
     "playground:solid": "pnpm --filter playground-solid dev",
-    "playground:qwik": "pnpm --filter playground-qwik dev"
+    "playground:qwik": "pnpm --filter playground-qwik dev",
+    "playground:tanstack": "pnpm --filter playground-tanstack dev"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -127,10 +133,6 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "msw",
-      "sharp"
-    ],
-    "trustedDependencies": [
-      "esbuild",
       "sharp"
     ]
   }
