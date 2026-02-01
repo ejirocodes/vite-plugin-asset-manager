@@ -41,11 +41,14 @@ const MIME_TYPES: Record<string, string> = {
   '.webm': 'video/webm',
   '.ogg': 'video/ogg',
   '.mov': 'video/quicktime',
+  '.avi': 'video/x-msvideo',
   /**
    * Audio:
    */
   '.mp3': 'audio/mpeg',
   '.wav': 'audio/wav',
+  '.flac': 'audio/flac',
+  '.aac': 'audio/aac',
   /**
    * Documents:
    */
@@ -95,7 +98,7 @@ export function createApiRouter(
         case '/thumbnail':
           return handleThumbnail(res, thumbnailService, root, query)
         case '/file':
-          return handleServeFile(res, root, query)
+          return handleServeFile(res, root, query, req.headers.range)
         case '/stats':
           return handleGetStats(res, scanner, duplicateScanner)
         case '/duplicates':
@@ -295,7 +298,12 @@ async function handleThumbnail(
   }
 }
 
-async function handleServeFile(res: ServerResponse, root: string, query: QueryParams) {
+async function handleServeFile(
+  res: ServerResponse,
+  root: string,
+  query: QueryParams,
+  rangeHeader?: string
+) {
   const relativePath = query.path as string
   if (!relativePath) {
     res.statusCode = 400
@@ -311,7 +319,9 @@ async function handleServeFile(res: ServerResponse, root: string, query: QueryPa
     return
   }
 
+  let stats: fs.Stats
   try {
+    stats = await fs.promises.stat(absolutePath)
     await fs.promises.access(absolutePath, fs.constants.R_OK)
   } catch {
     res.statusCode = 404
@@ -320,9 +330,36 @@ async function handleServeFile(res: ServerResponse, root: string, query: QueryPa
   }
 
   const ext = path.extname(relativePath).toLowerCase()
-  res.setHeader('Content-Type', MIME_TYPES[ext] || 'application/octet-stream')
+  const mimeType = MIME_TYPES[ext] || 'application/octet-stream'
+  const fileSize = stats.size
+
+  res.setHeader('Content-Type', mimeType)
+  res.setHeader('Accept-Ranges', 'bytes')
   res.setHeader('Cache-Control', 'public, max-age=3600')
-  fs.createReadStream(absolutePath).pipe(res)
+
+  if (rangeHeader) {
+    const parts = rangeHeader.replace(/bytes=/, '').split('-')
+    const start = parseInt(parts[0], 10)
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
+    const chunkSize = end - start + 1
+
+    if (start >= fileSize || end >= fileSize) {
+      res.statusCode = 416
+      res.setHeader('Content-Range', `bytes */${fileSize}`)
+      res.end()
+      return
+    }
+
+    res.statusCode = 206
+    res.setHeader('Content-Range', `bytes ${start}-${end}/${fileSize}`)
+    res.setHeader('Content-Length', chunkSize.toString())
+
+    const stream = fs.createReadStream(absolutePath, { start, end })
+    stream.pipe(res)
+  } else {
+    res.setHeader('Content-Length', fileSize.toString())
+    fs.createReadStream(absolutePath).pipe(res)
+  }
 }
 
 async function handleGetStats(
@@ -371,12 +408,10 @@ async function handleGetDuplicates(
   const hash = query.hash as string
 
   if (hash) {
-    // Get specific duplicate group by hash
     const paths = duplicateScanner.getDuplicatesByHash(hash)
     const assets = scanner.getAssets().filter(a => paths.includes(a.path))
     sendJson(res, { duplicates: assets, total: assets.length, hash })
   } else {
-    // Get all assets that have duplicates
     const assets = scanner.getAssets().filter(a => (a.duplicatesCount ?? 0) > 0)
     sendJson(res, { duplicates: assets, total: assets.length })
   }
@@ -497,14 +532,12 @@ async function handleRevealInFinder(
 
   const absolutePath = path.resolve(root, filePath)
 
-  // Security: validate path is within project root
   if (!absolutePath.startsWith(root)) {
     res.statusCode = 403
     sendJson(res, { error: 'Invalid path' })
     return
   }
 
-  // Check if file exists
   try {
     await fs.promises.access(absolutePath, fs.constants.R_OK)
   } catch {
