@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-asset-manager",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "type": "module",
   "description": "Visual asset management for Vite",
   "author": "Ejiro Asiuwhu <ejiroasiuwhu10@gmail.com>",
