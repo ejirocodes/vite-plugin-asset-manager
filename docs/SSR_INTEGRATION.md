@@ -109,7 +109,27 @@ pnpm run dev
 
 ## Next.js Setup (App Router)
 
-### For App Router (app directory):
+> **Note**: Next.js uses Webpack/Turbopack by default, not Vite. This setup requires using Next.js with Vite as the bundler (e.g., via `vite-plugin-next` or similar adapters). For standard Next.js projects, this plugin will not work out of the box.
+
+### Step 1: Configure the Plugin
+
+If using Next.js with Vite, add the plugin to your `vite.config.ts`:
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite'
+import AssetManager from 'vite-plugin-asset-manager'
+
+export default defineConfig({
+  plugins: [
+    AssetManager()
+  ]
+})
+```
+
+### Step 2: Add Scripts to Layout
+
+#### For App Router (app directory):
 
 Edit your `app/layout.tsx` file:
 
@@ -141,7 +161,7 @@ export default function RootLayout({
 }
 ```
 
-### For Pages Router (pages directory):
+#### For Pages Router (pages directory):
 
 Edit your `pages/_document.tsx` file:
 
@@ -176,6 +196,26 @@ export default function Document() {
 ---
 
 ## Remix Setup
+
+### Step 1: Configure the Plugin
+
+Add the plugin to your `vite.config.ts`:
+
+```typescript
+// vite.config.ts
+import { vitePlugin as remix } from '@remix-run/dev'
+import { defineConfig } from 'vite'
+import AssetManager from 'vite-plugin-asset-manager'
+
+export default defineConfig({
+  plugins: [
+    remix(),
+    AssetManager()
+  ]
+})
+```
+
+### Step 2: Add Scripts to Root Component
 
 Edit your `app/root.tsx` file:
 
@@ -215,6 +255,26 @@ export default function App() {
 
 ## Solid Start Setup
 
+### Step 1: Configure the Plugin
+
+Add the plugin to your `app.config.ts`:
+
+```typescript
+// app.config.ts
+import { defineConfig } from '@solidjs/start/config'
+import AssetManager from 'vite-plugin-asset-manager'
+
+export default defineConfig({
+  vite: {
+    plugins: [
+      AssetManager()
+    ]
+  }
+})
+```
+
+### Step 2: Add Scripts to Root Component
+
 Edit your `src/root.tsx` file:
 
 ```tsx
@@ -251,9 +311,32 @@ export default function Root() {
 
 ## Nuxt Setup
 
+### Step 1: Configure the Plugin
+
+Add the plugin to your `nuxt.config.ts` using the `vite` configuration option:
+
+```typescript
+// nuxt.config.ts
+import AssetManager from 'vite-plugin-asset-manager'
+
+export default defineNuxtConfig({
+  vite: {
+    plugins: [
+      AssetManager()
+    ]
+  }
+})
+```
+
+### Step 2: Add Scripts to Root Component
+
 For Nuxt 3, create or edit `app.vue`:
 
 ```vue
+<script setup lang="ts">
+const isDev = process.env.NODE_ENV === 'development'
+</script>
+
 <template>
   <div>
     <NuxtLayout>
@@ -269,15 +352,31 @@ For Nuxt 3, create or edit `app.vue`:
     </ClientOnly>
   </div>
 </template>
-
-<script setup>
-const isDev = process.env.NODE_ENV === 'development'
-</script>
 ```
 
 ---
 
 ## SvelteKit Setup
+
+### Step 1: Configure the Plugin
+
+Add the plugin to your `vite.config.ts`:
+
+```typescript
+// vite.config.ts
+import { sveltekit } from '@sveltejs/kit/vite'
+import { defineConfig } from 'vite'
+import AssetManager from 'vite-plugin-asset-manager'
+
+export default defineConfig({
+  plugins: [
+    sveltekit(),
+    AssetManager()
+  ]
+})
+```
+
+### Step 2: Add Scripts to Layout
 
 Edit your `src/routes/+layout.svelte` file:
 
@@ -299,33 +398,38 @@ Edit your `src/routes/+layout.svelte` file:
 
 ## Plugin Configuration
 
-All SSR frameworks use the same plugin configuration:
+All SSR frameworks use the same plugin options. The configuration file varies by framework:
+
+| Framework | Config File | Plugin Location |
+|-----------|-------------|-----------------|
+| TanStack Start | `vite.config.ts` | `plugins: [...]` |
+| Next.js (with Vite) | `vite.config.ts` | `plugins: [...]` |
+| Remix | `vite.config.ts` | `plugins: [...]` |
+| Solid Start | `app.config.ts` | `vite.plugins: [...]` |
+| Nuxt | `nuxt.config.ts` | `vite.plugins: [...]` |
+| SvelteKit | `vite.config.ts` | `plugins: [...]` |
+
+### Available Options
 
 ```typescript
-import AssetManager from 'vite-plugin-asset-manager'
+AssetManager({
+  // Base path for asset manager (default: '/__asset_manager__')
+  base: '/__asset_manager__',
 
-export default defineConfig({
-  plugins: [
-    AssetManager({
-      // Base path for asset manager (default: '/__asset_manager__')
-      base: '/__asset_manager__',
+  // Enable/disable floating icon (default: true)
+  floatingIcon: true,
 
-      // Enable/disable floating icon (default: true)
-      floatingIcon: true,
+  // Directories to scan for assets (default: ['src', 'public'])
+  include: ['src', 'public'],
 
-      // Directories to scan for assets (default: ['src', 'public'])
-      include: ['src', 'public'],
+  // Directories to exclude (default shown)
+  exclude: ['node_modules', '.git', 'dist', '.cache', 'coverage'],
 
-      // Directories to exclude (default shown)
-      exclude: ['node_modules', '.git', 'dist', '.cache', 'coverage'],
+  // Enable file watching for real-time updates (default: true)
+  watch: true,
 
-      // Enable file watching for real-time updates (default: true)
-      watch: true,
-
-      // Editor for "Open in Editor" feature (default: 'code')
-      launchEditor: 'code' // 'code' | 'cursor' | 'webstorm' | 'vim' | etc.
-    })
-  ]
+  // Editor for "Open in Editor" feature (default: 'code')
+  launchEditor: 'code' // 'code' | 'cursor' | 'webstorm' | 'vim' | etc.
 })
 ```
 
