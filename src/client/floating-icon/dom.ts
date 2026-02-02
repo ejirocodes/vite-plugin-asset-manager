@@ -199,6 +199,8 @@ export function updatePanelState(
   edge: Edge,
   customSize?: Size | null
 ): void {
+  document.body.style.overflow = isOpen ? 'hidden' : ''
+
   elements.overlay.dataset.open = String(isOpen)
   elements.panel.dataset.open = String(isOpen)
   elements.panel.dataset.edge = edge
