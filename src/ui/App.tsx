@@ -19,6 +19,7 @@ import { useAdvancedFilters } from './hooks/useAdvancedFilters'
 import { useIgnoredAssets } from './providers/ignored-assets-provider'
 import { sortAssets, type SortOption } from '@/ui/lib/sort-utils'
 import {
+  ArrowSquareOutIcon,
   CaretRightIcon,
   MagnifyingGlassIcon,
   PackageIcon,
@@ -26,6 +27,7 @@ import {
   ListIcon,
   LightningIcon
 } from '@phosphor-icons/react'
+import { useEmbeddedMode } from './hooks/useEmbeddedMode'
 import type { Asset, AssetType } from './types'
 
 const LoadingSpinner = (
@@ -56,6 +58,7 @@ const EmptyStateNoAssetsFiltered = (
 )
 
 export default function App() {
+  const isEmbedded = useEmbeddedMode()
   const [selectedType, setSelectedType] = useState<AssetType | null>(null)
   const [showUnusedOnly, setShowUnusedOnly] = useState(false)
   const [showDuplicatesOnly, setShowDuplicatesOnly] = useState(false)
@@ -420,18 +423,24 @@ export default function App() {
         </Sheet>
 
         <main ref={mainRef} className="flex-1 overflow-auto flex flex-col">
-          <header className="md:hidden sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <header
+            className={`sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ${
+              isEmbedded ? '' : 'md:hidden'
+            }`}
+          >
             <div className="flex h-14 items-center justify-between px-4">
               <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="md:hidden"
-                  aria-label="Toggle sidebar"
-                  onClick={() => setSidebarOpen(true)}
-                >
-                  <ListIcon weight="bold" className="h-5 w-5" />
-                </Button>
+                {!isEmbedded && (
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="md:hidden"
+                    aria-label="Toggle sidebar"
+                    onClick={() => setSidebarOpen(true)}
+                  >
+                    <ListIcon weight="bold" className="h-5 w-5" />
+                  </Button>
+                )}
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-md bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-md shadow-violet-500/20">
                     <LightningIcon weight="fill" className="w-4 h-4 text-white" />
@@ -447,6 +456,17 @@ export default function App() {
                 <span className="font-mono text-xs text-muted-foreground tabular-nums">
                   {adjustedStats.total}
                 </span>
+                {isEmbedded && (
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => window.open(window.location.pathname, '_blank')}
+                    aria-label="Open full dashboard in new tab"
+                    title="Open full dashboard in new tab"
+                  >
+                    <ArrowSquareOutIcon weight="bold" className="h-5 w-5" />
+                  </Button>
+                )}
               </div>
             </div>
           </header>
