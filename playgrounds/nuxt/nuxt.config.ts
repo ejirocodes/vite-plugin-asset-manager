@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     // floatingIcon: true,
     // watch: true,
     // launchEditor: 'code',
-    // devtools: true,
-    debug: true // Enable for testing
+    devtools: true,
+    // debug: true // Enable for testing
   }
 })

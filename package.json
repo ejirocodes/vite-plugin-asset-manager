@@ -80,6 +80,7 @@
     "vite": ">=5.0.0"
   },
   "dependencies": {
+    "@vite-asset-manager/core": "workspace:*",
     "@base-ui/react": "^1.1.0",
     "@fontsource-variable/figtree": "^5.2.10",
     "@phosphor-icons/react": "^2.1.10",

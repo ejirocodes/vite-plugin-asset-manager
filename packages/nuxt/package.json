@@ -5,6 +5,25 @@
   "description": "Nuxt module for vite-plugin-asset-manager",
   "author": "Ejiro Asiuwhu <ejiroasiuwhu10@gmail.com>",
   "license": "MIT",
+  "homepage": "https://github.com/ejirocodes/vite-plugin-asset-manager#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ejirocodes/vite-plugin-asset-manager.git",
+    "directory": "packages/nuxt"
+  },
+  "bugs": {
+    "url": "https://github.com/ejirocodes/vite-plugin-asset-manager/issues"
+  },
+  "keywords": [
+    "nuxt",
+    "nuxt-module",
+    "vite",
+    "assets",
+    "asset-manager"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "types": "./dist/module.d.mts",

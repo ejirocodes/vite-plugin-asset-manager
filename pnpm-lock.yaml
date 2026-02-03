@@ -20,6 +20,9 @@ importers:
       '@tanstack/react-virtual':
         specifier: ^3.13.18
         version: 3.13.18(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@vite-asset-manager/core':
+        specifier: workspace:*
+        version: link:packages/core
       archiver:
         specifier: ^7.0.1
         version: 7.0.1

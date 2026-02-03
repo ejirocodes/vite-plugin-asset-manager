@@ -5,6 +5,24 @@
   "description": "Core functionality for vite-plugin-asset-manager",
   "author": "Ejiro Asiuwhu <ejiroasiuwhu10@gmail.com>",
   "license": "MIT",
+  "homepage": "https://github.com/ejirocodes/vite-plugin-asset-manager#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ejirocodes/vite-plugin-asset-manager.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/ejirocodes/vite-plugin-asset-manager/issues"
+  },
+  "keywords": [
+    "vite",
+    "assets",
+    "asset-manager",
+    "vite-plugin"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -41,10 +59,5 @@
     "@types/node": "^25.1.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp"
-    ]
   }
 }
