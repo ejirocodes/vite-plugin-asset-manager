@@ -7,6 +7,13 @@ export default defineConfig({
   clean: true,
   splitting: false,
   sourcemap: true,
-  external: ['sharp'],
+  external: [
+    'sharp',
+    'launch-editor',
+    'fast-glob',
+    'chokidar',
+    'archiver',
+    'sirv'
+  ],
   treeshake: true
 })

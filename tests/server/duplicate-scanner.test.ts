@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { EventEmitter } from 'events'
-import type { ResolvedOptions, Asset } from '../../src/shared/types'
+import type { ResolvedOptions, Asset } from '../../packages/core/src/types'
 
 class MockFSWatcher extends EventEmitter {
   async close() {
@@ -8,33 +8,44 @@ class MockFSWatcher extends EventEmitter {
   }
 }
 
+const { mockChokidarWatch, mockFsCreateReadStream, mockFsStat, mockFsReadFile } = vi.hoisted(() => ({
+  mockChokidarWatch: vi.fn(),
+  mockFsCreateReadStream: vi.fn(),
+  mockFsStat: vi.fn(),
+  mockFsReadFile: vi.fn()
+}))
+
 vi.mock('chokidar', () => ({
   default: {
-    watch: vi.fn()
+    watch: mockChokidarWatch
   }
 }))
 
 vi.mock('fs', () => ({
   default: {
-    createReadStream: vi.fn(),
+    createReadStream: mockFsCreateReadStream,
     promises: {
-      stat: vi.fn(),
-      readFile: vi.fn()
+      stat: mockFsStat,
+      readFile: mockFsReadFile
     }
   },
   promises: {
-    stat: vi.fn(),
-    readFile: vi.fn()
+    stat: mockFsStat,
+    readFile: mockFsReadFile
   },
-  createReadStream: vi.fn()
+  createReadStream: mockFsCreateReadStream
 }))
 
-import { DuplicateScanner } from '../../src/server/duplicate-scanner'
-import chokidar from 'chokidar'
-import fs from 'fs'
+import { DuplicateScanner } from '../../packages/core/src/services/duplicate-scanner'
 
-const mockChokidar = vi.mocked(chokidar)
-const mockFs = vi.mocked(fs)
+const mockChokidar = { watch: mockChokidarWatch }
+const mockFs = {
+  createReadStream: mockFsCreateReadStream,
+  promises: {
+    stat: mockFsStat,
+    readFile: mockFsReadFile
+  }
+}
 
 const DEFAULT_OPTIONS: ResolvedOptions = {
   base: '/__asset_manager__',
