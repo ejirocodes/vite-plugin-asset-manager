@@ -1,7 +1,21 @@
 # Vite Plugin Asset Manager - Architecture & Design Decisions
 
 ## Overview
-A Vite plugin that provides a visual dashboard for browsing assets in Vite projects (supports React, Vue, Svelte, Solid, Preact, Lit, Qwik, and vanilla JS), accessible at `/__asset_manager__` during development.
+A Vite plugin that provides a visual dashboard for browsing assets in Vite projects (supports React, Vue, Svelte, Solid, Preact, Lit, Qwik, Nuxt, and vanilla JS), accessible at `/__asset_manager__` during development.
+
+## Monorepo Structure
+
+The project uses a pnpm workspace monorepo with three packages:
+
+| Package | Location | Description |
+|---------|----------|-------------|
+| `vite-plugin-asset-manager` | Root `./` | Main Vite plugin |
+| `@vite-asset-manager/core` | `packages/core/` | Core functionality (scanners, API, middleware) |
+| `@vite-asset-manager/nuxt` | `packages/nuxt/` | Official Nuxt 3/4 module |
+
+**Dependency Graph**:
+- `vite-plugin-asset-manager` → `@vite-asset-manager/core`
+- `@vite-asset-manager/nuxt` → `@vite-asset-manager/core`
 
 ## Key Design Decisions
 
@@ -11,13 +25,13 @@ A Vite plugin that provides a visual dashboard for browsing assets in Vite proje
 - **Pre-built UI**: React UI is compiled at build time and served as static files (not compiled at runtime)
 - **Floating icon injection**: Uses `transformIndexHtml` hook to inject overlay button into host app HTML
 
-### 2. Asset Scanner (`src/server/scanner.ts`)
+### 2. Asset Scanner (`packages/core/src/services/scanner.ts`)
 - **fast-glob** chosen over native `fs.readdir` for performance on large codebases
 - **In-memory cache**: Assets cached in a `Map<string, Asset>` after initial scan
 - **Incremental updates**: Uses `chokidar` to watch for file changes and update cache incrementally (not full re-scan)
 - **Event-driven**: Extends `EventEmitter` to notify plugin of changes for WebSocket updates
 
-### 2a. Importer Scanner (`src/server/importer-scanner.ts`)
+### 2a. Importer Scanner (`packages/core/src/services/importer-scanner.ts`)
 - Detects which source files import each asset
 - **Source file extensions**: js, jsx, ts, tsx, vue, svelte, css, scss, less, html
 - **Import patterns detected**:
@@ -30,13 +44,13 @@ A Vite plugin that provides a visual dashboard for browsing assets in Vite proje
 - **Real-time watching**: Watches source files and emits `change` events with affected assets
 - **Batch processing**: Scans files in batches of 50 to avoid overwhelming I/O
 
-### 2b. Editor Launcher (`src/server/editor-launcher.ts`)
+### 2b. Editor Launcher (`packages/core/src/services/editor-launcher.ts`)
 - Opens files in configured editor at specific line/column
 - Uses `launch-editor` package (supports 20+ editors)
 - Configurable via `launchEditor` option (default: 'code' for VS Code)
 - Supported editors: code, cursor, webstorm, idea, vim, emacs, sublime, atom, etc.
 
-### 2c. Duplicate Scanner (`src/server/duplicate-scanner.ts`)
+### 2c. Duplicate Scanner (`packages/core/src/services/duplicate-scanner.ts`)
 - Content-based duplicate detection using MD5 hashing
 - **Hash computation**: MD5 of file contents, streaming for files >1MB
 - **Two-tier cache**: hashCache (path -> {hash, mtime, size}) + duplicateGroups (hash -> Set<paths>)
@@ -46,7 +60,7 @@ A Vite plugin that provides a visual dashboard for browsing assets in Vite proje
 - **Reverse index**: pathToHash map for quick lookups
 - **API**: getDuplicateInfo(path), getDuplicatesByHash(hash), enrichAssetsWithDuplicateInfo(assets)
 
-### 2d. File Revealer (`src/server/file-revealer.ts`)
+### 2d. File Revealer (`packages/core/src/services/file-revealer.ts`)
 - Cross-platform utility to reveal files in system file explorer
 - **macOS**: Uses `open -R` command (reveals in Finder)
 - **Windows**: Uses `explorer /select,` command (reveals in Explorer)
@@ -101,7 +115,7 @@ Framework-agnostic overlay button that opens the Asset Manager panel. Built as s
 - Separate state managers for position, panel, drag
 - Getter/setter pattern with localStorage sync
 
-### 3. Thumbnail Service (`src/server/thumbnail.ts`)
+### 3. Thumbnail Service (`packages/core/src/services/thumbnail.ts`)
 - **Sharp** for image processing (faster than ImageMagick, pure JS alternatives)
 - **Supported formats**: `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif`, `.gif`, `.tiff`
 - **HEIC/HEIF**: Requires libheif support in Sharp (may not generate thumbnails without it)
@@ -298,9 +312,9 @@ The preview panel is a fixed sidebar (not a Sheet/Dialog) with 13 total componen
 The plugin build must use `clean: false` in tsup.config.ts. If `clean: true`, tsup wipes the entire `dist/` folder including `dist/client/` (the UI build output) before building the plugin.
 
 ### Client path resolution (`findClientDir`)
-The middleware in `src/server/index.ts` uses `findClientDir()` to locate the pre-built UI files. This handles two scenarios:
+The middleware in `packages/core/src/middleware/create-middleware.ts` uses `findClientDir()` to locate the pre-built UI files. This handles two scenarios:
 1. **From built dist**: `__dirname` is `dist/`, client at `dist/client/`
-2. **From source** (e.g., playground): `__dirname` is `src/server/`, client at `dist/client/`
+2. **From source** (e.g., playground): `__dirname` is `packages/core/src/middleware/`, client at `dist/client/`
 
 ```typescript
 function findClientDir(): string {
@@ -339,7 +353,7 @@ Each category has a distinct color in the sidebar:
 ### 8. Real-Time Updates (SSE)
 The plugin uses Server-Sent Events for real-time updates instead of WebSocket:
 
-**Server side** (`src/server/api.ts`):
+**Server side** (`packages/core/src/api/router.ts`):
 - `sseClients` - Set of active SSE connections
 - `handleSSE()` - Sets up SSE response headers and adds client to set
 - `broadcastSSE(event, data)` - Sends events to all connected clients

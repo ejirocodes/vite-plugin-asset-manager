@@ -1,19 +1,16 @@
 import type { Plugin, ViteDevServer, ResolvedConfig, IndexHtmlTransformResult } from 'vite'
 import colors from 'picocolors'
-import { setupMiddleware } from './server/index.js'
-import { AssetScanner } from './server/scanner.js'
-import { ImporterScanner } from './server/importer-scanner.js'
-import { DuplicateScanner } from './server/duplicate-scanner.js'
-import { ThumbnailService } from './server/thumbnail.js'
-import { broadcastSSE } from './server/api.js'
-import { resolveOptions, type AssetManagerOptions } from './shared/types.js'
+import {
+  AssetManager,
+  createAssetManagerMiddleware,
+  broadcastSSE,
+  resolveOptions,
+  type AssetManagerOptions
+} from '@vite-asset-manager/core'
 
 export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plugin {
   let config: ResolvedConfig
-  let scanner: AssetScanner
-  let importerScanner: ImporterScanner
-  let duplicateScanner: DuplicateScanner
-  let thumbnailService: ThumbnailService
+  let assetManager: AssetManager
 
   const resolvedOptions = resolveOptions(options)
 
@@ -26,34 +23,43 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
     },
 
     configureServer(server: ViteDevServer) {
-      scanner = new AssetScanner(config.root, resolvedOptions)
-      importerScanner = new ImporterScanner(config.root, resolvedOptions)
-      duplicateScanner = new DuplicateScanner(config.root, resolvedOptions)
-      thumbnailService = new ThumbnailService(resolvedOptions.thumbnailSize)
+      // Create asset manager instance using the core package
+      assetManager = new AssetManager({
+        root: config.root,
+        options: resolvedOptions
+      })
 
-      setupMiddleware(server, {
+      // Initialize and setup watchers
+      assetManager.init().then(() => {
+        if (resolvedOptions.watch) {
+          assetManager.setupWatchers(broadcastSSE)
+        }
+      })
+
+      // Create middleware using the core package
+      const middleware = createAssetManagerMiddleware({
         base: resolvedOptions.base,
-        scanner,
-        importerScanner,
-        duplicateScanner,
-        thumbnailService,
+        scanner: assetManager.scanner,
+        importerScanner: assetManager.importerScanner,
+        duplicateScanner: assetManager.duplicateScanner,
+        thumbnailService: assetManager.thumbnailService,
         root: config.root,
         launchEditor: resolvedOptions.launchEditor
       })
 
-      scanner.init().then(async () => {
-        await importerScanner.init()
-        scanner.enrichWithImporterCounts(importerScanner)
+      // Add middleware to Vite server
+      server.middlewares.use((req, res, next) => {
+        const url = req.url || ''
 
-        await duplicateScanner.init()
-        await duplicateScanner.scanAssets(scanner.getAssets())
-        scanner.enrichWithDuplicateInfo(duplicateScanner)
-
-        if (resolvedOptions.watch) {
-          duplicateScanner.initWatcher()
+        // Only handle requests to our base path
+        if (url === resolvedOptions.base || url.startsWith(`${resolvedOptions.base}/`)) {
+          return middleware(req, res, next)
         }
+
+        next()
       })
 
+      // Print URLs
       const _printUrls = server.printUrls
       server.printUrls = () => {
         _printUrls()
@@ -79,22 +85,6 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
         server.config.logger.info(
           `  ${colors.magenta('➜')}  ${colors.bold('Asset Manager')}: Press ${colors.yellow('Option(⌥)+Shift(⇧)+A')} in App to toggle the Asset Manager`
         )
-      }
-
-      if (resolvedOptions.watch) {
-        scanner.on('change', async event => {
-          await duplicateScanner.scanAssets(scanner.getAssets())
-          scanner.enrichWithDuplicateInfo(duplicateScanner)
-          broadcastSSE('asset-manager:update', event)
-        })
-        importerScanner.on('change', event => {
-          scanner.enrichWithImporterCounts(importerScanner)
-          broadcastSSE('asset-manager:importers-update', event)
-        })
-        duplicateScanner.on('change', event => {
-          scanner.enrichWithDuplicateInfo(duplicateScanner)
-          broadcastSSE('asset-manager:duplicates-update', event)
-        })
       }
     },
 
@@ -139,9 +129,7 @@ export function createAssetManagerPlugin(options: AssetManagerOptions = {}): Plu
     },
 
     buildEnd() {
-      scanner?.destroy()
-      importerScanner?.destroy()
-      duplicateScanner?.destroy()
+      assetManager?.destroy()
     }
   }
 }

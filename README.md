@@ -87,11 +87,39 @@ Start your dev server and access the Asset Manager in three ways:
 | Svelte | ✅ | Fully automatic |
 | Solid | ✅ | Fully automatic |
 | Qwik | ✅ | Fully automatic |
+| **Nuxt 3/4** | ✅ | [Official module](#nuxt-module) |
 | **TanStack Start** | ✅ | [Manual setup required](./docs/SSR_INTEGRATION.md#tanstack-start-setup) |
 
-### SSR Frameworks
+### Nuxt Module
 
-For SSR frameworks (Next.js, Remix, Nuxt, SvelteKit, Solid Start), manual script injection is required. See the **[SSR Integration Guide](./docs/SSR_INTEGRATION.md)** for setup instructions.
+For Nuxt 3/4 projects, use the official module for automatic integration:
+
+```bash
+npm install @vite-asset-manager/nuxt -D
+```
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['@vite-asset-manager/nuxt'],
+
+  // Optional configuration
+  assetManager: {
+    floatingIcon: true,    // Inject floating panel button
+    devtools: true,        // Add Nuxt DevTools tab
+  }
+})
+```
+
+Features:
+- Automatic floating icon injection (no manual setup)
+- Nuxt DevTools integration
+- Supports Nuxt 3 and 4 directory structures
+- Dev-only (zero production footprint)
+
+### Other SSR Frameworks
+
+For SSR frameworks (Next.js, Remix, SvelteKit, Solid Start), manual script injection is required. See the **[SSR Integration Guide](./docs/SSR_INTEGRATION.md)** for setup instructions.
 
 ## Configuration
 
@@ -163,7 +191,8 @@ The plugin exposes REST endpoints at `{base}/api/`:
 
 ```bash
 pnpm install          # Install dependencies
-pnpm run build        # Build UI + plugin
+pnpm run build:all    # Build everything (packages + plugin)
+pnpm run build        # Build main plugin only
 pnpm run dev          # Watch mode
 
 # Testing
@@ -180,6 +209,7 @@ pnpm run playground:lit
 pnpm run playground:svelte
 pnpm run playground:solid
 pnpm run playground:qwik
+pnpm run playground:nuxt
 ```
 
 ## License

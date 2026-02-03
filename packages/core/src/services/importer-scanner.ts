@@ -2,8 +2,8 @@ import { EventEmitter } from 'events'
 import fg from 'fast-glob'
 import path from 'path'
 import fs from 'fs/promises'
-import chokidar from 'chokidar'
-import type { Importer, ImportType, ResolvedOptions } from '../shared/types.js'
+import chokidar, { type FSWatcher } from 'chokidar'
+import type { Importer, ImportType, ResolvedOptions } from '../types/index.js'
 
 export interface ImporterScannerEvents {
   change: [{ event: string; path: string; affectedAssets: string[] }]
@@ -110,7 +110,7 @@ export class ImporterScanner extends EventEmitter {
   private cache: Map<string, Importer[]> = new Map()
   /** Reverse index: source file -> set of asset paths it imports */
   private reverseIndex: Map<string, Set<string>> = new Map()
-  private watcher?: chokidar.FSWatcher
+  private watcher?: FSWatcher
   private scanPromise?: Promise<void>
   private initialized = false
 
@@ -268,10 +268,15 @@ export class ImporterScanner extends EventEmitter {
       return null
     }
 
+    // Check if import starts with a configured alias
+    const aliases = this.options.aliases || { '@/': 'src/' }
+    const aliasKeys = Object.keys(aliases)
+    const matchedAlias = aliasKeys.find(alias => importPath.startsWith(alias))
+
     if (
       !importPath.startsWith('.') &&
       !importPath.startsWith('/') &&
-      !importPath.startsWith('@/')
+      !matchedAlias
     ) {
       return null
     }
@@ -283,8 +288,10 @@ export class ImporterScanner extends EventEmitter {
       if (!resolvedPath.startsWith('public/')) {
         resolvedPath = 'public' + importPath
       }
-    } else if (importPath.startsWith('@/')) {
-      resolvedPath = 'src/' + importPath.slice(2)
+    } else if (matchedAlias) {
+      // Use configured alias mapping
+      const aliasValue = aliases[matchedAlias]
+      resolvedPath = aliasValue + importPath.slice(matchedAlias.length)
     } else {
       resolvedPath = path.normalize(path.join(fileDir, importPath))
     }
@@ -360,9 +367,9 @@ export class ImporterScanner extends EventEmitter {
       }
     })
 
-    this.watcher.on('add', filePath => this.handleFileChange('add', filePath))
-    this.watcher.on('unlink', filePath => this.handleFileChange('unlink', filePath))
-    this.watcher.on('change', filePath => this.handleFileChange('change', filePath))
+    this.watcher.on('add', (filePath: string) => this.handleFileChange('add', filePath))
+    this.watcher.on('unlink', (filePath: string) => this.handleFileChange('unlink', filePath))
+    this.watcher.on('change', (filePath: string) => this.handleFileChange('change', filePath))
   }
 
   private async handleFileChange(event: string, absolutePath: string): Promise<void> {

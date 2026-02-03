@@ -2,8 +2,8 @@ import { EventEmitter } from 'events'
 import fg from 'fast-glob'
 import path from 'path'
 import fs from 'fs/promises'
-import chokidar from 'chokidar'
-import type { Asset, AssetGroup, AssetType, Importer, ResolvedOptions } from '../shared/types.js'
+import chokidar, { type FSWatcher } from 'chokidar'
+import type { Asset, AssetGroup, AssetType, Importer, ResolvedOptions } from '../types/index.js'
 
 export interface ScannerEvents {
   change: [{ event: string; path: string }]
@@ -13,7 +13,7 @@ export class AssetScanner extends EventEmitter {
   private root: string
   private options: ResolvedOptions
   private cache: Map<string, Asset> = new Map()
-  private watcher?: chokidar.FSWatcher
+  private watcher?: FSWatcher
   private scanPromise?: Promise<void>
 
   constructor(root: string, options: ResolvedOptions) {
@@ -55,6 +55,18 @@ export class AssetScanner extends EventEmitter {
       onlyFiles: true,
       dot: false
     })
+
+    if (this.options.debug) {
+      console.log('\n[asset-manager] Debug Info:')
+      console.log('  Root:', this.root)
+      console.log('  Include paths:', this.options.include)
+      console.log('  Glob patterns:', patterns)
+      console.log('  Files found:', entries.length)
+      if (entries.length > 0) {
+        console.log('  Sample files:', entries.slice(0, 5).map(e => e.path))
+      }
+      console.log('')
+    }
 
     this.cache.clear()
 
@@ -196,9 +208,9 @@ export class AssetScanner extends EventEmitter {
       }
     })
 
-    this.watcher.on('add', filePath => this.handleFileChange('add', filePath))
-    this.watcher.on('unlink', filePath => this.handleFileChange('unlink', filePath))
-    this.watcher.on('change', filePath => this.handleFileChange('change', filePath))
+    this.watcher.on('add', (filePath: string) => this.handleFileChange('add', filePath))
+    this.watcher.on('unlink', (filePath: string) => this.handleFileChange('unlink', filePath))
+    this.watcher.on('change', (filePath: string) => this.handleFileChange('change', filePath))
   }
 
   private async handleFileChange(event: string, absolutePath: string): Promise<void> {

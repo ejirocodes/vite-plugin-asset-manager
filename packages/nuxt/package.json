@@ -1,0 +1,57 @@
+{
+  "name": "@vite-asset-manager/nuxt",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Nuxt module for vite-plugin-asset-manager",
+  "author": "Ejiro Asiuwhu <ejiroasiuwhu10@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/ejirocodes/vite-plugin-asset-manager#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ejirocodes/vite-plugin-asset-manager.git",
+    "directory": "packages/nuxt"
+  },
+  "bugs": {
+    "url": "https://github.com/ejirocodes/vite-plugin-asset-manager/issues"
+  },
+  "keywords": [
+    "nuxt",
+    "nuxt-module",
+    "vite",
+    "assets",
+    "asset-manager"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/module.d.mts",
+      "import": "./dist/module.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "nuxt-module-build build",
+    "dev": "nuxi dev playground",
+    "dev:build": "nuxi build playground",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
+    "prepack": "nuxt-module-build build"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^3.17.5",
+    "@vite-asset-manager/core": "workspace:*",
+    "h3": "^1.15.3"
+  },
+  "devDependencies": {
+    "@nuxt/module-builder": "^1.0.1",
+    "@nuxt/schema": "^3.17.5",
+    "nuxt": "^3.17.5",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "nuxt": ">=3.0.0"
+  }
+}

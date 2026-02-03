@@ -9,8 +9,11 @@ The plugin uses two injection methods depending on your framework:
 1. **Automatic (transformIndexHtml)**: For frameworks with static `index.html` files
    ✅ React, Vue, Svelte, Solid, Preact, Lit, Qwik, Vanilla
 
-2. **Manual Component Injection**: For SSR frameworks
-   ⚠️ TanStack Start, Next.js, Remix, Nuxt, SvelteKit, Solid Start
+2. **Official Framework Module**: Native integration with auto-injection
+   ✅ Nuxt (`@vite-asset-manager/nuxt`)
+
+3. **Manual Component Injection**: For other SSR frameworks
+   ⚠️ TanStack Start, Next.js, Remix, SvelteKit, Solid Start
 
 ---
 
@@ -311,9 +314,61 @@ export default function Root() {
 
 ## Nuxt Setup
 
-### Step 1: Configure the Plugin
+### Recommended: Official Nuxt Module
+
+The easiest way to use Asset Manager with Nuxt is via the official module `@vite-asset-manager/nuxt`:
+
+#### Step 1: Install the Module
+
+```bash
+npm install @vite-asset-manager/nuxt
+# or
+pnpm add @vite-asset-manager/nuxt
+```
+
+#### Step 2: Add to Nuxt Config
+
+```typescript
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['@vite-asset-manager/nuxt'],
+
+  // Optional: customize settings
+  assetManager: {
+    base: '/__asset_manager__',     // Default
+    include: ['assets', 'public'],   // Directories to scan
+    floatingIcon: true,              // Show floating icon
+    watch: true,                     // Real-time updates
+    launchEditor: 'code',            // Editor for "Open in Editor"
+    devtools: true,                  // Add Nuxt DevTools tab
+    debug: false                     // Enable debug logging
+  }
+})
+```
+
+That's it! The module automatically:
+- ✅ Injects the floating icon (no manual script injection)
+- ✅ Handles Nuxt 3 and Nuxt 4 directory structure differences
+- ✅ Adds an Asset Manager tab to Nuxt DevTools
+- ✅ Only runs in development mode
+
+#### Step 3: Access the Dashboard
+
+- **Floating Icon**: Click the overlay button or press `Option+Shift+A` (⌥⇧A)
+- **Direct URL**: Visit `http://localhost:3000/__asset_manager__/`
+- **Nuxt DevTools**: Open DevTools (Shift+Option+D) and find the "Asset Manager" tab
+
+---
+
+### Alternative: Manual Vite Plugin Setup
+
+If you prefer manual configuration or need more control, you can use the Vite plugin directly:
+
+#### Step 1: Configure the Plugin
 
 Add the plugin to your `nuxt.config.ts` using the `vite` configuration option:
+
+> **Important for Nuxt 4**: Nuxt 4 sets Vite's root to the `app/` directory. You must configure paths relative to `app/`, include source directories for unused asset detection, and set up aliases correctly.
 
 ```typescript
 // nuxt.config.ts
@@ -322,13 +377,32 @@ import AssetManager from 'vite-plugin-asset-manager'
 export default defineNuxtConfig({
   vite: {
     plugins: [
-      AssetManager()
+      AssetManager({
+        // Paths are relative to app/ directory (Nuxt's Vite root)
+        // Include both asset directories AND source directories
+        include: [
+          'assets',           // app/assets/ - your assets
+          '../public',        // public/ - static files (one level up from app/)
+          'components',       // For unused asset detection
+          'pages',
+          'layouts',
+          'composables',
+          'plugins'
+        ],
+        // Configure aliases to match Nuxt's path resolution
+        aliases: {
+          '@/': 'assets/',    // @/image.png → assets/image.png
+          '~/': ''            // ~/assets/image.png → assets/image.png
+        },
+        // Enable debug mode if assets aren't showing
+        debug: true
+      })
     ]
   }
 })
 ```
 
-### Step 2: Add Scripts to Root Component
+#### Step 2: Add Scripts to Root Component
 
 For Nuxt 3, create or edit `app.vue`:
 
@@ -406,7 +480,8 @@ All SSR frameworks use the same plugin options. The configuration file varies by
 | Next.js (with Vite) | `vite.config.ts` | `plugins: [...]` |
 | Remix | `vite.config.ts` | `plugins: [...]` |
 | Solid Start | `app.config.ts` | `vite.plugins: [...]` |
-| Nuxt | `nuxt.config.ts` | `vite.plugins: [...]` |
+| Nuxt (Module) | `nuxt.config.ts` | `modules: ['@vite-asset-manager/nuxt']` |
+| Nuxt (Manual) | `nuxt.config.ts` | `vite.plugins: [...]` |
 | SvelteKit | `vite.config.ts` | `plugins: [...]` |
 
 ### Available Options
@@ -516,6 +591,101 @@ The keyboard shortcut `Option+Shift+A` (⌥⇧A) requires:
 1. Floating icon scripts properly injected
 2. `window.__VAM_BASE_URL__` defined before `floating-icon.js` loads
 3. Page must be focused (click anywhere on the page first)
+
+### Nuxt: Dashboard Shows 0 Assets
+
+If the Asset Manager UI loads but shows no assets in a Nuxt project:
+
+1. **Enable debug mode** to see what paths are being scanned:
+   ```typescript
+   // nuxt.config.ts
+   AssetManager({
+     include: ['assets', '../public'],
+     debug: true  // Check terminal output
+   })
+   ```
+
+2. **Check terminal output** for debug info showing:
+   - `Root:` - The base path Vite/Nuxt is using (usually `app/` for Nuxt 4)
+   - `Include paths:` - Your configured directories
+   - `Files found:` - Number of assets discovered
+
+3. **Adjust include paths** based on the root shown:
+   ```typescript
+   // If root is app/ directory (Nuxt 4 default):
+   include: ['assets', '../public']
+
+   // If root is project root:
+   include: ['app/assets', 'public']
+
+   // For Nuxt 3 with src/ directory:
+   include: ['src/assets', 'public']
+   ```
+
+4. **Common Nuxt 4 directory structures**:
+   ```
+   project/
+   ├── app/              ← Vite root is here!
+   │   ├── assets/       → include: ['assets']
+   │   │   ├── css/
+   │   │   ├── img/
+   │   │   └── video/
+   │   └── components/
+   ├── public/           → include: ['../public'] (one level up)
+   │   ├── favicon.svg
+   │   └── images/
+   └── nuxt.config.ts
+   ```
+
+5. **Verify with API directly**:
+   - Visit `http://localhost:3000/__asset_manager__/api/stats`
+   - If it shows `{"total":0}`, the scanner isn't finding files
+   - Check the debug output in your terminal
+
+### Nuxt: Unused Assets Not Detected
+
+If assets show but "unused" detection doesn't work:
+
+1. **Include source directories** - The importer scanner needs to scan your Vue/JS files:
+   ```typescript
+   include: [
+     'assets',        // Asset directories
+     '../public',
+     'components',    // Source directories for importer scanning
+     'pages',
+     'layouts',
+     'composables'
+   ]
+   ```
+
+2. **Configure aliases** - Nuxt uses `@/` and `~/` aliases differently than standard Vite:
+   ```typescript
+   aliases: {
+     '@/': 'assets/',   // Adjust based on your import patterns
+     '~/': ''
+   }
+   ```
+
+3. **Check your imports** - The importer scanner detects:
+   - ES imports: `import img from '@/images/logo.png'`
+   - CSS url(): `url('@/images/bg.png')`
+   - HTML src/href: `<img src="@/images/logo.png">`
+
+### Nuxt: Real-Time Updates Not Working
+
+If you need to refresh to see changes:
+
+1. **Check the SSE connection** - Open browser DevTools → Network → filter by "events"
+   - You should see a persistent connection to `/__asset_manager__/api/events`
+
+2. **Restart the dev server** after configuration changes
+
+3. **Ensure watch mode is enabled** (it's on by default):
+   ```typescript
+   AssetManager({
+     watch: true  // Default, but verify it's not disabled
+   })
+   ```
 
 ---
 

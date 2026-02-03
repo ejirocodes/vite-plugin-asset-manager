@@ -139,12 +139,11 @@ const STYLES = `
 #${ELEMENT_IDS.OVERLAY} {
   position: fixed;
   inset: 0;
-  background: var(--vam-overlay-bg);
-  backdrop-filter: blur(${DIMENSIONS.OVERLAY_BLUR}px);
-  -webkit-backdrop-filter: blur(${DIMENSIONS.OVERLAY_BLUR}px);
+  background: transparent;
   z-index: ${Z_INDEX.OVERLAY};
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
@@ -172,6 +171,7 @@ const STYLES = `
     opacity 0.2s ease,
     visibility 0.2s ease;
   overflow: hidden;
+  pointer-events: auto;
 }
 
 #${ELEMENT_IDS.PANEL}[data-open="true"] {

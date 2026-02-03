@@ -2,8 +2,8 @@ import { EventEmitter } from 'events'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
-import chokidar from 'chokidar'
-import type { ResolvedOptions, Asset } from '../shared/types.js'
+import chokidar, { type FSWatcher } from 'chokidar'
+import type { ResolvedOptions, Asset } from '../types/index.js'
 
 export interface DuplicateScannerEvents {
   change: [{ event: string; affectedHashes: string[] }]
@@ -26,7 +26,7 @@ export class DuplicateScanner extends EventEmitter {
   private duplicateGroups: Map<string, Set<string>> = new Map()
   /** Reverse index: path -> hash (for quick lookups) */
   private pathToHash: Map<string, string> = new Map()
-  private watcher?: chokidar.FSWatcher
+  private watcher?: FSWatcher
   private scanPromise?: Promise<void>
   private initialized = false
 
@@ -247,7 +247,6 @@ export class DuplicateScanner extends EventEmitter {
     if (this.watcher) return
 
     const watchPaths = this.options.include.map(dir => path.join(this.root, dir))
-    // const extensionPattern = this.options.extensions.map(ext => ext.replace('.', '')).join(',')
 
     this.watcher = chokidar.watch(watchPaths, {
       ignored: [
@@ -265,17 +264,17 @@ export class DuplicateScanner extends EventEmitter {
       }
     })
 
-    this.watcher.on('add', async filePath => {
+    this.watcher.on('add', async (filePath: string) => {
       const relativePath = path.relative(this.root, filePath)
       await this.handleAssetChange('add', relativePath, filePath)
     })
 
-    this.watcher.on('change', async filePath => {
+    this.watcher.on('change', async (filePath: string) => {
       const relativePath = path.relative(this.root, filePath)
       await this.handleAssetChange('change', relativePath, filePath)
     })
 
-    this.watcher.on('unlink', async filePath => {
+    this.watcher.on('unlink', async (filePath: string) => {
       const relativePath = path.relative(this.root, filePath)
       await this.handleAssetChange('unlink', relativePath, filePath)
     })

@@ -99,25 +99,16 @@ export function setupClickHandlers(context: EventHandlerContext): CleanupFn {
     updatePanelState(elements, panelState.isOpen(), positionState.get().edge, sizeState.get())
   }
 
-  const onOverlayClick = (e: MouseEvent) => {
-    if (e.target === elements.overlay) {
-      panelState.close()
-      updatePanelState(elements, false, positionState.get().edge, sizeState.get())
-    }
-  }
-
   elements.trigger.addEventListener('pointerdown', onPointerDown)
   document.addEventListener('pointermove', onPointerMove)
   document.addEventListener('pointerup', onPointerUp)
   elements.trigger.addEventListener('click', onTriggerClick)
-  elements.overlay.addEventListener('click', onOverlayClick)
 
   return () => {
     elements.trigger.removeEventListener('pointerdown', onPointerDown)
     document.removeEventListener('pointermove', onPointerMove)
     document.removeEventListener('pointerup', onPointerUp)
     elements.trigger.removeEventListener('click', onTriggerClick)
-    elements.overlay.removeEventListener('click', onOverlayClick)
   }
 }
 

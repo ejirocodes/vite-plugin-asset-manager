@@ -1,0 +1,63 @@
+{
+  "name": "@vite-asset-manager/core",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Core functionality for vite-plugin-asset-manager",
+  "author": "Ejiro Asiuwhu <ejiroasiuwhu10@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/ejirocodes/vite-plugin-asset-manager#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ejirocodes/vite-plugin-asset-manager.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/ejirocodes/vite-plugin-asset-manager/issues"
+  },
+  "keywords": [
+    "vite",
+    "assets",
+    "asset-manager",
+    "vite-plugin"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "chokidar": "^5.0.0",
+    "fast-glob": "^3.3.3",
+    "launch-editor": "^2.12.0",
+    "picocolors": "^1.1.1",
+    "sharp": "^0.34.5",
+    "sirv": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/archiver": "^7.0.0",
+    "@types/node": "^25.1.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}

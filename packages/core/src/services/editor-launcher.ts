@@ -1,5 +1,5 @@
 import launch from 'launch-editor'
-import type { EditorType } from '../shared/types.js'
+import type { EditorType } from '../types/index.js'
 
 /**
  * Opens a file in the configured editor at the specified line and column.

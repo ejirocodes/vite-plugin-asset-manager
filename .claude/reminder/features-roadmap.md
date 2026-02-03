@@ -89,7 +89,7 @@ Sidebar type filtering is fully wired up and functional.
 **Impact**: Medium
 
 **Implementation**:
-- `src/server/importer-scanner.ts` - Scans source files for asset imports using regex patterns
+- `packages/core/src/services/importer-scanner.ts` - Scans source files for asset imports using regex patterns
 - `src/ui/components/preview-panel/importers-section.tsx` - Displays importing files
 - `src/ui/hooks/useImporters.ts` - Fetches importers and handles open-in-editor
 - API endpoint: `GET /api/importers?path=`
@@ -140,7 +140,7 @@ Multi-select functionality for batch actions is fully implemented.
 - `src/ui/components/asset-card.tsx` - Selection state with Shift+click and Ctrl/Cmd+click
 - `src/ui/components/asset-grid.tsx` - Selection tracking
 - `src/ui/App.tsx` - Bulk selection state management
-- `src/server/api.ts` - `/bulk-download` and `/bulk-delete` endpoints
+- `packages/core/src/api/router.ts` - `/bulk-download` and `/bulk-delete` endpoints
 
 **Features**:
 - Multi-select via Shift+click (range selection) or Ctrl/Cmd+click (toggle)
@@ -169,7 +169,7 @@ Multi-select functionality for batch actions is fully implemented.
 **Implementation**:
 - `src/ui/hooks/useAdvancedFilters.ts` - Filter state management hook
 - `src/ui/components/advanced-filters.tsx` - Dropdown UI with filter chips/pills
-- `src/server/api.ts` - Query param parsing for `/assets/grouped` and `/search` endpoints
+- `packages/core/src/api/router.ts` - Query param parsing for `/assets/grouped` and `/search` endpoints
 - `src/shared/types.ts` - `SizeFilter`, `DateFilter`, `ExtensionFilter`, `AdvancedFilters` types
 
 **Remaining**:
@@ -227,10 +227,10 @@ Multi-select functionality for batch actions is fully implemented.
 **Enhancement**: Identify duplicate files by content hash
 
 **Implementation**:
-- `src/server/duplicate-scanner.ts` - MD5 content hashing with streaming for large files
+- `packages/core/src/services/duplicate-scanner.ts` - MD5 content hashing with streaming for large files
 - `src/ui/hooks/useDuplicates.ts` - Hook for fetching duplicate assets by hash
 - `src/shared/types.ts` - Added `contentHash` and `duplicatesCount` fields to Asset interface
-- `src/server/api.ts` - `/duplicates?hash=` endpoint returns all assets with matching hash
+- `packages/core/src/api/router.ts` - `/duplicates?hash=` endpoint returns all assets with matching hash
 - Asset cards display duplicate count badge
 - Real-time updates via SSE (`asset-manager:duplicates-update` event)
 
@@ -249,9 +249,9 @@ Multi-select functionality for batch actions is fully implemented.
 **Enhancement**: Identify assets not imported anywhere
 
 **Implementation**:
-- `src/server/importer-scanner.ts` - Tracks importers for each asset
+- `packages/core/src/services/importer-scanner.ts` - Tracks importers for each asset
 - `src/shared/types.ts` - `Asset` interface includes `importersCount?: number`
-- `src/server/api.ts` - `/stats` endpoint includes `unused` count
+- `packages/core/src/api/router.ts` - `/stats` endpoint includes `unused` count
 - `src/ui/hooks/useStats.ts` - Fetches stats including unused count
 - `src/ui/components/side-bar.tsx` - "Unused Assets" filter option
 - `src/ui/components/asset-card.tsx` - Displays "Unused" badge on assets with no importers
@@ -434,8 +434,8 @@ Multi-select functionality for batch actions is fully implemented.
 - `src/ui/hooks/useAssetActions.ts` - Core action hook with 7 handlers
 - `src/ui/components/asset-context-menu.tsx` - Context menu UI component
 - `src/ui/components/asset-card.tsx` - Wrapped with context menu
-- `src/server/file-revealer.ts` - Cross-platform file reveal utility
-- `src/server/api.ts` - Added `/reveal-in-finder` endpoint
+- `packages/core/src/services/file-revealer.ts` - Cross-platform file reveal utility
+- `packages/core/src/api/router.ts` - Added `/reveal-in-finder` endpoint
 
 **Actions** (7 total):
 - Open in preview (Eye icon)
