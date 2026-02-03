@@ -2,7 +2,13 @@
 
 ## Commands
 ```bash
-# Build everything (UI + floating icon + plugin)
+# Build everything (packages + main plugin)
+pnpm run build:all
+
+# Build packages only (core + nuxt)
+pnpm run build:packages
+
+# Build main plugin only (UI + floating icon + plugin)
 pnpm run build
 
 # Build UI only
@@ -26,6 +32,7 @@ pnpm run playground:lit      # Lit playground
 pnpm run playground:svelte   # Svelte playground
 pnpm run playground:solid    # Solid playground
 pnpm run playground:qwik     # Qwik playground
+pnpm run playground:nuxt     # Nuxt playground (uses @vite-asset-manager/nuxt)
 # Then visit: http://localhost:5173/__asset_manager__
 
 # Testing (14 test files: 6 server + 8 UI)
@@ -37,12 +44,36 @@ pnpm run test:server   # Server tests only (Node environment)
 pnpm run test:client   # UI tests only (jsdom environment)
 ```
 
-## Project Structure
+## Monorepo Structure
 ```
-src/
+packages/
+├── core/                    # @vite-asset-manager/core
+│   └── src/
+│       ├── index.ts             # Main exports
+│       ├── asset-manager.ts     # AssetManager orchestrator class
+│       ├── services/
+│       │   ├── scanner.ts           # Asset discovery (fast-glob + chokidar)
+│       │   ├── thumbnail.ts         # Image thumbnails (sharp)
+│       │   ├── importer-scanner.ts  # Detects which files import each asset
+│       │   ├── duplicate-scanner.ts # Content-based duplicate detection
+│       │   ├── editor-launcher.ts   # Opens files in configured editor
+│       │   └── file-revealer.ts     # Cross-platform file reveal utility
+│       ├── api/
+│       │   └── router.ts            # REST endpoints + SSE handling
+│       ├── middleware/
+│       │   └── create-middleware.ts # Middleware factory (sirv + API)
+│       └── types/
+│           └── index.ts             # Shared TypeScript types
+│
+└── nuxt/                    # @vite-asset-manager/nuxt
+    └── src/
+        ├── module.ts            # Nuxt module definition
+        └── runtime/
+            └── plugin.client.ts # Client-side floating icon injection
+
+src/                         # Main vite-plugin-asset-manager
 ├── index.ts          # Entry point, exports plugin function
 ├── plugin.ts         # Vite plugin hooks (configureServer, transformIndexHtml)
-├── shared/types.ts   # Shared TypeScript types (Asset, Importer, EditorType, DuplicateInfo, etc.)
 ├── client/
 │   └── floating-icon/      # Framework-agnostic floating button (IIFE)
 │       ├── index.ts            # Entry point with auto-init
@@ -53,15 +84,6 @@ src/
 │       ├── styles.ts           # CSS injection
 │       ├── icons.ts            # Embedded SVG icons
 │       └── tsconfig.json       # ES2020 DOM targeting
-├── server/
-│   ├── index.ts            # Middleware setup (sirv + API router)
-│   ├── api.ts              # REST endpoints + SSE handling
-│   ├── scanner.ts          # Asset discovery (fast-glob + chokidar)
-│   ├── thumbnail.ts        # Image thumbnails (sharp)
-│   ├── importer-scanner.ts # Detects which files import each asset
-│   ├── duplicate-scanner.ts # Content-based duplicate detection (MD5 hashing)
-│   ├── editor-launcher.ts  # Opens files in configured editor
-│   └── file-revealer.ts    # Cross-platform file reveal utility
 └── ui/               # React app (built separately)
     ├── App.tsx
     ├── main.tsx
@@ -161,23 +183,23 @@ tests/
 
 ### Adding new asset types
 Edit these files:
-1. [src/shared/types.ts](src/shared/types.ts) - Add to `AssetType` union and `DEFAULT_OPTIONS.extensions`
+1. [packages/core/src/types/index.ts](packages/core/src/types/index.ts) - Add to `AssetType` union and `DEFAULT_OPTIONS.extensions`
 2. [src/ui/types/index.ts](src/ui/types/index.ts) - Mirror the `AssetType` change
-3. [src/server/scanner.ts](src/server/scanner.ts) - Update `getAssetType()` method
+3. [packages/core/src/services/scanner.ts](packages/core/src/services/scanner.ts) - Update `getAssetType()` method
 4. [src/ui/App.tsx](src/ui/App.tsx) - Add to `stats` computation
 5. [src/ui/components/side-bar.tsx](src/ui/components/side-bar.tsx) - Add StatBadge and NavItem
 
 Current categories (8): `image`, `video`, `audio`, `document`, `font`, `data`, `text`, `other`
 
 ### Adding new API endpoints
-Edit [src/server/api.ts](src/server/api.ts):
+Edit [packages/core/src/api/router.ts](packages/core/src/api/router.ts):
 - Add case to switch statement
 - Create handler function
 
 Current endpoints: `/assets`, `/assets/grouped`, `/search`, `/thumbnail`, `/file`, `/stats`, `/importers`, `/duplicates`, `/open-in-editor`, `/reveal-in-finder`, `/bulk-download`, `/bulk-delete`, `/events` (SSE)
 
 ### Changing thumbnail behavior
-Edit [src/server/thumbnail.ts](src/server/thumbnail.ts):
+Edit [packages/core/src/services/thumbnail.ts](packages/core/src/services/thumbnail.ts):
 - `supportedFormats` array (line 11) controls which formats get thumbnails
 - `generateThumbnail()` method for Sharp options
 
@@ -241,13 +263,27 @@ curl -N "http://localhost:5173/__asset_manager__/api/events"
 ```
 
 ## Publishing
+
+### Monorepo Publishing Order
+Packages must be published in dependency order:
+1. `@vite-asset-manager/core` (no internal deps)
+2. `@vite-asset-manager/nuxt` (depends on core)
+3. `vite-plugin-asset-manager` (depends on core)
+
 ```bash
-pnpm run build
-pnpm publish
+# Build all packages
+pnpm run build:all
+
+# Publish in order (from each package directory)
+cd packages/core && pnpm publish
+cd packages/nuxt && pnpm publish
+cd ../.. && pnpm publish
 ```
 
+Note: `workspace:*` dependencies are automatically converted to actual version numbers during publish.
+
 ## Playgrounds
-Eight framework playgrounds are available:
+Nine framework playgrounds are available:
 - `playgrounds/react/` - Vite+React
 - `playgrounds/vue/` - Vite+Vue
 - `playgrounds/vanilla/` - Vite+Vanilla (no framework)
@@ -256,6 +292,7 @@ Eight framework playgrounds are available:
 - `playgrounds/svelte/` - Vite+Svelte
 - `playgrounds/solid/` - Vite+Solid
 - `playgrounds/qwik/` - Vite+Qwik
+- `playgrounds/nuxt/` - Nuxt 3 (uses `@vite-asset-manager/nuxt` module)
 
 Each includes test assets in `src/assets/` and `public/` directories.
 

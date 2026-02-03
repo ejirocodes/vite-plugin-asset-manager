@@ -32,13 +32,13 @@ export const VideoPreview = memo(function VideoPreview({ asset }: VideoPreviewPr
           <p className="text-sm text-muted-foreground max-w-md">
             {isAVI ? (
               <>
-                This AVI file uses a codec that isn't supported by your browser. Most AVI files
-                use legacy codecs (DivX, Xvid) that HTML5 video can't play.
+                This AVI file uses a codec that isn't supported by your browser. Most AVI files use
+                legacy codecs (DivX, Xvid) that HTML5 video can't play.
               </>
             ) : (
               <>
-                This {extension} video format or codec isn't supported by your browser's HTML5
-                video player.
+                This {extension} video format or codec isn't supported by your browser's HTML5 video
+                player.
               </>
             )}
           </p>

@@ -9,7 +9,26 @@ Vite Plugin Asset Manager is a visual asset management dashboard for Vite projec
 - Node requirement: >=22
 - Vite compatibility: >=5.0.0
 - Package type: ESM module with CJS support
-- Package manager: pnpm (workspace includes `playgrounds/*`)
+- Package manager: pnpm (workspace includes `packages/*` and `playgrounds/*`)
+
+## Monorepo Structure
+
+The project uses a monorepo architecture with three packages:
+
+| Package | Description | Location |
+|---------|-------------|----------|
+| `vite-plugin-asset-manager` | Main Vite plugin (re-exports from core) | Root `./` |
+| `@vite-asset-manager/core` | Core functionality (scanners, API, middleware) | `packages/core/` |
+| `@vite-asset-manager/nuxt` | Official Nuxt module | `packages/nuxt/` |
+
+**Dependency Graph**:
+```
+vite-plugin-asset-manager
+    └── @vite-asset-manager/core
+
+@vite-asset-manager/nuxt
+    └── @vite-asset-manager/core
+```
 
 ## Vite Framework Support
 
@@ -23,23 +42,34 @@ Vite Plugin Asset Manager is a visual asset management dashboard for Vite projec
 - [x] Solid
 - [x] Qwik
 
+**SSR Frameworks with Official Modules**:
+- [x] Nuxt 3/4 - Use `@vite-asset-manager/nuxt` module (automatic floating icon injection + DevTools integration)
+
 **SSR Frameworks** (manual script injection required):
 - [x] TanStack Start
 
-See `docs/SSR_INTEGRATION.md` for setup instructions for TanStack Start, Next.js, Remix, Nuxt, SvelteKit, and Solid Start.
+See `docs/SSR_INTEGRATION.md` for setup instructions for TanStack Start, Next.js, Remix, SvelteKit, and Solid Start.
 
 ## Build Commands
 
 ```bash
-pnpm install                  # Install all deps (root + playground workspace)
-pnpm run build                # Build everything (runs build:ui → build:floating-icon → build:plugin)
+pnpm install                  # Install all deps (root + packages + playgrounds)
+pnpm run build:all            # Build everything (packages → main plugin)
+pnpm run build:packages       # Build core + nuxt packages
+pnpm run build                # Build main plugin (runs build:ui → build:floating-icon → build:plugin)
 pnpm run build:ui             # Build React dashboard using Vite → dist/client/
 pnpm run build:floating-icon  # Build floating icon component → dist/client/floating-icon.js
 pnpm run build:plugin         # Build plugin using tsup → dist/index.js, dist/index.cjs
 pnpm run dev                  # Watch mode for plugin development using tsup
 ```
 
-The build order matters: UI must build first, then floating icon, then plugin. The tsup config uses `clean: false` to preserve the UI and floating icon builds. The floating icon uses `emptyOutDir: false` to preserve the UI build.
+**Build Order**:
+1. `build:packages` - Builds `@vite-asset-manager/core` then `@vite-asset-manager/nuxt`
+2. `build:ui` - React dashboard
+3. `build:floating-icon` - Floating icon IIFE
+4. `build:plugin` - Main Vite plugin
+
+The tsup config uses `clean: false` to preserve the UI and floating icon builds. The floating icon uses `emptyOutDir: false` to preserve the UI build.
 
 ## Testing with the Playgrounds
 
@@ -53,6 +83,7 @@ The `playgrounds/` directory contains framework-specific demo projects:
 - `playgrounds/svelte/` - Vite+Svelte demo
 - `playgrounds/solid/` - Vite+Solid demo
 - `playgrounds/qwik/` - Vite+Qwik demo
+- `playgrounds/nuxt/` - Nuxt 3 demo (uses `@vite-asset-manager/nuxt` module)
 
 ```bash
 cd playgrounds/react
@@ -67,6 +98,7 @@ pnpm run playground:lit
 pnpm run playground:svelte
 pnpm run playground:solid
 pnpm run playground:qwik
+pnpm run playground:nuxt    # Nuxt playground (uses official module)
 ```
 
 Each playground imports the plugin directly from `../../src/index` (no pnpm link needed). They also include `vite-plugin-inspect` for debugging Vite internals.
@@ -90,15 +122,17 @@ Each playground imports the plugin directly from `../../src/index` (no pnpm link
    - Features: drag support, edge snapping, localStorage persistence, keyboard shortcuts
    - See "Floating Icon Component" section below for details
 
-3. **Server Layer** (`src/server/`)
-   - `scanner.ts` - EventEmitter-based file scanner using fast-glob + chokidar for watching
-   - `thumbnail.ts` - Sharp-based thumbnail generation with dual-tier caching (memory + disk in OS temp)
-   - `importer-scanner.ts` - Detects which source files import each asset (ES imports, dynamic imports, require, CSS url, HTML attributes)
-   - `duplicate-scanner.ts` - Content-based duplicate detection using MD5 hashing with streaming support for large files
-   - `editor-launcher.ts` - Opens files in configured editor at specific line/column using launch-editor
-   - `file-revealer.ts` - Cross-platform utility to reveal files in system file explorer (Finder/Explorer)
-   - `api.ts` - HTTP API router with endpoints: `/assets`, `/assets/grouped`, `/search`, `/thumbnail`, `/file`, `/stats`, `/importers`, `/duplicates`, `/open-in-editor`, `/reveal-in-finder`, `/bulk-download`, `/bulk-delete`, `/events` (SSE)
-   - `index.ts` - Middleware setup, serves API at `{base}/api/*` and dashboard UI via sirv
+3. **Core Package** (`packages/core/src/`) - `@vite-asset-manager/core`
+   - `services/scanner.ts` - EventEmitter-based file scanner using fast-glob + chokidar for watching
+   - `services/thumbnail.ts` - Sharp-based thumbnail generation with dual-tier caching (memory + disk in OS temp)
+   - `services/importer-scanner.ts` - Detects which source files import each asset (ES imports, dynamic imports, require, CSS url, HTML attributes)
+   - `services/duplicate-scanner.ts` - Content-based duplicate detection using MD5 hashing with streaming support for large files
+   - `services/editor-launcher.ts` - Opens files in configured editor at specific line/column using launch-editor
+   - `services/file-revealer.ts` - Cross-platform utility to reveal files in system file explorer (Finder/Explorer)
+   - `api/router.ts` - HTTP API router with endpoints: `/assets`, `/assets/grouped`, `/search`, `/thumbnail`, `/file`, `/stats`, `/importers`, `/duplicates`, `/open-in-editor`, `/reveal-in-finder`, `/bulk-download`, `/bulk-delete`, `/events` (SSE)
+   - `middleware/create-middleware.ts` - Middleware factory, serves API at `{base}/api/*` and dashboard UI via sirv
+   - `asset-manager.ts` - `AssetManager` orchestrator class that initializes all services
+   - `types/index.ts` - All shared TypeScript types
 
 4. **UI Layer** (`src/ui/`)
    - Self-contained React dashboard with its own `tsconfig.json`
@@ -192,11 +226,41 @@ The floating icon is a framework-agnostic overlay button that provides quick acc
 - Size constraints enforced (MIN_WIDTH: 400px, MIN_HEIGHT: 300px)
 - Viewport margin constraint (20px) ensures panel stays visible
 
+### Nuxt Module (`packages/nuxt/`)
+
+The `@vite-asset-manager/nuxt` package provides first-class Nuxt 3/4 support.
+
+**Structure**:
+- `src/module.ts` - Nuxt module definition using `@nuxt/kit`
+- `src/runtime/plugin.client.ts` - Client-side floating icon injection
+
+**Features**:
+- Auto-configures with sensible Nuxt defaults
+- Automatic floating icon injection (no manual `app.vue` setup)
+- Nuxt DevTools integration (iframe tab)
+- Supports both Nuxt 3 and Nuxt 4 directory structures
+- Uses Nitro `devHandlers` for dev-only middleware
+
+**Configuration** (`nuxt.config.ts`):
+```typescript
+export default defineNuxtConfig({
+  modules: ['@vite-asset-manager/nuxt'],
+  assetManager: {
+    base: '/__asset_manager__',
+    include: ['assets', '../public'],  // Relative to srcDir
+    floatingIcon: true,
+    devtools: true,  // Add DevTools tab
+  }
+})
+```
+
 ### TypeScript Configuration
 
 - Root `tsconfig.json` - Plugin code (excludes `src/ui/` and `src/client/`), uses `@/*` → `./src/*` alias
 - `src/ui/tsconfig.json` - Dashboard code with DOM libs, uses `@/*` → `./src/*` alias (baseUrl: `../..`)
 - `src/client/floating-icon/tsconfig.json` - Floating icon code targeting ES2020 with DOM libs
+- `packages/core/tsconfig.json` - Core package with Node types
+- `packages/nuxt/tsconfig.json` - Nuxt module with @nuxt/kit types
 
 ### shadcn/ui Configuration (`components.json`)
 
@@ -205,7 +269,7 @@ All shadcn components install to `src/ui/`:
 - Utils: `@/ui/lib/utils`
 - Hooks: `@/ui/hooks/`
 
-### Shared Types (`src/shared/types.ts`)
+### Shared Types (`packages/core/src/types/index.ts`)
 
 Key types: `Asset`, `AssetGroup`, `AssetType`, `AssetManagerOptions`, `ResolvedOptions`, `Importer`, `ImportType`, `EditorType`, `AssetStats`, `DuplicateInfo`, `SizeFilter`, `DateFilter`, `ExtensionFilter`, `AdvancedFilters`, `SizeFilterPreset`, `DateFilterPreset`
 
