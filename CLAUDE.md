@@ -71,6 +71,30 @@ pnpm run dev                  # Watch mode for plugin development using tsup
 
 The tsup config uses `clean: false` to preserve the UI and floating icon builds. The floating icon uses `emptyOutDir: false` to preserve the UI build.
 
+## Quick Development Workflow
+
+```bash
+# 1. Make changes to core package (packages/core/)
+pnpm run build:packages
+
+# 2. Make changes to UI (src/ui/)
+pnpm run build:ui
+
+# 3. Make changes to floating icon (src/client/floating-icon/)
+pnpm run build:floating-icon
+
+# 4. Make changes to plugin layer (src/plugin.ts, src/index.ts)
+pnpm run build:plugin
+
+# 5. Test in a playground
+pnpm run playground:svelte   # or :react, :vue, :nuxt, etc.
+
+# 6. Full rebuild after major changes
+pnpm run build:all
+```
+
+**Typical iteration**: Edit code → `pnpm run build:ui` → refresh playground browser
+
 ## Testing with the Playgrounds
 
 The `playgrounds/` directory contains framework-specific demo projects:
@@ -162,69 +186,17 @@ Each playground imports the plugin directly from `../../src/index` (no pnpm link
 
 ### Floating Icon Component
 
-The floating icon is a framework-agnostic overlay button that provides quick access to the Asset Manager from any Vite app.
+Framework-agnostic overlay button (`src/client/floating-icon/`) built as self-executing IIFE.
 
-**Architecture** (`src/client/floating-icon/` - 8 files):
-- `index.ts` - Entry point with `initFloatingIcon()` function and auto-initialization
-- `constants.ts` - Configuration (Z-index values 99998-100000, dimensions, colors, drag thresholds, resize constraints: MIN_WIDTH=400px, MIN_HEIGHT=300px, viewport margin=20px)
-- `dom.ts` - DOM element creation and manipulation (5 elements: container, trigger button, overlay, panel, iframe + contextual resize handles)
-- `state.ts` - Composable-style state managers:
-  - `createPositionState()` - Position (left/right/top/bottom edge, vertical/horizontal offset, localStorage persistence)
-  - `createPanelState()` - Panel open/closed state (localStorage persistence)
-  - `createDragState()` - Drag state for distinguishing clicks from drags
-  - `createSizeState()` - Panel size (width/height, localStorage persistence with key: `vite-asset-manager-size`)
-- `events.ts` - Event handler setup:
-  - Drag handlers (pointer events with 5px threshold, momentum-based edge snapping to all 4 edges)
-  - Click handlers (distinguishes drag vs click, triggers panel toggle)
-  - Keyboard handlers (Escape to close, Option+Shift+A to toggle)
-  - Resize handlers (drag handles with min/max constraints, double-click to reset to default size, animation frame throttling)
-- `styles.ts` - CSS injection with CSS variables, responsive design, backdrop blur effects, automatic light/dark theme support via `@media (prefers-color-scheme: dark)`
-- `icons.ts` - Embedded Vite gradient SVG icon (VITE_ICON constant)
-- `tsconfig.json` - TypeScript config targeting ES2020 with DOM libs
+**Key Files**: `index.ts` (entry), `state.ts` (composable state managers), `events.ts` (drag/keyboard handlers), `dom.ts` (element creation), `styles.ts` (CSS injection)
 
-**Build Process**:
-- **Dedicated Vite config**: `vite.config.floating-icon.ts`
-- **Format**: IIFE (Immediately Invoked Function Expression) with self-execution
-- **Output**: `dist/client/floating-icon.js` (minified with esbuild)
-- **Build command**: `pnpm run build:floating-icon`
-- **Build order**: `build:ui` → `build:floating-icon` → `build:plugin`
-- **Config option**: `emptyOutDir: false` to preserve UI build
+**Build**: `vite.config.floating-icon.ts` → `dist/client/floating-icon.js` (IIFE format)
 
-**Plugin Integration** (`src/plugin.ts`):
-- Conditional injection in `transformIndexHtml()` hook based on `resolvedOptions.floatingIcon`
-- Injects two `<script>` tags into HTML body:
-  1. Inline script setting `window.__VAM_BASE_URL__` with the asset manager base path
-  2. Module script loading `floating-icon.js` from base URL
-- Auto-initialization triggered when `__VAM_BASE_URL__` global variable exists
+**Features**: Draggable with edge snapping, resizable panel, keyboard shortcuts (⌥⇧A toggle, Escape close), localStorage persistence, auto light/dark theme
 
-**Features**:
-- Draggable floating button with momentum-based snapping to all 4 edges (left/right/top/bottom)
-- Resizable panel with drag handles (contextual positioning based on trigger edge)
-- Smooth panel slide-in animation from trigger edge
-- Automatic light/dark theme support based on system preferences (`@media (prefers-color-scheme: dark)`)
-- Dark overlay backdrop with blur effect
-- Position, size, and open state persisted to localStorage (3 keys: position, size, panel state)
-- Keyboard shortcuts:
-  - `Option+Shift+A` (⌥⇧A) - Toggle panel
-  - `Escape` - Close panel
-  - Double-click resize handles - Reset to default size
-- Cursor feedback (grab/grabbing on drag, resize cursors on handles)
-- Visual effects (drop-shadow on active state, backdrop blur on overlay, theme-aware colors)
-- Cross-browser compatible (uses Pointer Events API)
-- Framework-agnostic (no React/Vue/etc. dependencies)
+**Integration**: Injected via `transformIndexHtml()` hook in `src/plugin.ts`, sets `window.__VAM_BASE_URL__` global
 
-**UI Integration**:
-- Dashboard loads via iframe from `{baseUrl}?embedded=true` query param
-- Modal overlay pattern with z-index layering
-- Responsive panel sizing (adapts to viewport)
-
-**State Management Pattern**:
-- Composable-style inspired by Vue DevTools
-- Separate state managers for position, panel, drag, and size
-- localStorage persistence with JSON serialization (keys: `vite-asset-manager-position`, `vite-asset-manager-open`, `vite-asset-manager-size`)
-- Getter/setter pattern for state access
-- Size constraints enforced (MIN_WIDTH: 400px, MIN_HEIGHT: 300px)
-- Viewport margin constraint (20px) ensures panel stays visible
+For full architecture details, see `.claude/reminder/architecture.md` section "Floating Icon System".
 
 ### Nuxt Module (`packages/nuxt/`)
 
@@ -319,6 +291,13 @@ pnpm run test:ui       # Run with Vitest UI
 pnpm run test:coverage # Run with coverage report
 pnpm run test:server   # Run server tests only (Node environment)
 pnpm run test:client   # Run UI tests only (jsdom environment)
+
+# Run a specific test file
+pnpm run test tests/server/scanner.test.ts
+pnpm run test src/ui/hooks/useAssets.test.ts
+
+# Run tests matching a pattern
+pnpm run test -t "scanner"
 ```
 
 ### Test Structure
@@ -341,136 +320,31 @@ pnpm run format:check  # Check formatting without changes
 
 ESLint uses flat config (`eslint.config.js`) with separate rules for plugin code (Node/TS) and UI code (React/TSX).
 
-## Recent Features (Latest Updates)
+## Feature Reference
 
-### Bulk Operations
-Multi-select assets for batch actions:
-- **Selection methods**: Click checkbox, Shift+click (range), Ctrl/Cmd+click (toggle)
-- **Actions**: Copy paths to clipboard, download as ZIP, bulk delete with confirmation
-- **UI**: Sticky action bar appears at top when assets are selected
-- **Implementation**: `useBulkOperations` hook, `BulkActionsBar` component
-- **API endpoints**: `/bulk-download` (POST), `/bulk-delete` (POST)
+| Feature | Key Files | Description |
+|---------|-----------|-------------|
+| Bulk Operations | `useBulkOperations`, `BulkActionsBar` | Multi-select with Shift/Ctrl+click, copy paths, ZIP download, bulk delete |
+| Unused Detection | `Asset.importersCount`, `useStats` | Badge on cards, sidebar filter, tracks assets with no importers |
+| Ignored Assets | `IgnoredAssetsProvider`, `useIgnoredAssets` | localStorage-persisted hiding without deletion |
+| Context Menu | `useAssetActions`, `AssetContextMenu` | Right-click for preview, copy, reveal in Finder, delete |
+| Duplicates | `DuplicateScanner`, `useDuplicates` | MD5 content hashing, badge showing duplicate count |
+| Keyboard Nav | `useKeyboardNavigation` | Arrow keys, vim-style `j`/`k`, shortcuts for all actions |
+| Advanced Filters | `useAdvancedFilters`, `AdvancedFilters` | Filter by size, date, extension with presets |
+| Virtual Scrolling | `useVirtualGrid`, `useResponsiveColumns` | `@tanstack/react-virtual` for 100+ assets |
+| Code Splitting | `vite.config.ui.ts` | Main bundle 711KB → 75KB (89% reduction) |
+| Responsive Design | `globals.css`, all components | Mobile-first, 320px to 4K+, bottom sheet on mobile |
 
-### Unused Asset Detection
-Identify assets not imported anywhere in your codebase:
-- **Badge indicator**: "Unused" badge on asset cards
-- **Sidebar filter**: "Unused Assets" option to show only unused
-- **Stats tracking**: Unused count in sidebar stats display
-- **Implementation**: `Asset.importersCount` field, `useStats` hook
-- **Integration**: Works with importer scanner to track usage
+For detailed implementation notes, see `.claude/reminder/architecture.md` and `.claude/reminder/quick-reference.md`.
 
-### Ignored Assets
-Hide assets locally without deleting them:
-- **Storage**: localStorage-persisted (key: `vite-asset-manager-ignored-assets`)
-- **Provider**: `IgnoredAssetsProvider` wraps app
-- **Hook**: `useIgnoredAssets()` for state management
-- **Integration**: Filtered at app level, works with all other filters
-- **Use cases**: Hide generated assets, vendor files, or work-in-progress assets
+## Troubleshooting
 
-### Quick Actions Context Menu
-Right-click context menu for fast asset actions:
-- **Trigger**: Right-click any asset card (auto-selects if not already selected)
-- **Actions**: 7 total actions in 5 groups
-  - Open Preview - Opens asset in preview panel
-  - Copy Path - Copies file path to clipboard with checkmark feedback
-  - Copy Import Code - Submenu with HTML/React/Vue code snippets
-  - Open in Editor - Opens first importer location in configured editor (disabled if no importers)
-  - Reveal in Finder/Explorer - Opens system file explorer and highlights the file (platform-specific)
-  - Mark/Unmark as Ignored - Toggle ignored state (only for unused assets)
-  - Delete - Bulk delete with confirmation dialog
-- **Keyboard shortcuts**: Displays shortcuts (⌘O, ⌘⇧R, ⌫) in menu
-- **Visual feedback**: Checkmark indicators for copy success, disabled states for unavailable actions
-- **Implementation**: `useAssetActions` hook, `AssetContextMenu` component, `file-revealer.ts` server utility
-- **API endpoint**: `/reveal-in-finder` (POST)
-- **Cross-platform**: Supports macOS (Finder), Windows (Explorer), and Linux (xdg-open)
+Common issues and solutions are documented in `.claude/reminder/quick-reference.md`:
 
-### Duplicate File Detection
-Identify duplicate files by content hash:
-- **Algorithm**: MD5 hash of file contents with streaming for files >1MB
-- **Cache strategy**: Two-level caching (hash cache + duplicate groups) validated by mtime+size
-- **UI indicators**: "X duplicates" badge on asset cards showing duplicate count
-- **Real-time updates**: File changes trigger hash recalculation and SSE broadcast
-- **Performance**: Batch processing (20 files at a time) to avoid overwhelming I/O
-- **Implementation**: `DuplicateScanner` class, `useDuplicates` hook, `DuplicatesSection` component
-- **API endpoint**: `/duplicates?hash=` (GET) returns all assets with matching hash
-- **SSE events**: `asset-manager:duplicates-update` emitted when duplicate status changes
-- **Asset enrichment**: Adds `contentHash` and `duplicatesCount` fields to Asset type
-- **Filtering**: Can filter to show only files with duplicates
-- **Use cases**: Find duplicate images, identify redundant assets, clean up project files
-
-### Keyboard Navigation
-Full keyboard support for navigating and managing assets:
-- **Navigation**: Arrow keys (grid-aware), `j`/`k` (vim-style), `Tab`/`Shift+Tab` (cycle focus)
-- **Focus**: `/` to focus search, `Escape` to close preview or blur search
-- **Selection**: `Space` to toggle, `Enter` to preview, `Cmd/Ctrl+A` select all, `Cmd/Ctrl+D` deselect
-- **Actions**: `Delete`/`Backspace` to delete, `Cmd/Ctrl+C` copy paths, `Cmd/Ctrl+O` open in editor, `Cmd/Ctrl+Shift+R` reveal in Finder
-- **Implementation**: `useKeyboardNavigation` hook integrated with `App.tsx`
-- **Features**: Grid-aware column calculation, platform-aware modifier keys, respects input field focus
-
-### Advanced Filtering
-Filter assets by size, date modified, and file extension:
-- **Filter categories**:
-  - **Size**: Small (<100KB), Medium (100KB-1MB), Large (1-10MB), Extra Large (>10MB)
-  - **Date**: Today, Last 7 days, Last 30 days, Last 90 days, This year
-  - **Extensions**: Multi-select from available extensions in current asset set
-- **UI**: Dropdown button with active filter count badge, organized sections with checkmarks
-- **Clear all**: Quickly reset all active filters
-- **API support**: Query params `minSize`, `maxSize`, `minDate`, `maxDate`, `extensions` (comma-separated)
-- **Implementation**: `useAdvancedFilters` hook, `AdvancedFilters` component
-- **Integration**: Works with type filters, unused/duplicate filters, and search
-- **Performance**: Uses primitive string dependencies to prevent unnecessary rerenders (Vercel best practice)
-
-### Virtual Scrolling
-Virtualized grid rendering for handling large asset collections (100+ assets) without DOM bloat:
-- **Library**: `@tanstack/react-virtual` for row-based virtualization
-- **Implementation**: `useVirtualGrid` hook wraps virtualizer, `useResponsiveColumns` calculates grid columns
-- **Row height**: Fixed 244px (200px card + 44px footer) with 16px gap
-- **Overscan**: 2 rows buffer for smooth scrolling
-- **Scroll container**: Shared `mainRef` passed from `App.tsx` to each `AssetGrid`
-- **Scroll-to-item**: Keyboard navigation triggers `scrollToItem()` to keep focused asset visible
-- **Features**: Absolute positioning with `translateY()`, maintains all existing interactions (selection, context menu, preview)
-
-### Performance Optimizations (Vercel Best Practices)
-React performance optimizations applied without breaking changes:
-- **Code Splitting**: Manual chunk splitting in `vite.config.ui.ts` separates vendor dependencies
-  - Main bundle reduced from 711 KB to 75 KB (89% reduction)
-  - Eliminates "chunks larger than 500 KB" build warning
-  - Vendor chunks: react (193 KB), ui (254 KB), icons (155 KB), virtual (15 KB)
-- **Lazy Loading**: PreviewPanel loaded on-demand with React.lazy() and Suspense
-  - Reduces initial bundle size for faster time-to-interactive
-  - Fallback loading spinner during chunk fetch
-- **Hoisted JSX**: Static components (`LoadingSpinner`, `EmptyState`) defined outside render
-- **Primitive dependencies**: Hooks return `filterParamsString` (string) instead of objects to prevent re-renders
-- **Stable callbacks**: `isIgnored` uses ref pattern for consistent reference identity
-- **Single-pass filtering**: `displayGroups` computation combines multiple iterations into one loop
-- **Cached property access**: Sort comparisons cache property lookups
-- **Functional setState**: Uses callback form to avoid stale closures
-- **Implementation**: See `.claude/REFACTORING_SUMMARY.md` for detailed changes
-
-### Responsive Design (Mobile-First)
-Comprehensive responsive implementation for all device sizes (320px to 4K+):
-- **Mobile Navigation**: Sticky header with drawer toggle, branding, and asset count (visible <768px)
-- **Sidebar Drawer**:
-  - Desktop (≥768px): Persistent 288px sidebar
-  - Mobile (<768px): Slide-out drawer (280px mobile, 320px tablet) that auto-closes after selection
-- **Bottom Sheet Preview**:
-  - Desktop: Right-side panel (384px default, resizable 300-600px)
-  - Mobile: Bottom sheet at 85vh height with full width, drag indicator, rounded top corners
-- **Touch-Friendly Interactions**: All interactive elements minimum 44×44px (WCAG 2.1 AAA)
-- **Responsive Components**:
-  - Advanced Filters: Adapts from full-width mobile to fixed desktop width
-  - Bulk Actions Bar: Icon-only buttons on mobile, full labels on desktop
-  - Search Bar: Optimized padding and shortened placeholder text
-  - Asset Cards: Touch-optimized overlay controls and larger interaction areas
-  - Sidebar Stats: Responsive spacing, gaps, and typography
-- **Global Optimizations**:
-  - Wider scrollbars on mobile (10px) for easier touch scrolling, compact (6px) on desktop
-  - Reduced motion support via `@media (prefers-reduced-motion: reduce)`
-  - Faster animations on mobile (200ms vs 300ms) for better performance
-  - Responsive base font size (14px on mobile)
-  - Touch-friendly tap targets via `@media (pointer: coarse)`
-- **Breakpoints**: Mobile (<640px), Tablet (640-1023px), Desktop (≥1024px)
-- **Design Patterns**: Mobile Drawer (iOS/Material), Bottom Sheet (Google Maps), 44×44pt touch targets (Apple HIG)
+- **Assets not showing**: Check `include` option matches directory structure, verify file extensions
+- **Thumbnails not generating**: Only works for jpg/jpeg/png/webp/avif/gif/tiff; check Sharp installation
+- **Real-time updates not working**: Ensure `watch: true`, check browser console for SSE errors
+- **UI shows main app**: Run `pnpm run build:ui` to build UI files to `dist/client/`
 
 ## Development Notes
 
