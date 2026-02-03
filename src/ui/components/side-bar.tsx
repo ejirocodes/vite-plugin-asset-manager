@@ -146,60 +146,80 @@ export const Sidebar = memo(function Sidebar({
                 label="Images"
                 count={stats.images}
                 color="violet"
+                onClick={() => onTypeSelect('image')}
+                active={selectedType === 'image'}
               />
               <StatBadge
                 icon={<VideoCameraIcon weight="fill" className="w-3.5 h-3.5" />}
                 label="Videos"
                 count={stats.videos}
                 color="pink"
+                onClick={() => onTypeSelect('video')}
+                active={selectedType === 'video'}
               />
               <StatBadge
                 icon={<MusicNoteIcon weight="fill" className="w-3.5 h-3.5" />}
                 label="Audio"
                 count={stats.audio}
                 color="cyan"
+                onClick={() => onTypeSelect('audio')}
+                active={selectedType === 'audio'}
               />
               <StatBadge
                 icon={<FileTextIcon weight="fill" className="w-3.5 h-3.5" />}
                 label="Docs"
                 count={stats.documents}
                 color="amber"
+                onClick={() => onTypeSelect('document')}
+                active={selectedType === 'document'}
               />
               <StatBadge
                 icon={<TextTIcon weight="fill" className="w-3.5 h-3.5" />}
                 label="Fonts"
                 count={stats.fonts}
                 color="rose"
+                onClick={() => onTypeSelect('font')}
+                active={selectedType === 'font'}
               />
               <StatBadge
                 icon={<DatabaseIcon weight="fill" className="w-3.5 h-3.5" />}
                 label="Data"
                 count={stats.data}
                 color="emerald"
+                onClick={() => onTypeSelect('data')}
+                active={selectedType === 'data'}
               />
               <StatBadge
                 icon={<ArticleIcon weight="fill" className="w-3.5 h-3.5" />}
                 label="Text"
                 count={stats.text}
                 color="purple"
+                onClick={() => onTypeSelect('text')}
+                active={selectedType === 'text'}
               />
               <StatBadge
                 icon={<FileIcon weight="fill" className="w-3.5 h-3.5" />}
                 label="Other"
                 count={stats.other}
                 color="zinc"
+                onClick={() => onTypeSelect('other')}
+                active={selectedType === 'other'}
               />
               <StatBadge
                 icon={<WarningCircleIcon weight="fill" className="w-3.5 h-3.5" />}
                 label="Unused"
                 count={stats.unused}
                 color="amber"
+                onClick={onUnusedFilterToggle}
+                active={showUnusedOnly}
               />
               <StatBadge
                 icon={<CopyIcon weight="fill" className="w-3.5 h-3.5" />}
                 label="Dupes"
                 count={stats.duplicateFiles}
                 color="blue"
+                onClick={onDuplicatesFilterToggle}
+                active={showDuplicatesOnly}
               />
             </div>
           )}
@@ -316,23 +336,41 @@ const StatBadge = memo(function StatBadge({
   icon,
   label,
   count,
-  color
+  color,
+  onClick,
+  active = false
 }: {
   icon: React.ReactNode
   label: string
   count: number
   color: keyof typeof colorClasses
+  onClick?: () => void
+  active?: boolean
 }) {
   return (
-    <div
-      className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-md ${colorClasses[color]}`}
+    <button
+      onClick={onClick}
+      className={`
+        relative flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-md
+        transition-all duration-200 ease-out
+        ${colorClasses[color]}
+        ${active
+          ? 'shadow-[inset_0_0_12px_rgba(255,255,255,0.15)] brightness-110 scale-[1.02]'
+          : 'hover:brightness-110 hover:scale-[1.01]'
+        }
+        active:scale-[0.98]
+        focus:outline-none focus-visible:brightness-125
+      `}
     >
+      {active && (
+        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-3/5 rounded-full bg-white/40" />
+      )}
       {icon}
-      <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground truncate">
+      <span className={`text-[9px] sm:text-[10px] font-medium truncate transition-colors ${active ? 'text-foreground' : 'text-muted-foreground'}`}>
         {label}
       </span>
       <span className="ml-auto font-mono text-xs font-semibold tabular-nums">{count}</span>
-    </div>
+    </button>
   )
 })
 
