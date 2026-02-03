@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="./.github/assets/banner.png" alt="Vite Plugin Asset Manager" />
+  <img src="./.github/assets/demo.gif" alt="Vite Plugin Asset Manager Demo" />
 </p>
 
 <h1 align="center">vite-plugin-asset-manager</h1>
 
 <p align="center">
-  A visual asset management dashboard for Vite projects.<br/>
-  Discover, browse, and manage all your media assets through a real-time web UI.
+  Stop grepping for image paths.<br/>
+  See exactly where every asset is used, find duplicates, and clean up what's unused.
 </p>
 
 <p align="center">
