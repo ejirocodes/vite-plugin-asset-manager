@@ -17,6 +17,18 @@ import {
 } from '@vite-asset-manager/core'
 import { eventHandler, fromNodeMiddleware } from 'h3'
 
+export type {
+  AssetManagerOptions,
+  Asset,
+  AssetGroup,
+  AssetType,
+  AssetStats,
+  ResolvedOptions,
+  Importer,
+  ImportType,
+  EditorType
+} from '@vite-asset-manager/core'
+
 export interface NuxtAssetManagerOptions extends AssetManagerOptions {
   /**
    * Add Asset Manager tab to Nuxt DevTools

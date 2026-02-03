@@ -2,7 +2,6 @@ import type { Plugin } from 'vite'
 import { createAssetManagerPlugin } from './plugin'
 import type { AssetManagerOptions } from '@vite-asset-manager/core'
 
-// Re-export types from core package for backward compatibility
 export type {
   AssetManagerOptions,
   Asset,
