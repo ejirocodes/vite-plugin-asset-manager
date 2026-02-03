@@ -48,7 +48,9 @@
     "playground:svelte": "pnpm --filter playground-svelte dev",
     "playground:solid": "pnpm --filter playground-solid dev",
     "playground:qwik": "pnpm --filter playground-qwik dev",
-    "playground:tanstack": "pnpm --filter playground-tanstack dev"
+    "playground:tanstack": "pnpm --filter playground-tanstack dev",
+    "playground:nuxt": "pnpm --filter playground-nuxt dev",
+    "build:packages": "pnpm --filter @vite-asset-manager/core build && pnpm --filter @vite-asset-manager/nuxt build"
   },
   "publishConfig": {
     "access": "public"
