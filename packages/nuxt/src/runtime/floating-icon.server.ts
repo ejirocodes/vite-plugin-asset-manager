@@ -1,3 +1,5 @@
+import { defineNitroPlugin, useRuntimeConfig } from 'nitropack/runtime'
+
 export default defineNitroPlugin((nitro) => {
   nitro.hooks.hook('render:html', (html) => {
     const config = useRuntimeConfig()
