@@ -100,6 +100,7 @@ export default function App() {
   const [isGridFocused, setIsGridFocused] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const mainRef = useRef<HTMLElement>(null)
+  const hasInitializedDirs = useRef(false)
   const [srAnnouncement, setSrAnnouncement] = useState('')
 
   const handlePreview = useCallback((asset: Asset) => {
@@ -124,10 +125,11 @@ export default function App() {
   }, [selectedType, showUnusedOnly, showDuplicatesOnly, searchQuery, filterParams])
 
   useEffect(() => {
-    if (groups.length > 0 && expandedDirs.size === 0) {
+    if (groups.length > 0 && !hasInitializedDirs.current) {
+      hasInitializedDirs.current = true
       setExpandedDirs(new Set(groups.map(g => g.directory)))
     }
-  }, [groups, expandedDirs.size])
+  }, [groups])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -424,7 +426,7 @@ export default function App() {
 
         <main ref={mainRef} className="flex-1 overflow-auto flex flex-col">
           <header
-            className={`sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ${
+            className={`sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 ${
               isEmbedded ? '' : 'md:hidden'
             }`}
           >
@@ -531,7 +533,7 @@ export default function App() {
                         <div
                           className={`
                       overflow-hidden transition-all duration-300 ease-in-out
-                      ${expandedDirs.has(group.directory) ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}
+                      ${expandedDirs.has(group.directory) ? 'max-h-500 opacity-100' : 'max-h-0 opacity-0'}
                     `}
                         >
                           <div className="border-t border-border">
