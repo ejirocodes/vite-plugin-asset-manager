@@ -33,23 +33,26 @@ const __dirname = path.dirname(__filename)
 
 /**
  * Find the client directory containing pre-built UI files.
- * Handles both production (built dist) and development scenarios.
+ * Handles standalone installs (npm/tarball) and monorepo development.
+ *
+ * When bundled by tsup, __dirname = packages/core/dist/
+ * When installed from npm, __dirname = node_modules/@vite-asset-manager/core/dist/
  */
 function findClientDir(): string {
-  // From built dist: __dirname is packages/core/dist/middleware
-  const fromDist = path.join(__dirname, '../../client')
-  if (fs.existsSync(fromDist)) return fromDist
+  // Standalone install: client/ alongside index.js in dist/
+  const colocated = path.join(__dirname, 'client')
+  if (fs.existsSync(colocated)) return colocated
 
-  // From development/source: look in root dist
+  // Monorepo development: root dist/client/ (from build:ui)
   const fromRoot = path.resolve(__dirname, '../../../../dist/client')
   if (fs.existsSync(fromRoot)) return fromRoot
 
-  // Fallback: look relative to package root
+  // Monorepo fallback
   const fromPackageRoot = path.resolve(__dirname, '../../../dist/client')
   if (fs.existsSync(fromPackageRoot)) return fromPackageRoot
 
   // Default fallback
-  return fromDist
+  return colocated
 }
 
 /**
