@@ -233,25 +233,25 @@ function resolveOptionsForNuxt(
   // Paths are relative to rootDir (not srcDir) so path security checks
   // work for both app/ and public/ directories
   if (isNuxt4 && !moduleOptions.include) {
-    // Nuxt 4: assets in app/assets/, public at root
+    // Nuxt 4: source files + assets in app/, public at root
     return {
       ...options,
-      include: ['app/assets', 'public'],
+      include: ['app', 'public'],
       aliases: {
-        '@/': 'app/assets/',
+        '@/': 'app/',
         '~/': 'app/',
         ...moduleOptions.aliases
       }
     }
   }
 
-  // Nuxt 3: assets and public at root
+  // Nuxt 3: source files, assets, and public at project root
   if (!moduleOptions.include) {
     return {
       ...options,
-      include: ['assets', 'public'],
+      include: ['.'],
       aliases: {
-        '@/': 'assets/',
+        '@/': '',
         '~/': '',
         ...moduleOptions.aliases
       }
