@@ -28,7 +28,7 @@
     "build:floating-icon": "vite build --config vite.config.floating-icon.ts",
     "build:plugin": "tsup",
     "build": "pnpm run build:ui && pnpm run build:floating-icon && pnpm run build:plugin",
-    "build:all": "pnpm run build:packages && pnpm run build",
+    "build:all": "pnpm run build:packages && pnpm run build && rm -rf packages/core/dist/client && cp -r dist/client packages/core/dist/client",
     "dev": "tsup --watch",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",

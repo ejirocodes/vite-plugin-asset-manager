@@ -88,7 +88,7 @@ Start your dev server and access the Asset Manager in three ways:
 | Solid | ✅ | Fully automatic |
 | Qwik | ✅ | Fully automatic |
 | **Nuxt 3/4** | ✅ | [Official module](#nuxt-module) |
-| **TanStack Start** | ✅ | [Manual setup required](./docs/SSR_INTEGRATION.md#tanstack-start-setup) |
+| **TanStack Start** | ✅ | [Manual setup required](./docs/SSR_INTEGRATION.md#tanstack-start-setup) ([playground](./playgrounds/tanstack/)) |
 
 ### Nuxt Module
 
@@ -132,6 +132,8 @@ assetManager({
   floatingIcon: true,             // Show toggle button in host app
   watch: true,                    // Enable real-time updates
   launchEditor: 'code',           // Editor: code, cursor, webstorm, vim, etc.
+  debug: false,                   // Enable debug logging for diagnostics
+  aliases: { '@/': 'src/' },      // Path aliases for import detection
 })
 ```
 
@@ -209,6 +211,7 @@ pnpm run playground:lit
 pnpm run playground:svelte
 pnpm run playground:solid
 pnpm run playground:qwik
+pnpm run playground:tanstack
 pnpm run playground:nuxt
 ```
 

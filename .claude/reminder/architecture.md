@@ -412,6 +412,8 @@ interface AssetManagerOptions {
   watch?: boolean         // Default: true (real-time updates)
   floatingIcon?: boolean  // Default: true (injects overlay button into host app)
   launchEditor?: EditorType // Default: 'code' (VS Code) - editor for "Open in Editor" feature
+  debug?: boolean         // Default: false - enable console logging for path/scanning diagnostics
+  aliases?: Record<string, string> // Default: { '@/': 'src/' } - path aliases for importer scanner
 }
 
 // EditorType supports: 'code' | 'cursor' | 'webstorm' | 'idea' | 'vim' | 'emacs' | 'sublime' | 'atom' | etc.
@@ -491,7 +493,7 @@ Framework-agnostic overlay button providing quick access to the Asset Manager da
 - ~~SSE Real-Time Updates~~ ✓ Implemented - Replaced WebSocket with Server-Sent Events
 - ~~Sidebar Type Filtering~~ ✓ Implemented - Filter by asset type from sidebar
 - ~~Asset Sorting~~ ✓ Implemented - 8 sort options via dropdown
-- ~~Test Infrastructure~~ ✓ Implemented - 14 test files (6 server + 8 UI)
+- ~~Test Infrastructure~~ ✓ Implemented - 16 test files (6 server + 10 UI)
 - ~~Bulk Operations~~ ✓ Implemented - Multi-select, copy paths, download ZIP, bulk delete
 - ~~Unused Asset Detection~~ ✓ Implemented - Badge on cards, sidebar filter, stats tracking
 - ~~Ignored Assets~~ ✓ Implemented - localStorage-persisted hiding without deletion
@@ -582,6 +584,11 @@ Comprehensive responsive implementation for all device sizes (320px to 4K+).
 
 **Accessibility**: WCAG 2.1 Level AAA compliant, reduced motion, platform-aware interactions
 
+### 6o. Embedded Mode Detection
+- **Hook**: `useEmbeddedMode.ts` - Detects if dashboard runs inside floating icon panel
+- **Detection**: Checks for `?embedded=true` query parameter in URL
+- **Usage**: Used in `App.tsx` to adjust layout when embedded in the floating icon iframe
+- **State**: Computed once on mount using `useState` initializer
 
 ## UI Component Library
 Key shadcn/ui components in use (19 total):

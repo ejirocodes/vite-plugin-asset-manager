@@ -14,7 +14,7 @@ The plugin provides a comprehensive asset management solution with:
 - Search functionality with debouncing
 - Importer detection with click-to-open-in-editor
 - Framework-agnostic floating icon with drag support and keyboard shortcuts (⌥⇧A)
-- Comprehensive test suite (3,623 lines across 17 test files)
+- Comprehensive test suite (16 test files: 6 server + 10 UI)
 - Mobile-optimized UI with touch-friendly interactions (WCAG 2.1 AAA compliant)
 
 ---
@@ -25,7 +25,7 @@ The plugin provides a comprehensive asset management solution with:
 **Status**: ✅ Complete
 **Impact**: High
 
-Comprehensive test suite implemented with Vitest (14 test files):
+Comprehensive test suite implemented with Vitest (16 test files):
 
 **Server tests** (`tests/server/` - 6 files):
 - `scanner.test.ts` - Asset discovery, caching, watching
@@ -42,7 +42,7 @@ Comprehensive test suite implemented with Vitest (14 test files):
 - `setup.ts` - Global test setup with `createMockAsset()` and `createMockImporter()` utilities
 - `setup-ui.ts` - UI-specific setup (jsdom), mocks for EventSource, fetch, clipboard
 
-**UI tests** (`src/ui/**/*.test.{ts,tsx}` - 8 files):
+**UI tests** (`src/ui/**/*.test.{ts,tsx}` - 10 files):
 - `components/asset-card.test.tsx` - Card rendering, copy functionality
 - `components/search-bar.test.tsx` - Search input, keyboard shortcuts
 - `hooks/useAssets.test.ts` - Asset fetching and SSE subscription
@@ -50,6 +50,8 @@ Comprehensive test suite implemented with Vitest (14 test files):
 - `hooks/useSSE.test.ts` - Singleton EventSource connection
 - `hooks/useImporters.test.ts` - Importer fetching and editor launch
 - `hooks/useDuplicates.test.ts` - Duplicate asset fetching
+- `hooks/useVirtualGrid.test.ts` - Virtual grid virtualization
+- `hooks/useResponsiveColumns.test.ts` - Responsive column calculation
 - `providers/ignored-assets-provider.test.tsx` - Ignored assets state management
 
 **Test commands**:
@@ -98,7 +100,7 @@ Sidebar type filtering is fully wired up and functional.
 - Detects ES imports, dynamic imports, require, CSS url(), HTML src/href
 - Shows file path, line number, import type, and code snippet
 - Click to open in editor at exact line/column
-- Real-time updates via WebSocket when imports change
+- Real-time updates via SSE when imports change
 
 ---
 
@@ -690,6 +692,42 @@ Framework-agnostic overlay button that provides quick access to the Asset Manage
 
 ---
 
+### 12. ~~Embedded Mode Detection~~ ✓ IMPLEMENTED (New Feature)
+**Status**: ✅ Complete
+**Impact**: Low (Developer Experience)
+
+Detects when the dashboard is running inside the floating icon panel iframe.
+
+**Implementation**:
+- `src/ui/hooks/useEmbeddedMode.ts` - Hook checking `?embedded=true` query parameter
+- Used in `App.tsx` to adjust layout behavior when embedded
+
+---
+
+### 13. ~~Debug & Aliases Configuration~~ ✓ IMPLEMENTED (New Feature)
+**Status**: ✅ Complete
+**Impact**: Medium (Developer Experience)
+
+New configuration options for better diagnostics and import path resolution.
+
+**Implementation**:
+- `debug?: boolean` (default: `false`) - Enables console logging for path and scanning diagnostics
+- `aliases?: Record<string, string>` (default: `{ '@/': 'src/' }`) - Path aliases for importer scanner to resolve imports
+
+---
+
+### 14. ~~TanStack Start Playground~~ ✓ IMPLEMENTED (New Feature)
+**Status**: ✅ Complete
+**Impact**: Medium (Framework Support)
+
+Added TanStack Start playground with manual SSR script injection.
+
+**Implementation**:
+- `playgrounds/tanstack/` - Full TanStack Start demo project
+- `playground:tanstack` script in root `package.json`
+
+---
+
 ## Priority Recommendations
 
 ### High Priority (Core Functionality) - ALL DONE ✓
@@ -736,5 +774,5 @@ Framework-agnostic overlay button that provides quick access to the Asset Manage
 
 ### Testing New Features
 - Add feature flags for experimental features
-- Use playgrounds for manual testing (react, vue, vanilla, preact, lit)
+- Use playgrounds for manual testing (react, vue, vanilla, preact, lit, svelte, solid, qwik, tanstack, nuxt)
 - Document breaking changes clearly
