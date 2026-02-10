@@ -606,8 +606,8 @@ export default function App() {
               {(pendingDeleteAssets?.length ?? 0) !== 1 ? 's' : ''}?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. The following files will be permanently deleted from your
-              computer:
+              This action cannot be undone. The following files will be permanently deleted from
+              your computer:
             </AlertDialogDescription>
           </AlertDialogHeader>
           <ul className="max-h-32 overflow-y-auto text-xs font-mono bg-muted/50 rounded p-2 space-y-0.5">

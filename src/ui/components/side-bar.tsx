@@ -354,9 +354,10 @@ const StatBadge = memo(function StatBadge({
         relative flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-md
         transition-all duration-200 ease-out
         ${colorClasses[color]}
-        ${active
-          ? 'shadow-[inset_0_0_12px_rgba(255,255,255,0.15)] brightness-110 scale-[1.02]'
-          : 'hover:brightness-110 hover:scale-[1.01]'
+        ${
+          active
+            ? 'shadow-[inset_0_0_12px_rgba(255,255,255,0.15)] brightness-110 scale-[1.02]'
+            : 'hover:brightness-110 hover:scale-[1.01]'
         }
         active:scale-[0.98]
         focus:outline-none focus-visible:brightness-125
@@ -366,7 +367,9 @@ const StatBadge = memo(function StatBadge({
         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-3/5 rounded-full bg-white/40" />
       )}
       {icon}
-      <span className={`text-[9px] sm:text-[10px] font-medium truncate transition-colors ${active ? 'text-foreground' : 'text-muted-foreground'}`}>
+      <span
+        className={`text-[9px] sm:text-[10px] font-medium truncate transition-colors ${active ? 'text-foreground' : 'text-muted-foreground'}`}
+      >
         {label}
       </span>
       <span className="ml-auto font-mono text-xs font-semibold tabular-nums">{count}</span>
