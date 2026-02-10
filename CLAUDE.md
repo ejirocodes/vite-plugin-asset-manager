@@ -46,7 +46,7 @@ vite-plugin-asset-manager
 - [x] Nuxt 3/4 - Use `@vite-asset-manager/nuxt` module (automatic floating icon injection + DevTools integration)
 
 **SSR Frameworks** (manual script injection required):
-- [x] TanStack Start
+- [x] TanStack Start (has playground: `playgrounds/tanstack/`)
 
 See `docs/SSR_INTEGRATION.md` for setup instructions for TanStack Start, Next.js, Remix, SvelteKit, and Solid Start.
 
@@ -54,7 +54,7 @@ See `docs/SSR_INTEGRATION.md` for setup instructions for TanStack Start, Next.js
 
 ```bash
 pnpm install                  # Install all deps (root + packages + playgrounds)
-pnpm run build:all            # Build everything (packages → main plugin)
+pnpm run build:all            # Build everything (packages → main plugin → copy client to core)
 pnpm run build:packages       # Build core + nuxt packages
 pnpm run build                # Build main plugin (runs build:ui → build:floating-icon → build:plugin)
 pnpm run build:ui             # Build React dashboard using Vite → dist/client/
@@ -68,6 +68,7 @@ pnpm run dev                  # Watch mode for plugin development using tsup
 2. `build:ui` - React dashboard
 3. `build:floating-icon` - Floating icon IIFE
 4. `build:plugin` - Main Vite plugin
+5. `build:all` also copies `dist/client` → `packages/core/dist/client` for tarball builds
 
 The tsup config uses `clean: false` to preserve the UI and floating icon builds. The floating icon uses `emptyOutDir: false` to preserve the UI build.
 
@@ -108,6 +109,7 @@ The `playgrounds/` directory contains framework-specific demo projects:
 - `playgrounds/solid/` - Vite+Solid demo
 - `playgrounds/qwik/` - Vite+Qwik demo
 - `playgrounds/nuxt/` - Nuxt 3 demo (uses `@vite-asset-manager/nuxt` module)
+- `playgrounds/tanstack/` - TanStack Start demo (manual script injection)
 
 ```bash
 cd playgrounds/react
@@ -122,7 +124,8 @@ pnpm run playground:lit
 pnpm run playground:svelte
 pnpm run playground:solid
 pnpm run playground:qwik
-pnpm run playground:nuxt    # Nuxt playground (uses official module)
+pnpm run playground:tanstack   # TanStack Start playground (manual SSR integration)
+pnpm run playground:nuxt       # Nuxt playground (uses official module)
 ```
 
 Each playground imports the plugin directly from `../../src/index` (no pnpm link needed). They also include `vite-plugin-inspect` for debugging Vite internals.
@@ -178,7 +181,7 @@ Each playground imports the plugin directly from `../../src/index` (no pnpm link
        - `details-section.tsx`, `actions-section.tsx`, `code-snippets.tsx` - Panel sections
        - `importers-section.tsx` - Shows files that import the asset with click-to-open-in-editor
        - `duplicates-section.tsx` - Shows other files with identical content hash
-     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetActions()` for context menu actions, `useDuplicates()` for duplicate file queries, `useKeyboardNavigation()` for full keyboard navigation support, `useAdvancedFilters()` for size/date/extension filtering, `useResponsiveColumns()` for viewport-aware grid columns, `useVirtualGrid()` for virtualized rendering with @tanstack/react-virtual
+     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetActions()` for context menu actions, `useDuplicates()` for duplicate file queries, `useKeyboardNavigation()` for full keyboard navigation support, `useAdvancedFilters()` for size/date/extension filtering, `useResponsiveColumns()` for viewport-aware grid columns, `useVirtualGrid()` for virtualized rendering with @tanstack/react-virtual, `useEmbeddedMode()` for detecting if dashboard runs inside floating icon panel
      - `providers/theme-provider.tsx` - Theme context using next-themes
      - `providers/ignored-assets-provider.tsx` - Manages ignored assets (localStorage-persisted)
      - `lib/utils.ts` - Tailwind `cn()` utility, `lib/code-snippets.ts` - Import snippet generators
@@ -245,6 +248,10 @@ All shadcn components install to `src/ui/`:
 
 Key types: `Asset`, `AssetGroup`, `AssetType`, `AssetManagerOptions`, `ResolvedOptions`, `Importer`, `ImportType`, `EditorType`, `AssetStats`, `DuplicateInfo`, `SizeFilter`, `DateFilter`, `ExtensionFilter`, `AdvancedFilters`, `SizeFilterPreset`, `DateFilterPreset`
 
+The `AssetManagerOptions` interface includes:
+- `debug?: boolean` - Enable console logging for path and scanning diagnostics
+- `aliases?: Record<string, string>` - Path aliases for importer scanner (default: `{ '@/': 'src/' }`)
+
 The `Asset` interface includes:
 - `importersCount?: number` - tracks how many files import this asset (assets with 0 are considered unused)
 - `contentHash?: string` - MD5 hash of file contents for duplicate detection
@@ -261,6 +268,8 @@ Default plugin options:
 - Floating icon: enabled (injects overlay button into host app)
 - Watch mode: enabled (sends HMR updates on file changes)
 - Launch editor: `'code'` (VS Code) - configurable for click-to-open-in-editor functionality
+- Debug: `false` - enables console logging for path and scanning diagnostics
+- Aliases: `{ '@/': 'src/' }` - path aliases for importer scanner to resolve imports (e.g., `@/` → `src/`)
 
 ## Key Patterns
 
@@ -300,10 +309,10 @@ pnpm run test src/ui/hooks/useAssets.test.ts
 pnpm run test -t "scanner"
 ```
 
-### Test Structure
+### Test Structure (16 test files: 6 server + 10 UI)
 
 - `tests/server/` - Server-side tests (scanner, thumbnail, api, importer-scanner, editor-launcher, duplicate-scanner)
-- `src/ui/**/*.test.{ts,tsx}` - UI component and hook tests (co-located)
+- `src/ui/**/*.test.{ts,tsx}` - UI component and hook tests (co-located): useAssets, useSearch, useSSE, useImporters, useDuplicates, useVirtualGrid, useResponsiveColumns, asset-card, search-bar, ignored-assets-provider
 - `tests/setup.ts` - Global test setup, exports `createMockAsset()` and `createMockImporter()` utilities
 - `tests/setup-ui.ts` - UI-specific setup (jsdom), mocks for EventSource, fetch, clipboard
 

@@ -2,7 +2,7 @@
 
 ## Commands
 ```bash
-# Build everything (packages + main plugin)
+# Build everything (packages + main plugin + copy client to core)
 pnpm run build:all
 
 # Build packages only (core + nuxt)
@@ -32,10 +32,11 @@ pnpm run playground:lit      # Lit playground
 pnpm run playground:svelte   # Svelte playground
 pnpm run playground:solid    # Solid playground
 pnpm run playground:qwik     # Qwik playground
+pnpm run playground:tanstack # TanStack Start playground (manual SSR integration)
 pnpm run playground:nuxt     # Nuxt playground (uses @vite-asset-manager/nuxt)
 # Then visit: http://localhost:5173/__asset_manager__
 
-# Testing (14 test files: 6 server + 8 UI)
+# Testing (16 test files: 6 server + 10 UI)
 pnpm run test          # Run all tests once
 pnpm run test:watch    # Watch mode
 pnpm run test:ui       # Vitest UI
@@ -138,7 +139,10 @@ src/                         # Main vite-plugin-asset-manager
     │   ├── useSSE.test.ts      # Tests
     │   ├── useStats.ts         # Fetch asset statistics with unused count
     │   ├── useResponsiveColumns.ts # Viewport-aware grid column calculation
-    │   └── useVirtualGrid.ts   # Virtual scrolling with @tanstack/react-virtual
+    │   ├── useResponsiveColumns.test.ts # Tests
+    │   ├── useVirtualGrid.ts   # Virtual scrolling with @tanstack/react-virtual
+    │   ├── useVirtualGrid.test.ts # Tests
+    │   └── useEmbeddedMode.ts  # Detects embedded mode (floating icon panel)
     ├── providers/
     │   ├── theme-provider.tsx
     │   ├── ignored-assets-provider.tsx      # Manages ignored assets (localStorage)
@@ -283,7 +287,7 @@ cd ../.. && pnpm publish
 Note: `workspace:*` dependencies are automatically converted to actual version numbers during publish.
 
 ## Playgrounds
-Nine framework playgrounds are available:
+Ten framework playgrounds are available:
 - `playgrounds/react/` - Vite+React
 - `playgrounds/vue/` - Vite+Vue
 - `playgrounds/vanilla/` - Vite+Vanilla (no framework)
@@ -292,6 +296,7 @@ Nine framework playgrounds are available:
 - `playgrounds/svelte/` - Vite+Svelte
 - `playgrounds/solid/` - Vite+Solid
 - `playgrounds/qwik/` - Vite+Qwik
+- `playgrounds/tanstack/` - TanStack Start (manual SSR integration)
 - `playgrounds/nuxt/` - Nuxt 3 (uses `@vite-asset-manager/nuxt` module)
 
 Each includes test assets in `src/assets/` and `public/` directories.
