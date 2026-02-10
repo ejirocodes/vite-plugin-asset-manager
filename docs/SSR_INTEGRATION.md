@@ -481,7 +481,6 @@ All SSR frameworks use the same plugin options. The configuration file varies by
 | Remix | `vite.config.ts` | `plugins: [...]` |
 | Solid Start | `app.config.ts` | `vite.plugins: [...]` |
 | Nuxt (Module) | `nuxt.config.ts` | `modules: ['@vite-asset-manager/nuxt']` |
-| Nuxt (Manual) | `nuxt.config.ts` | `vite.plugins: [...]` |
 | SvelteKit | `vite.config.ts` | `plugins: [...]` |
 
 ### Available Options
