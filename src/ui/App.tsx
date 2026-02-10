@@ -6,6 +6,16 @@ import { BulkActionsBar } from './components/bulk-actions-bar'
 import { AdvancedFilters } from './components/advanced-filters'
 import { Button } from './components/ui/button'
 import { Sheet, SheetContent } from './components/ui/sheet'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from './components/ui/alert-dialog'
 
 const PreviewPanel = lazy(() =>
   import('./components/preview-panel').then(m => ({ default: m.PreviewPanel }))
@@ -98,6 +108,7 @@ export default function App() {
 
   const [focusedAssetId, setFocusedAssetId] = useState<string | null>(null)
   const [isGridFocused, setIsGridFocused] = useState(false)
+  const [pendingDeleteAssets, setPendingDeleteAssets] = useState<Asset[] | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const mainRef = useRef<HTMLElement>(null)
   const hasInitializedDirs = useRef(false)
@@ -267,6 +278,17 @@ export default function App() {
     }
   }, [bulkDelete, selectedAssetsArray])
 
+  const handleConfirmKeyboardDelete = useCallback(async () => {
+    if (!pendingDeleteAssets) return
+    const success = await bulkDelete(pendingDeleteAssets)
+    if (success) {
+      setSelectedAssets(new Set())
+      setLastSelectedId(null)
+      setFocusedAssetId(null)
+    }
+    setPendingDeleteAssets(null)
+  }, [bulkDelete, pendingDeleteAssets])
+
   const handleCopyPaths = useCallback(async (assets: Asset[]) => {
     try {
       const paths = assets.map(a => a.path).join('\n')
@@ -324,7 +346,7 @@ export default function App() {
     searchInputRef: searchInputRef as React.RefObject<HTMLInputElement>,
     onCopyPaths: handleCopyPaths,
     onDelete: (assets: Asset[]) => {
-      bulkDelete(assets)
+      setPendingDeleteAssets(assets)
     },
     onOpenInEditor: handleOpenInEditor,
     onRevealInFinder: handleRevealInFinder
@@ -571,6 +593,43 @@ export default function App() {
           />
         </Suspense>
       )}
+      <AlertDialog
+        open={pendingDeleteAssets !== null}
+        onOpenChange={open => {
+          if (!open) setPendingDeleteAssets(null)
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Delete {pendingDeleteAssets?.length ?? 0} asset
+              {(pendingDeleteAssets?.length ?? 0) !== 1 ? 's' : ''}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The following files will be permanently deleted from your
+              computer:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <ul className="max-h-32 overflow-y-auto text-xs font-mono bg-muted/50 rounded p-2 space-y-0.5">
+            {pendingDeleteAssets?.slice(0, 10).map(a => (
+              <li key={a.id} className="truncate text-muted-foreground">
+                {a.path}
+              </li>
+            ))}
+            {(pendingDeleteAssets?.length ?? 0) > 10 && (
+              <li className="text-muted-foreground/60">
+                ...and {(pendingDeleteAssets?.length ?? 0) - 10} more
+              </li>
+            )}
+          </ul>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleConfirmKeyboardDelete}>
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
