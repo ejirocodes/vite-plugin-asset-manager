@@ -102,12 +102,6 @@ npm install @vite-asset-manager/nuxt -D
 // nuxt.config.ts
 export default defineNuxtConfig({
   modules: ['@vite-asset-manager/nuxt'],
-
-  // Optional configuration
-  assetManager: {
-    floatingIcon: true,    // Inject floating panel button
-    devtools: true,        // Add Nuxt DevTools tab
-  }
 })
 ```
 
