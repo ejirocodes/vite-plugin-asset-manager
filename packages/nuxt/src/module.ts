@@ -1,6 +1,6 @@
 import {
   defineNuxtModule,
-  addPlugin,
+  addDevServerHandler,
   createResolver,
   useLogger
 } from '@nuxt/kit'
@@ -48,17 +48,13 @@ export default defineNuxtModule<NuxtAssetManagerOptions>({
 
   defaults: {
     base: '/__asset_manager__',
-    include: ['assets', '../public'],
+    // include/aliases are set dynamically in resolveOptionsForNuxt based on Nuxt version
     exclude: ['node_modules', '.git', '.nuxt', '.output', 'dist', '.cache', 'coverage'],
     floatingIcon: true,
     watch: true,
     launchEditor: 'code',
     debug: false,
     devtools: true,
-    aliases: {
-      '@/': 'assets/',
-      '~/': ''
-    }
   },
 
   async setup(moduleOptions, nuxt) {
@@ -73,8 +69,10 @@ export default defineNuxtModule<NuxtAssetManagerOptions>({
     // Resolve options with Nuxt-specific defaults
     const resolvedOptions = resolveOptionsForNuxt(moduleOptions, nuxt)
 
-    // Determine root directory (handles Nuxt 3 vs 4 differences)
-    const root = nuxt.options.srcDir || nuxt.options.rootDir
+    // Use rootDir so path security checks allow files from both srcDir (app/)
+    // and public/ directories. In Nuxt 4, srcDir is <project>/app/ but public
+    // files live at <project>/public/, which would fail srcDir-based checks.
+    const root = nuxt.options.rootDir
 
     // Shared state
     let assetManager: AssetManager | null = null
@@ -126,20 +124,27 @@ export default defineNuxtModule<NuxtAssetManagerOptions>({
         return { error: 'Asset Manager not initialized' }
       }
 
-      // Use fromNodeMiddleware to convert our Connect-style middleware to h3
-      return fromNodeMiddleware(middleware)(event)
+      const nodeReq = event.node.req
+      const originalUrl = nodeReq.url || ''
+
+      // Nitro/h3 may strip the route prefix when dispatching to devHandlers.
+      // Our middleware expects the full URL with the base prefix.
+      // Prepend it if it's been stripped, preserving query parameters.
+      if (!originalUrl.startsWith(resolvedOptions.base)) {
+        nodeReq.url = resolvedOptions.base + originalUrl
+      }
+
+      try {
+        return await fromNodeMiddleware(middleware)(event)
+      } finally {
+        nodeReq.url = originalUrl
+      }
     })
 
-    // Add handler via Nitro devHandlers
-    // @ts-expect-error - nitro:config hook types may not be fully exported
-    nuxt.hook('nitro:config', (nitroConfig: { devHandlers?: Array<{ route: string; handler: unknown }> }) => {
-      nitroConfig.devHandlers = nitroConfig.devHandlers || []
-
-      // Add handler for Asset Manager routes
-      nitroConfig.devHandlers.push({
-        route: resolvedOptions.base,
-        handler: h3Handler
-      })
+    // Register dev-only handler via @nuxt/kit (works for both Nuxt 3 and 4)
+    addDevServerHandler({
+      route: resolvedOptions.base,
+      handler: h3Handler
     })
 
     // Also add middleware to Vite for direct access
@@ -172,17 +177,18 @@ export default defineNuxtModule<NuxtAssetManagerOptions>({
       ;(config.plugins as VitePlugin[]).push(assetManagerPlugin)
     })
 
-    // Inject floating icon client-side plugin
+    // Inject floating icon directly into HTML via a Nitro server plugin.
+    // This bypasses the Nuxt client plugin system, making it more reliable
+    // since it doesn't depend on Vue/Nuxt client runtime hydration.
     if (moduleOptions.floatingIcon !== false) {
-      addPlugin({
-        src: resolver.resolve('./runtime/plugin.client'),
-        mode: 'client'
-      })
-
-      // Pass config to runtime
       nuxt.options.runtimeConfig.public.assetManager = {
         base: resolvedOptions.base
       }
+      // @ts-expect-error - nitro:config hook types may not be fully exported
+      nuxt.hook('nitro:config', (nitroConfig: { plugins?: string[] }) => {
+        nitroConfig.plugins = nitroConfig.plugins || []
+        nitroConfig.plugins.push(resolver.resolve('./runtime/floating-icon.server'))
+      })
     }
 
     // Add Nuxt DevTools integration
@@ -220,25 +226,26 @@ function resolveOptionsForNuxt(
 
   // Detect Nuxt 4 (app/ directory structure)
   const isNuxt4 =
-    // @ts-expect-error - future.compatibilityVersion may not be typed
     nuxt.options.future?.compatibilityVersion === 4 ||
     nuxt.options.srcDir?.endsWith('/app') ||
     nuxt.options.srcDir?.endsWith('\\app')
 
+  // Paths are relative to rootDir (not srcDir) so path security checks
+  // work for both app/ and public/ directories
   if (isNuxt4 && !moduleOptions.include) {
-    // Default paths for Nuxt 4
+    // Nuxt 4: assets in app/assets/, public at root
     return {
       ...options,
-      include: ['assets', '../public'],
+      include: ['app/assets', 'public'],
       aliases: {
-        '@/': 'assets/',
-        '~/': '',
+        '@/': 'app/assets/',
+        '~/': 'app/',
         ...moduleOptions.aliases
       }
     }
   }
 
-  // Default paths for Nuxt 3
+  // Nuxt 3: assets and public at root
   if (!moduleOptions.include) {
     return {
       ...options,
