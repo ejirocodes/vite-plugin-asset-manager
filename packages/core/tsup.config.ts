@@ -11,9 +11,9 @@ export default defineConfig({
     'sharp',
     'launch-editor',
     'fast-glob',
-    'chokidar',
     'archiver',
     'sirv'
   ],
+  noExternal: ['chokidar'],
   treeshake: true
 })
