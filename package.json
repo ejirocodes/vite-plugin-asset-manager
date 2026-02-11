@@ -81,7 +81,7 @@
     "vite": ">=5.0.0"
   },
   "dependencies": {
-    "@vite-asset-manager/core": "workspace:*",
+    "@vite-asset-manager/core": "workspace:^",
     "@base-ui/react": "^1.1.0",
     "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-virtual": "^3.13.18",
