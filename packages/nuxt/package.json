@@ -1,6 +1,6 @@
 {
   "name": "@vite-asset-manager/nuxt",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "Nuxt module for vite-plugin-asset-manager",
   "author": "Ejiro Asiuwhu <ejiroasiuwhu10@gmail.com>",

@@ -1,6 +1,6 @@
 {
   "name": "@vite-asset-manager/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "Core functionality for vite-plugin-asset-manager",
   "author": "Ejiro Asiuwhu <ejiroasiuwhu10@gmail.com>",
