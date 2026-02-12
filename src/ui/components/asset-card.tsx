@@ -5,6 +5,7 @@ import { AssetContextMenu } from './asset-context-menu'
 import { CopyIcon, CheckIcon, EyeSlashIcon } from '@phosphor-icons/react'
 import { Checkbox } from '@/ui/components/ui/checkbox'
 import { useIgnoredAssets } from '../providers/ignored-assets-provider'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '../types'
 
 interface AssetCardProps {
@@ -48,7 +49,7 @@ export const AssetCard = memo(function AssetCard({
   const cardRef = useRef<HTMLDivElement>(null)
 
   const isImage = asset.type === 'image'
-  const thumbnailUrl = `/__asset_manager__/api/thumbnail?path=${encodeURIComponent(asset.path)}`
+  const thumbnailUrl = `${getApiBase()}/api/thumbnail?path=${encodeURIComponent(asset.path)}`
 
   const handleClick = useCallback(() => {
     onPreview?.(asset)

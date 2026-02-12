@@ -1,5 +1,6 @@
 import { memo, useState, useEffect, useId, useRef } from 'react'
 import { FileIcon } from '../file-icon'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '@/ui/types'
 
 interface FontCardPreviewProps {
@@ -13,7 +14,7 @@ export const FontCardPreview = memo(function FontCardPreview({ asset }: FontCard
   const containerRef = useRef<HTMLDivElement>(null)
   const fontId = useId()
   const fontFamily = `card-font-${fontId.replace(/:/g, '-')}`
-  const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
 
   useEffect(() => {
     const container = containerRef.current

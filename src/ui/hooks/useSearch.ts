@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset, UseSearchResult } from '../types'
 
 export function useSearch(advancedParams?: URLSearchParams): UseSearchResult {
@@ -23,7 +24,7 @@ export function useSearch(advancedParams?: URLSearchParams): UseSearchResult {
           advancedUrlParams.forEach((value, key) => params.append(key, value))
         }
 
-        const res = await fetch(`/__asset_manager__/api/search?${params.toString()}`)
+        const res = await fetch(`${getApiBase()}/api/search?${params.toString()}`)
         if (!res.ok) throw new Error('Search failed')
         const data = await res.json()
         setResults(data.assets)

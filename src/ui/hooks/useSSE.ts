@@ -1,5 +1,6 @@
 /* global EventSource */
 import { useEffect, useCallback, useSyncExternalStore } from 'react'
+import { getApiBase } from '@/ui/lib/api-base'
 
 type MessageHandler = (data: unknown) => void
 
@@ -49,7 +50,7 @@ function connect(): void {
 
   try {
     setConnectionStatus('connecting')
-    const eventSource = new EventSource('/__asset_manager__/api/events')
+    const eventSource = new EventSource(`${getApiBase()}/api/events`)
     sharedEventSource = eventSource
 
     eventSource.onopen = () => {

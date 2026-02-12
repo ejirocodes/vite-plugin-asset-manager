@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { toast } from 'sonner'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Importer, UseImportersResult } from '../types'
 import { useSSE } from './useSSE'
 
@@ -20,7 +21,7 @@ export function useImporters(assetPath: string): UseImportersResult {
       setLoading(true)
       setError(null)
       const res = await fetch(
-        `/__asset_manager__/api/importers?path=${encodeURIComponent(assetPath)}`
+        `${getApiBase()}/api/importers?path=${encodeURIComponent(assetPath)}`
       )
       if (!res.ok) throw new Error('Failed to fetch importers')
       const data = await res.json()
@@ -35,7 +36,7 @@ export function useImporters(assetPath: string): UseImportersResult {
   const openInEditor = useCallback(async (importer: Importer) => {
     try {
       const res = await fetch(
-        `/__asset_manager__/api/open-in-editor?` +
+        `${getApiBase()}/api/open-in-editor?` +
           `file=${encodeURIComponent(importer.filePath)}` +
           `&line=${importer.line}` +
           `&column=${importer.column}`,
