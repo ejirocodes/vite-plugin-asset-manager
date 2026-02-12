@@ -48,7 +48,7 @@ vite-plugin-asset-manager
 **SSR Frameworks** (manual script injection required):
 - [x] TanStack Start (has playground: `playgrounds/tanstack/`)
 
-See `docs/SSR_INTEGRATION.md` for setup instructions for TanStack Start, Next.js, Remix, SvelteKit, and Solid Start.
+See `docs/SSR_INTEGRATION.md` for setup instructions for TanStack Start, Remix, SvelteKit, and Solid Start.
 
 ## Build Commands
 

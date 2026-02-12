@@ -113,7 +113,7 @@ Features:
 
 ### Other SSR Frameworks
 
-For SSR frameworks (Next.js, Remix, SvelteKit, Solid Start), manual script injection is required. See the **[SSR Integration Guide](./docs/SSR_INTEGRATION.md)** for setup instructions.
+For SSR frameworks (Remix, SvelteKit, Solid Start), manual script injection is required. See the **[SSR Integration Guide](./docs/SSR_INTEGRATION.md)** for setup instructions.
 
 ## Configuration
 

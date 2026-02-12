@@ -13,7 +13,7 @@ The plugin uses two injection methods depending on your framework:
    ✅ Nuxt (`@vite-asset-manager/nuxt`)
 
 3. **Manual Component Injection**: For other SSR frameworks
-   ⚠️ TanStack Start, Next.js, Remix, SvelteKit, Solid Start
+   ⚠️ TanStack Start, Remix, SvelteKit, Solid Start
 
 ---
 
@@ -23,7 +23,7 @@ SSR frameworks dynamically generate HTML and don't use static `index.html` files
 
 - The `transformIndexHtml()` Vite hook is not called (no static HTML file exists)
 - Scripts must be injected directly in the SSR component tree
-- This applies to all modern SSR frameworks (TanStack Start, Next.js, Remix, Nuxt, SvelteKit, Solid Start)
+- This applies to all modern SSR frameworks (TanStack Start, Remix, Nuxt, SvelteKit, Solid Start)
 
 **The Solution**: Add the floating icon scripts directly in your framework's root component.
 
@@ -107,94 +107,6 @@ pnpm run dev
 - Floating icon should appear in the bottom-right corner
 - Press `Option+Shift+A` (⌥⇧A) to toggle the Asset Manager panel
 - Access dashboard directly at `http://localhost:3000/__asset_manager__/`
-
----
-
-## Next.js Setup (App Router)
-
-> **Note**: Next.js uses Webpack/Turbopack by default, not Vite. This setup requires using Next.js with Vite as the bundler (e.g., via `vite-plugin-next` or similar adapters). For standard Next.js projects, this plugin will not work out of the box.
-
-### Step 1: Configure the Plugin
-
-If using Next.js with Vite, add the plugin to your `vite.config.ts`:
-
-```typescript
-// vite.config.ts
-import { defineConfig } from 'vite'
-import AssetManager from 'vite-plugin-asset-manager'
-
-export default defineConfig({
-  plugins: [
-    AssetManager()
-  ]
-})
-```
-
-### Step 2: Add Scripts to Layout
-
-#### For App Router (app directory):
-
-Edit your `app/layout.tsx` file:
-
-```tsx
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="en">
-      <body>
-        {children}
-
-        {/* Vite Plugin Asset Manager - Floating Icon Injection */}
-        {process.env.NODE_ENV === 'development' && (
-          <>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window.__VAM_BASE_URL__ = "/__asset_manager__";`
-              }}
-            />
-            <script type="module" src="/__asset_manager__/floating-icon.js" />
-          </>
-        )}
-      </body>
-    </html>
-  )
-}
-```
-
-#### For Pages Router (pages directory):
-
-Edit your `pages/_document.tsx` file:
-
-```tsx
-import { Html, Head, Main, NextScript } from 'next/document'
-
-export default function Document() {
-  return (
-    <Html>
-      <Head />
-      <body>
-        <Main />
-        <NextScript />
-
-        {/* Vite Plugin Asset Manager - Floating Icon Injection */}
-        {process.env.NODE_ENV === 'development' && (
-          <>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window.__VAM_BASE_URL__ = "/__asset_manager__";`
-              }}
-            />
-            <script type="module" src="/__asset_manager__/floating-icon.js" />
-          </>
-        )}
-      </body>
-    </Html>
-  )
-}
-```
 
 ---
 
@@ -477,7 +389,6 @@ All SSR frameworks use the same plugin options. The configuration file varies by
 | Framework | Config File | Plugin Location |
 |-----------|-------------|-----------------|
 | TanStack Start | `vite.config.ts` | `plugins: [...]` |
-| Next.js (with Vite) | `vite.config.ts` | `plugins: [...]` |
 | Remix | `vite.config.ts` | `plugins: [...]` |
 | Solid Start | `app.config.ts` | `vite.plugins: [...]` |
 | Nuxt (Module) | `nuxt.config.ts` | `modules: ['@vite-asset-manager/nuxt']` |
@@ -535,7 +446,6 @@ Then access the dashboard directly at: `http://localhost:5173/__asset_manager__/
 2. **Verify script order**
    - Asset Manager scripts should come **after** framework scripts
    - In TanStack Start: after `<Scripts />`
-   - In Next.js: after `<NextScript />`
    - In Remix: after `<Scripts />`
 
 3. **Check browser console for errors**
@@ -698,7 +608,7 @@ The Asset Manager only runs in development mode (`apply: 'serve'`). It will not 
 
 To ensure scripts are only injected in development:
 
-**React/Next.js/Remix:**
+**React/Remix:**
 ```tsx
 {process.env.NODE_ENV === 'development' && (
   <script ... />
@@ -783,7 +693,7 @@ For frameworks with static `index.html` files (React, Vue, Svelte, Solid, Preact
 
 ### Streaming SSR Frameworks (Manual)
 
-For streaming SSR frameworks (TanStack Start, Next.js App Router, Remix, Solid Start):
+For streaming SSR frameworks (TanStack Start, Remix, Solid Start):
 
 - ⚠️ Manual script injection required in root component
 - ⚠️ Must maintain scripts if changing frameworks
@@ -796,7 +706,7 @@ For streaming SSR frameworks (TanStack Start, Next.js App Router, Remix, Solid S
 
 We're exploring ways to make SSR integration more automatic:
 
-- **Framework-specific plugins**: Dedicated plugins for TanStack Start, Next.js, etc.
+- **Framework-specific plugins**: Dedicated plugins for TanStack Start, Remix, etc.
 - **Auto-detection**: Detect framework and provide setup instructions
 - **CLI setup command**: `npx vite-plugin-asset-manager setup tanstack-start`
 - **Alternative injection methods**: Vite middleware hooks, framework-specific APIs
