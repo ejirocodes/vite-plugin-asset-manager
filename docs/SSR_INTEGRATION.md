@@ -9,8 +9,9 @@ The plugin uses two injection methods depending on your framework:
 1. **Automatic (transformIndexHtml)**: For frameworks with static `index.html` files
    ✅ React, Vue, Svelte, Solid, Preact, Lit, Qwik, Vanilla
 
-2. **Official Framework Module**: Native integration with auto-injection
+2. **Official Framework Packages**: Native integration with auto-injection
    ✅ Nuxt (`@vite-asset-manager/nuxt`)
+   ✅ Next.js (`nextjs-asset-manager`)
 
 3. **Manual Component Injection**: For other SSR frameworks
    ⚠️ TanStack Start, Remix, SvelteKit, Solid Start
@@ -26,6 +27,91 @@ SSR frameworks dynamically generate HTML and don't use static `index.html` files
 - This applies to all modern SSR frameworks (TanStack Start, Remix, Nuxt, SvelteKit, Solid Start)
 
 **The Solution**: Add the floating icon scripts directly in your framework's root component.
+
+---
+
+## Next.js Setup
+
+### Recommended: Official Next.js Package
+
+The easiest way to use Asset Manager with Next.js is via the official package `nextjs-asset-manager`:
+
+#### Step 1: Install the Package
+
+```bash
+npm install nextjs-asset-manager -D
+# or
+pnpm add nextjs-asset-manager -D
+```
+
+#### Step 2: Create an API Route Handler
+
+Create a catch-all API route to handle all Asset Manager requests:
+
+```typescript
+// app/api/asset-manager/[[...path]]/route.ts
+import { createHandler } from 'nextjs-asset-manager'
+
+const { GET, POST } = createHandler({
+  // Optional: customize settings
+  include: ['src', 'public', 'app'],   // Directories to scan (default: ['app', 'public', 'src'])
+  launchEditor: 'code',                // Editor for "Open in Editor" (default: 'code')
+  watch: true,                         // Real-time updates (default: true)
+  debug: false,                        // Enable debug logging
+  aliases: { '@/': 'src/' },           // Path aliases for import detection
+})
+
+export { GET, POST }
+```
+
+#### Step 3: Add the Client Component
+
+Add `AssetManagerScript` to your root layout for floating icon injection:
+
+```tsx
+// app/layout.tsx
+import { AssetManagerScript } from 'nextjs-asset-manager'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <AssetManagerScript />
+      </body>
+    </html>
+  )
+}
+```
+
+That's it! The package automatically:
+- ✅ Creates API endpoints for asset management
+- ✅ Injects the floating icon (no manual script injection)
+- ✅ Only runs in development mode (returns 404 in production)
+- ✅ Survives Next.js HMR re-evaluation (globalThis singleton)
+
+#### Step 4: Access the Dashboard
+
+- **Floating Icon**: Click the overlay button or press `Option+Shift+A` (⌥⇧A)
+- **Direct URL**: Visit `http://localhost:3000/api/asset-manager/`
+
+### Next.js-Specific Notes
+
+**Default Base Path**: The default base path is `/api/asset-manager` instead of `/__asset_manager__`. This is because Next.js treats folders starting with `_` as [private folders](https://nextjs.org/docs/app/getting-started/project-structure#private-folders) and excludes them from routing.
+
+**Custom Base Path**: If you want a different base path, update both the handler and the component:
+
+```typescript
+// route.ts
+const { GET, POST } = createHandler({ base: '/api/assets' })
+
+// layout.tsx
+<AssetManagerScript base="/api/assets" />
+```
+
+**Web API Adapter**: Next.js App Router uses Web API `Request`/`Response` objects, while the core middleware uses Node.js HTTP. The package includes an adapter that bridges these transparently.
+
+**HMR Singleton**: The package uses a `globalThis` singleton pattern (similar to Prisma) to prevent re-initialization during Next.js hot module replacement.
 
 ---
 
@@ -388,6 +474,7 @@ All SSR frameworks use the same plugin options. The configuration file varies by
 
 | Framework | Config File | Plugin Location |
 |-----------|-------------|-----------------|
+| Next.js | `app/api/.../route.ts` | `createHandler()` from `nextjs-asset-manager` |
 | TanStack Start | `vite.config.ts` | `plugins: [...]` |
 | Remix | `vite.config.ts` | `plugins: [...]` |
 | Solid Start | `app.config.ts` | `vite.plugins: [...]` |
@@ -690,6 +777,15 @@ For frameworks with static `index.html` files (React, Vue, Svelte, Solid, Preact
 - ✅ Fully automatic - no manual setup needed
 - ✅ Plugin injects scripts via `transformIndexHtml()` hook
 - ✅ Zero configuration required
+
+### Official Integration Packages (Automatic)
+
+For frameworks with official packages (Nuxt, Next.js):
+
+- ✅ Automatic setup with minimal configuration
+- ✅ Floating icon auto-injection
+- ✅ Framework-specific defaults and conventions
+- ✅ Dev-only (zero production footprint)
 
 ### Streaming SSR Frameworks (Manual)
 

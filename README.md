@@ -88,6 +88,7 @@ Start your dev server and access the Asset Manager in three ways:
 | Solid | ✅ | Fully automatic |
 | Qwik | ✅ | Fully automatic |
 | **Nuxt 3/4** | ✅ | [Official module](#nuxt-module) |
+| **Next.js 14+** | ✅ | [Official package](#nextjs-integration) |
 | **TanStack Start** | ✅ | [Manual setup required](./docs/SSR_INTEGRATION.md#tanstack-start-setup) ([playground](./playgrounds/tanstack/)) |
 
 ### Nuxt Module
@@ -110,6 +111,48 @@ Features:
 - Nuxt DevTools integration
 - Supports Nuxt 3 and 4 directory structures
 - Dev-only (zero production footprint)
+
+### Next.js Integration
+
+For Next.js 14+ projects, use the official integration package:
+
+```bash
+npm install nextjs-asset-manager -D
+```
+
+**Step 1:** Create an API catch-all route:
+
+```ts
+// app/api/asset-manager/[[...path]]/route.ts
+import { createHandler } from 'nextjs-asset-manager'
+
+const { GET, POST } = createHandler()
+export { GET, POST }
+```
+
+**Step 2:** Add the client component to your root layout:
+
+```tsx
+// app/layout.tsx
+import { AssetManagerScript } from 'nextjs-asset-manager'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <AssetManagerScript />
+      </body>
+    </html>
+  )
+}
+```
+
+Features:
+- Dev-only (returns 404 in production)
+- Automatic floating icon injection via client component
+- Default base path: `/api/asset-manager`
+- Singleton management for HMR stability
 
 ### Other SSR Frameworks
 
@@ -207,6 +250,7 @@ pnpm run playground:solid
 pnpm run playground:qwik
 pnpm run playground:tanstack
 pnpm run playground:nuxt
+pnpm run playground:nextjs
 ```
 
 ## License

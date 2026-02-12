@@ -20,6 +20,7 @@ The project uses a monorepo architecture with three packages:
 | `vite-plugin-asset-manager` | Main Vite plugin (re-exports from core) | Root `./` |
 | `@vite-asset-manager/core` | Core functionality (scanners, API, middleware) | `packages/core/` |
 | `@vite-asset-manager/nuxt` | Official Nuxt module | `packages/nuxt/` |
+| `nextjs-asset-manager` | Official Next.js integration | `packages/nextjs/` |
 
 **Dependency Graph**:
 ```
@@ -27,6 +28,9 @@ vite-plugin-asset-manager
     └── @vite-asset-manager/core
 
 @vite-asset-manager/nuxt
+    └── @vite-asset-manager/core
+
+nextjs-asset-manager
     └── @vite-asset-manager/core
 ```
 
@@ -44,18 +48,19 @@ vite-plugin-asset-manager
 
 **SSR Frameworks with Official Modules**:
 - [x] Nuxt 3/4 - Use `@vite-asset-manager/nuxt` module (automatic floating icon injection + DevTools integration)
+- [x] Next.js 14+ - Use `nextjs-asset-manager` package (API route handler + client component)
 
 **SSR Frameworks** (manual script injection required):
 - [x] TanStack Start (has playground: `playgrounds/tanstack/`)
 
-See `docs/SSR_INTEGRATION.md` for setup instructions for TanStack Start, Remix, SvelteKit, and Solid Start.
+See `docs/SSR_INTEGRATION.md` for setup instructions for Next.js, TanStack Start, Remix, SvelteKit, and Solid Start.
 
 ## Build Commands
 
 ```bash
 pnpm install                  # Install all deps (root + packages + playgrounds)
 pnpm run build:all            # Build everything (packages → main plugin → copy client to core)
-pnpm run build:packages       # Build core + nuxt packages
+pnpm run build:packages       # Build core + nuxt + nextjs packages
 pnpm run build                # Build main plugin (runs build:ui → build:floating-icon → build:plugin)
 pnpm run build:ui             # Build React dashboard using Vite → dist/client/
 pnpm run build:floating-icon  # Build floating icon component → dist/client/floating-icon.js
@@ -64,7 +69,7 @@ pnpm run dev                  # Watch mode for plugin development using tsup
 ```
 
 **Build Order**:
-1. `build:packages` - Builds `@vite-asset-manager/core` then `@vite-asset-manager/nuxt`
+1. `build:packages` - Builds `@vite-asset-manager/core` then `@vite-asset-manager/nuxt` then `nextjs-asset-manager`
 2. `build:ui` - React dashboard
 3. `build:floating-icon` - Floating icon IIFE
 4. `build:plugin` - Main Vite plugin
@@ -109,6 +114,7 @@ The `playgrounds/` directory contains framework-specific demo projects:
 - `playgrounds/solid/` - Vite+Solid demo
 - `playgrounds/qwik/` - Vite+Qwik demo
 - `playgrounds/nuxt/` - Nuxt 3 demo (uses `@vite-asset-manager/nuxt` module)
+- `playgrounds/nextjs/` - Next.js demo (uses `nextjs-asset-manager` package)
 - `playgrounds/tanstack/` - TanStack Start demo (manual script injection)
 
 ```bash
@@ -126,6 +132,7 @@ pnpm run playground:solid
 pnpm run playground:qwik
 pnpm run playground:tanstack   # TanStack Start playground (manual SSR integration)
 pnpm run playground:nuxt       # Nuxt playground (uses official module)
+pnpm run playground:nextjs     # Next.js playground (uses nextjs-asset-manager)
 ```
 
 Each playground imports the plugin directly from `../../src/index` (no pnpm link needed). They also include `vite-plugin-inspect` for debugging Vite internals.
@@ -229,6 +236,36 @@ export default defineNuxtConfig({
 })
 ```
 
+### Next.js Integration (`packages/nextjs/`)
+
+The `nextjs-asset-manager` package provides first-class Next.js 14+ support. Published under `nextjs-asset-manager` (not under `@vite-asset-manager/` scope).
+
+**Structure**:
+- `src/index.ts` - Main exports (`createHandler`, `AssetManagerScript`, core type re-exports)
+- `src/handler.ts` - `createHandler()` factory returning `{ GET, POST }` route handlers
+- `src/adapter.ts` - Web API (`Request`/`Response`) ↔ Node.js HTTP (`IncomingMessage`/`ServerResponse`) bridge
+- `src/singleton.ts` - `globalThis` singleton management (survives Next.js HMR re-evaluation)
+- `src/components/AssetManagerScript.tsx` - `'use client'` component for floating icon injection
+
+**Key Differences from Nuxt**:
+- Default base path: `/api/asset-manager` (Next.js treats `_`-prefixed folders as private)
+- Default includes: `['app', 'public', 'src']` (Next.js directory conventions)
+- Uses Web API adapter (Next.js App Router uses `Request`/`Response`, not Node.js HTTP)
+- Uses `globalThis` with `Symbol.for()` keys for singleton (Prisma-style HMR pattern)
+- Dev-only: returns 404 in production via `NODE_ENV` check
+
+**Configuration** (Next.js App Router):
+```typescript
+// app/api/asset-manager/[[...path]]/route.ts
+import { createHandler } from 'nextjs-asset-manager'
+const { GET, POST } = createHandler()
+export { GET, POST }
+
+// app/layout.tsx
+import { AssetManagerScript } from 'nextjs-asset-manager'
+// Add <AssetManagerScript /> before </body>
+```
+
 ### TypeScript Configuration
 
 - Root `tsconfig.json` - Plugin code (excludes `src/ui/` and `src/client/`), uses `@/*` → `./src/*` alias
@@ -236,6 +273,7 @@ export default defineNuxtConfig({
 - `src/client/floating-icon/tsconfig.json` - Floating icon code targeting ES2020 with DOM libs
 - `packages/core/tsconfig.json` - Core package with Node types
 - `packages/nuxt/tsconfig.json` - Nuxt module with @nuxt/kit types
+- `packages/nextjs/tsconfig.json` - Next.js integration with DOM libs, JSX react-jsx
 
 ### shadcn/ui Configuration (`components.json`)
 
