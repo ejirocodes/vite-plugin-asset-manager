@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import type { Asset } from '@/ui/types'
+import { getApiBase } from '@/ui/lib/api-base'
 import { ImagePreview } from './renderers/image-preview'
 import { VideoPreview } from './renderers/video-preview'
 import { AudioPreview } from './renderers/audio-preview'
@@ -31,7 +32,7 @@ export const PreviewSection = memo(function PreviewSection({
         return <FontPreview asset={asset} />
       case 'document':
         if (asset.extension === '.pdf') {
-          const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
+          const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
           return (
             <iframe
               src={fileUrl}

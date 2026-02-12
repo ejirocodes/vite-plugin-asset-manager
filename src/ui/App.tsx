@@ -38,6 +38,7 @@ import {
   LightningIcon
 } from '@phosphor-icons/react'
 import { useEmbeddedMode } from './hooks/useEmbeddedMode'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset, AssetType } from './types'
 
 const LoadingSpinner = (
@@ -301,14 +302,14 @@ export default function App() {
   const handleOpenInEditor = useCallback(async (asset: Asset) => {
     try {
       const response = await fetch(
-        `/__asset_manager__/api/importers?path=${encodeURIComponent(asset.path)}`
+        `${getApiBase()}/api/importers?path=${encodeURIComponent(asset.path)}`
       )
       if (response.ok) {
         const data = await response.json()
         if (data.importers && data.importers.length > 0) {
           const firstImporter = data.importers[0]
           await fetch(
-            `/__asset_manager__/api/open-in-editor?file=${encodeURIComponent(firstImporter.file)}&line=${firstImporter.line}&column=${firstImporter.column}`,
+            `${getApiBase()}/api/open-in-editor?file=${encodeURIComponent(firstImporter.file)}&line=${firstImporter.line}&column=${firstImporter.column}`,
             { method: 'POST' }
           )
         }
@@ -321,7 +322,7 @@ export default function App() {
   const handleRevealInFinder = useCallback(async (asset: Asset) => {
     try {
       await fetch(
-        `/__asset_manager__/api/reveal-in-finder?path=${encodeURIComponent(asset.path)}`,
+        `${getApiBase()}/api/reveal-in-finder?path=${encodeURIComponent(asset.path)}`,
         { method: 'POST' }
       )
     } catch (err) {

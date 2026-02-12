@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { AssetGroup, AssetType, UseAssetsResult } from '../types'
 import { useSSE } from './useSSE'
 
@@ -31,8 +32,8 @@ export function useAssets(
 
       const queryString = params.toString()
       const url = queryString
-        ? `/__asset_manager__/api/assets/grouped?${queryString}`
-        : '/__asset_manager__/api/assets/grouped'
+        ? `${getApiBase()}/api/assets/grouped?${queryString}`
+        : `${getApiBase()}/api/assets/grouped`
 
       const res = await fetch(url)
       if (!res.ok) throw new Error('Failed to fetch assets')

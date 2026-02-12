@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset, UseDuplicatesResult } from '../types'
 import { useSSE } from './useSSE'
 
@@ -19,7 +20,7 @@ export function useDuplicates(contentHash: string | undefined): UseDuplicatesRes
       setLoading(true)
       setError(null)
       const res = await fetch(
-        `/__asset_manager__/api/duplicates?hash=${encodeURIComponent(contentHash)}`
+        `${getApiBase()}/api/duplicates?hash=${encodeURIComponent(contentHash)}`
       )
       if (!res.ok) throw new Error('Failed to fetch duplicates')
       const data = await res.json()

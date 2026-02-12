@@ -1,4 +1,5 @@
 import { memo, useState, useEffect, useId } from 'react'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '@/ui/types'
 
 interface FontPreviewProps {
@@ -13,7 +14,7 @@ export const FontPreview = memo(function FontPreview({ asset }: FontPreviewProps
   const [error, setError] = useState(false)
   const fontId = useId()
   const fontFamily = `preview-font-${fontId.replace(/:/g, '-')}`
-  const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
 
   useEffect(() => {
     const loadFont = async () => {

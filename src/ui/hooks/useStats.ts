@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { getApiBase } from '@/ui/lib/api-base'
 import { useSSE } from './useSSE'
 
 interface Stats {
@@ -46,7 +47,7 @@ export function useStats(): UseStatsResult {
   const fetchStats = useCallback(async () => {
     try {
       setError(null)
-      const res = await fetch('/__asset_manager__/api/stats')
+      const res = await fetch(`${getApiBase()}/api/stats`)
       if (!res.ok) throw new Error('Failed to fetch stats')
       const data = await res.json()
       setStats({

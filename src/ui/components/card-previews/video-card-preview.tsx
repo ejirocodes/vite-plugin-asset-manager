@@ -1,6 +1,7 @@
 import { memo, useRef, useState, useEffect, useCallback } from 'react'
 import { PlayIcon } from '@phosphor-icons/react'
 import { FileIcon } from '../file-icon'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '@/ui/types'
 
 interface VideoCardPreviewProps {
@@ -13,7 +14,7 @@ export const VideoCardPreview = memo(function VideoCardPreview({ asset }: VideoC
   const [error, setError] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
 
-  const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
 
   const handleError = useCallback(() => setError(true), [])
 

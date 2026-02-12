@@ -8,6 +8,7 @@ import {
   SquareIcon
 } from '@phosphor-icons/react'
 import { Button } from '@/ui/components/ui/button'
+import { getApiBase } from '@/ui/lib/api-base'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,7 +61,7 @@ export const BulkActionsBar = memo(function BulkActionsBar({
     setIsDownloading(true)
     try {
       const paths = selectedAssets.map(a => a.path)
-      const response = await fetch('/__asset_manager__/api/bulk-download', {
+      const response = await fetch(`${getApiBase()}/api/bulk-download`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paths })

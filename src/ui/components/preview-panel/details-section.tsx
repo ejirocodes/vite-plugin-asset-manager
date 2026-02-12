@@ -1,6 +1,7 @@
 import { memo, useCallback, useState } from 'react'
 import { CopyIcon, CheckIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '@/ui/types'
 
 interface DetailsSectionProps {
@@ -149,7 +150,7 @@ export const DetailsSection = memo(function DetailsSection({
   imageDimensions
 }: DetailsSectionProps) {
   const publicPath = getPublicPath(asset)
-  const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
 
   return (
     <div className="p-4">

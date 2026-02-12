@@ -2,6 +2,7 @@ import { memo, useCallback } from 'react'
 import { DownloadIcon, EyeSlashIcon, EyeIcon } from '@phosphor-icons/react'
 import { Button } from '@/ui/components/ui/button'
 import { useIgnoredAssets } from '@/ui/providers/ignored-assets-provider'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '@/ui/types'
 
 interface ActionsSectionProps {
@@ -9,7 +10,7 @@ interface ActionsSectionProps {
 }
 
 export const ActionsSection = memo(function ActionsSection({ asset }: ActionsSectionProps) {
-  const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
   const { isIgnored, toggleIgnored } = useIgnoredAssets()
   const ignored = isIgnored(asset.path)
 

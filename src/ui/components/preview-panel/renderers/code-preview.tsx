@@ -1,5 +1,6 @@
 import { memo, useState, useEffect } from 'react'
 import { SpinnerIcon } from '@phosphor-icons/react'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '@/ui/types'
 
 interface CodePreviewProps {
@@ -22,7 +23,7 @@ export const CodePreview = memo(function CodePreview({ asset }: CodePreviewProps
 
       try {
         const response = await fetch(
-          `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
+          `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
         )
 
         if (!response.ok) {

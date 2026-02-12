@@ -1,5 +1,6 @@
 import { memo, useState, useCallback } from 'react'
 import { MusicNoteIcon } from '@phosphor-icons/react'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '@/ui/types'
 
 interface AudioPreviewProps {
@@ -8,7 +9,7 @@ interface AudioPreviewProps {
 
 export const AudioPreview = memo(function AudioPreview({ asset }: AudioPreviewProps) {
   const [error, setError] = useState(false)
-  const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
 
   const handleError = useCallback(() => setError(true), [])
 

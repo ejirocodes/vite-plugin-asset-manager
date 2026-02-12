@@ -4,6 +4,7 @@ import { useIgnoredAssets } from '../providers/ignored-assets-provider'
 import { useImporters } from './useImporters'
 import { useBulkOperations } from './useBulkOperations'
 import { generateCodeSnippets, type SnippetType } from '@/ui/lib/code-snippets'
+import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '../types'
 
 interface UseAssetActionsProps {
@@ -102,7 +103,7 @@ export function useAssetActions({ asset, onPreview }: UseAssetActionsProps): Use
   const handleRevealInFinder = useCallback(async () => {
     try {
       const response = await fetch(
-        `/__asset_manager__/api/reveal-in-finder?path=${encodeURIComponent(asset.path)}`,
+        `${getApiBase()}/api/reveal-in-finder?path=${encodeURIComponent(asset.path)}`,
         { method: 'POST' }
       )
 

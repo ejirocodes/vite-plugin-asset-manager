@@ -2,6 +2,7 @@ import { memo, useState, useCallback } from 'react'
 import { DownloadIcon, WarningIcon } from '@phosphor-icons/react'
 import type { Asset } from '@/ui/types'
 import { Button } from '@/ui/components/ui/button'
+import { getApiBase } from '@/ui/lib/api-base'
 
 interface VideoPreviewProps {
   asset: Asset
@@ -9,8 +10,8 @@ interface VideoPreviewProps {
 
 export const VideoPreview = memo(function VideoPreview({ asset }: VideoPreviewProps) {
   const [error, setError] = useState(false)
-  const fileUrl = `/__asset_manager__/api/file?path=${encodeURIComponent(asset.path)}`
-  const thumbnailUrl = `/__asset_manager__/api/thumbnail?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
+  const thumbnailUrl = `${getApiBase()}/api/thumbnail?path=${encodeURIComponent(asset.path)}`
   const extension = asset.path.split('.').pop()?.toUpperCase() || 'VIDEO'
 
   const handleError = useCallback(() => setError(true), [])
