@@ -51,7 +51,8 @@
     "playground:qwik": "pnpm --filter playground-qwik dev",
     "playground:tanstack": "pnpm --filter playground-tanstack dev",
     "playground:nuxt": "pnpm --filter playground-nuxt dev",
-    "build:packages": "pnpm --filter @vite-asset-manager/core build && pnpm --filter @vite-asset-manager/nuxt build"
+    "playground:nextjs": "pnpm --filter playground-nextjs dev",
+    "build:packages": "pnpm --filter @vite-asset-manager/core build && pnpm --filter @vite-asset-manager/nuxt build && pnpm --filter nextjs-asset-manager build"
   },
   "publishConfig": {
     "access": "public"
