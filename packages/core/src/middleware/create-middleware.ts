@@ -87,16 +87,41 @@ export function createAssetManagerMiddleware(
   const clientDir = findClientDir()
   const staticServe = sirv(clientDir, { single: true, dev: true })
 
+  // The dashboard UI is built with a hardcoded base path. When the configured
+  // base differs (e.g. '/api/asset-manager' for Next.js), rewrite asset paths
+  // in index.html so JS/CSS references point to the correct location.
+  const BUILD_TIME_BASE = '/__asset_manager__'
+  let rewrittenHtml: string | null = null
+  if (base !== BUILD_TIME_BASE) {
+    const htmlPath = path.join(clientDir, 'index.html')
+    if (fs.existsSync(htmlPath)) {
+      const raw = fs.readFileSync(htmlPath, 'utf-8')
+      rewrittenHtml = raw.replaceAll(BUILD_TIME_BASE, base)
+    }
+  }
+
   return (req: IncomingMessage, res: ServerResponse, next: NextFunction) => {
     const url = req.url || ''
+    // Strip query string for path matching (req.url includes ?query)
+    const qIndex = url.indexOf('?')
+    const pathname = qIndex >= 0 ? url.slice(0, qIndex) : url
 
     // Handle API requests
-    if (url.startsWith(`${base}/api/`)) {
+    if (pathname.startsWith(`${base}/api/`)) {
       return apiRouter(req, res, next)
     }
 
     // Handle static UI requests
-    if (url === base || url.startsWith(`${base}/`)) {
+    if (pathname === base || pathname.startsWith(`${base}/`)) {
+      // If the base path differs from build-time default, serve rewritten
+      // index.html directly for non-asset requests (SPA fallback)
+      const subPath = pathname.slice(base.length)
+      if (rewrittenHtml && (subPath === '' || subPath === '/')) {
+        res.setHeader('Content-Type', 'text/html')
+        res.end(rewrittenHtml)
+        return
+      }
+
       // Rewrite URL for sirv to serve from root
       req.url = url.slice(base.length) || '/'
       return staticServe(req, res, () => {
