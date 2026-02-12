@@ -1,21 +1,23 @@
 # Vite Plugin Asset Manager - Architecture & Design Decisions
 
 ## Overview
-A Vite plugin that provides a visual dashboard for browsing assets in Vite projects (supports React, Vue, Svelte, Solid, Preact, Lit, Qwik, Nuxt, and vanilla JS), accessible at `/__asset_manager__` during development.
+A Vite plugin that provides a visual dashboard for browsing assets in Vite projects (supports React, Vue, Svelte, Solid, Preact, Lit, Qwik, Nuxt, Next.js, and vanilla JS), accessible at `/__asset_manager__` during development.
 
 ## Monorepo Structure
 
-The project uses a pnpm workspace monorepo with three packages:
+The project uses a pnpm workspace monorepo with four packages:
 
 | Package | Location | Description |
 |---------|----------|-------------|
 | `vite-plugin-asset-manager` | Root `./` | Main Vite plugin |
 | `@vite-asset-manager/core` | `packages/core/` | Core functionality (scanners, API, middleware) |
 | `@vite-asset-manager/nuxt` | `packages/nuxt/` | Official Nuxt 3/4 module |
+| `nextjs-asset-manager` | `packages/nextjs/` | Official Next.js 14+ integration |
 
 **Dependency Graph**:
 - `vite-plugin-asset-manager` → `@vite-asset-manager/core`
 - `@vite-asset-manager/nuxt` → `@vite-asset-manager/core`
+- `nextjs-asset-manager` → `@vite-asset-manager/core`
 
 ## Key Design Decisions
 
@@ -483,6 +485,47 @@ Framework-agnostic overlay button providing quick access to the Asset Manager da
 - **Format**: IIFE (self-executing) with `emptyOutDir: false` to preserve UI build
 - **Output**: `dist/client/floating-icon.js` (minified with esbuild)
 - **Build order**: `build:ui` → `build:floating-icon` → `build:plugin`
+
+## Next.js Integration (`packages/nextjs/`)
+
+The `nextjs-asset-manager` package provides a thin adapter layer between Next.js App Router and the core asset manager.
+
+### Architecture (5 source files)
+
+- **`handler.ts`** - `createHandler(options?)` factory function
+  - Returns `{ GET, POST }` route handlers for Next.js catch-all routes
+  - Dev-only guard: returns 404 in production
+  - Default base path: `/api/asset-manager` (not `/__asset_manager__` — Next.js treats `_`-prefixed folders as private)
+  - Default includes: `['app', 'public', 'src']`
+
+- **`adapter.ts`** - Web API ↔ Node.js HTTP bridge (278 lines)
+  - `MockIncomingMessage` (extends `Readable`): Wraps Web API `Request` as Node.js `IncomingMessage`
+  - `MockServerResponse` (extends `Writable`): Captures output and converts to Web API `Response`
+  - Handles JSON, binary streaming, SSE (`text/event-stream`), and range requests (206)
+  - `callMiddleware(request, middleware)`: Main bridge function
+
+- **`singleton.ts`** - Singleton management using `globalThis` with `Symbol.for()` keys
+  - Survives Next.js HMR module re-evaluation (Prisma-style pattern)
+  - Three keys: `__vam_asset_manager__`, `__vam_middleware__`, `__vam_init_promise__`
+  - `getOrCreateMiddleware(root, options)`: Creates or returns cached middleware
+  - `destroyInstance()`: Cleanup for testing
+
+- **`components/AssetManagerScript.tsx`** - `'use client'` React component
+  - Dev-only rendering (returns `null` in production)
+  - Injects two `next/Script` tags: global `window.__VAM_BASE_URL__` setup + floating icon loader
+  - Props: `base?: string` (default: `'/api/asset-manager'`)
+
+- **`index.ts`** - Re-exports: `createHandler`, `AssetManagerScript`, core types
+
+### Key Design Decisions
+- **Published as `nextjs-asset-manager`** (not `@vite-asset-manager/nextjs`) to match Next.js ecosystem conventions
+- **Web API adapter pattern** required because core middleware uses Node.js HTTP (`IncomingMessage`/`ServerResponse`) but Next.js App Router uses Web API (`Request`/`Response`)
+- **`globalThis` singleton** prevents re-initialization during Next.js HMR, which re-evaluates modules
+- **Catch-all route** (`[[...path]]`) captures all API sub-paths in a single route file
+
+### Build
+- Config: `tsup.config.ts` — ESM + CJS, external core/react/next
+- Build order: core → nuxt → **nextjs** (part of `build:packages`)
 
 ## Future Considerations / In Progress
 

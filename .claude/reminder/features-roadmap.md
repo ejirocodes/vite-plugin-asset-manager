@@ -728,6 +728,29 @@ Added TanStack Start playground with manual SSR script injection.
 
 ---
 
+### 15. ~~Next.js Integration~~ ✓ IMPLEMENTED (New Feature)
+**Status**: ✅ Complete
+**Impact**: High (Framework Support)
+
+Official Next.js 14+ integration package published as `nextjs-asset-manager`.
+
+**Implementation**:
+- `packages/nextjs/src/handler.ts` - `createHandler()` factory returning `{ GET, POST }` route handlers
+- `packages/nextjs/src/adapter.ts` - Web API ↔ Node.js HTTP adapter (bridges `Request`/`Response` to `IncomingMessage`/`ServerResponse`)
+- `packages/nextjs/src/singleton.ts` - `globalThis` singleton management (survives Next.js HMR)
+- `packages/nextjs/src/components/AssetManagerScript.tsx` - `'use client'` component for floating icon injection
+- `playgrounds/nextjs/` - Full Next.js demo project
+- `playground:nextjs` script in root `package.json`
+
+**Key Decisions**:
+- Published as `nextjs-asset-manager` (not `@vite-asset-manager/nextjs`) for ecosystem conventions
+- Default base path: `/api/asset-manager` (Next.js treats `_`-prefixed folders as private)
+- Default includes: `['app', 'public', 'src']` (Next.js directory structure)
+- Uses `globalThis` with `Symbol.for()` for HMR-safe singleton (Prisma pattern)
+- Dev-only: returns 404 in production via `NODE_ENV` check
+
+---
+
 ## Priority Recommendations
 
 ### High Priority (Core Functionality) - ALL DONE ✓
@@ -774,5 +797,5 @@ Added TanStack Start playground with manual SSR script injection.
 
 ### Testing New Features
 - Add feature flags for experimental features
-- Use playgrounds for manual testing (react, vue, vanilla, preact, lit, svelte, solid, qwik, tanstack, nuxt)
+- Use playgrounds for manual testing (react, vue, vanilla, preact, lit, svelte, solid, qwik, tanstack, nuxt, nextjs)
 - Document breaking changes clearly

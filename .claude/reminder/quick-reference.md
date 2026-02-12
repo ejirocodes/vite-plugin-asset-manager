@@ -5,7 +5,7 @@
 # Build everything (packages + main plugin + copy client to core)
 pnpm run build:all
 
-# Build packages only (core + nuxt)
+# Build packages only (core + nuxt + nextjs)
 pnpm run build:packages
 
 # Build main plugin only (UI + floating icon + plugin)
@@ -34,7 +34,9 @@ pnpm run playground:solid    # Solid playground
 pnpm run playground:qwik     # Qwik playground
 pnpm run playground:tanstack # TanStack Start playground (manual SSR integration)
 pnpm run playground:nuxt     # Nuxt playground (uses @vite-asset-manager/nuxt)
+pnpm run playground:nextjs   # Next.js playground (uses nextjs-asset-manager)
 # Then visit: http://localhost:5173/__asset_manager__
+# For Next.js: http://localhost:3000/api/asset-manager
 
 # Testing (16 test files: 6 server + 10 UI)
 pnpm run test          # Run all tests once
@@ -66,11 +68,20 @@ packages/
 │       └── types/
 │           └── index.ts             # Shared TypeScript types
 │
-└── nuxt/                    # @vite-asset-manager/nuxt
+├── nuxt/                    # @vite-asset-manager/nuxt
+│   └── src/
+│       ├── module.ts            # Nuxt module definition
+│       └── runtime/
+│           └── plugin.client.ts # Client-side floating icon injection
+│
+└── nextjs/                  # nextjs-asset-manager
     └── src/
-        ├── module.ts            # Nuxt module definition
-        └── runtime/
-            └── plugin.client.ts # Client-side floating icon injection
+        ├── index.ts             # Main exports
+        ├── handler.ts           # createHandler() factory (GET/POST)
+        ├── adapter.ts           # Web API ↔ Node.js HTTP bridge
+        ├── singleton.ts         # globalThis singleton management
+        └── components/
+            └── AssetManagerScript.tsx # Client component for script injection
 
 src/                         # Main vite-plugin-asset-manager
 ├── index.ts          # Entry point, exports plugin function
@@ -272,7 +283,8 @@ curl -N "http://localhost:5173/__asset_manager__/api/events"
 Packages must be published in dependency order:
 1. `@vite-asset-manager/core` (no internal deps)
 2. `@vite-asset-manager/nuxt` (depends on core)
-3. `vite-plugin-asset-manager` (depends on core)
+3. `nextjs-asset-manager` (depends on core)
+4. `vite-plugin-asset-manager` (depends on core)
 
 ```bash
 # Build all packages
@@ -281,13 +293,14 @@ pnpm run build:all
 # Publish in order (from each package directory)
 cd packages/core && pnpm publish
 cd packages/nuxt && pnpm publish
+cd packages/nextjs && pnpm publish
 cd ../.. && pnpm publish
 ```
 
 Note: `workspace:*` dependencies are automatically converted to actual version numbers during publish.
 
 ## Playgrounds
-Ten framework playgrounds are available:
+Eleven framework playgrounds are available:
 - `playgrounds/react/` - Vite+React
 - `playgrounds/vue/` - Vite+Vue
 - `playgrounds/vanilla/` - Vite+Vanilla (no framework)
@@ -298,6 +311,7 @@ Ten framework playgrounds are available:
 - `playgrounds/qwik/` - Vite+Qwik
 - `playgrounds/tanstack/` - TanStack Start (manual SSR integration)
 - `playgrounds/nuxt/` - Nuxt 3 (uses `@vite-asset-manager/nuxt` module)
+- `playgrounds/nextjs/` - Next.js (uses `nextjs-asset-manager` package)
 
 Each includes test assets in `src/assets/` and `public/` directories.
 
