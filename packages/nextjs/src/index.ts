@@ -1,13 +1,16 @@
-// Handler
 export { createHandler, type NextAssetManagerOptions } from './handler.js'
 
-// Client component
+export {
+  withAssetManager,
+  type WithAssetManagerOptions,
+} from './with-asset-manager.js'
+
 export {
   AssetManagerScript,
   type AssetManagerScriptProps,
 } from './components/AssetManagerScript.js'
 
-// Re-export commonly used types from core
+// Re-exporting commonly used types from core module
 export type {
   AssetManagerOptions,
   Asset,
