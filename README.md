@@ -120,7 +120,18 @@ For Next.js 14+ projects, use the official integration package:
 npm install nextjs-asset-manager -D
 ```
 
-**Step 1:** Create an API catch-all route:
+**Step 1:** Wrap your Next.js config to suppress dev server request logging:
+
+```ts
+// next.config.ts
+import type { NextConfig } from "next"
+import { withAssetManager } from "nextjs-asset-manager"
+
+const nextConfig: NextConfig = {}
+export default withAssetManager(nextConfig)
+```
+
+**Step 2:** Create an API catch-all route:
 
 ```ts
 // app/api/asset-manager/[[...path]]/route.ts
@@ -130,7 +141,7 @@ const { GET, POST } = createHandler()
 export { GET, POST }
 ```
 
-**Step 2:** Add the client component to your root layout:
+**Step 3:** Add the client component to your root layout:
 
 ```tsx
 // app/layout.tsx
@@ -151,8 +162,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 Features:
 - Dev-only (returns 404 in production)
 - Automatic floating icon injection via client component
+- Suppresses asset manager request logging in dev server
 - Default base path: `/api/asset-manager`
 - Singleton management for HMR stability
+- Composable with other `withX` plugins (`withSentryConfig`, `withBundleAnalyzer`, etc.)
 
 ### Other SSR Frameworks
 

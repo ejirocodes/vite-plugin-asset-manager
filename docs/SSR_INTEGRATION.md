@@ -44,7 +44,29 @@ npm install nextjs-asset-manager -D
 pnpm add nextjs-asset-manager -D
 ```
 
-#### Step 2: Create an API Route Handler
+#### Step 2: Wrap Your Next.js Config
+
+Wrap your `next.config.ts` with `withAssetManager` to automatically suppress dev server request logging for asset manager API routes:
+
+```typescript
+// next.config.ts
+import type { NextConfig } from "next"
+import { withAssetManager } from "nextjs-asset-manager"
+
+const nextConfig: NextConfig = {
+  // Your existing config
+}
+
+export default withAssetManager(nextConfig)
+```
+
+If you use a custom base path, pass it as an option:
+
+```typescript
+export default withAssetManager(nextConfig, { base: '/api/assets' })
+```
+
+#### Step 3: Create an API Route Handler
 
 Create a catch-all API route to handle all Asset Manager requests:
 
@@ -64,7 +86,7 @@ const { GET, POST } = createHandler({
 export { GET, POST }
 ```
 
-#### Step 3: Add the Client Component
+#### Step 4: Add the Client Component
 
 Add `AssetManagerScript` to your root layout for floating icon injection:
 
@@ -85,12 +107,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 That's it! The package automatically:
+- ✅ Suppresses dev server request logging for asset manager routes
 - ✅ Creates API endpoints for asset management
 - ✅ Injects the floating icon (no manual script injection)
 - ✅ Only runs in development mode (returns 404 in production)
 - ✅ Survives Next.js HMR re-evaluation (globalThis singleton)
 
-#### Step 4: Access the Dashboard
+#### Step 5: Access the Dashboard
 
 - **Floating Icon**: Click the overlay button or press `Option+Shift+A` (⌥⇧A)
 - **Direct URL**: Visit `http://localhost:3000/api/asset-manager/`
@@ -99,14 +122,49 @@ That's it! The package automatically:
 
 **Default Base Path**: The default base path is `/api/asset-manager` instead of `/__asset_manager__`. This is because Next.js treats folders starting with `_` as [private folders](https://nextjs.org/docs/app/getting-started/project-structure#private-folders) and excludes them from routing.
 
-**Custom Base Path**: If you want a different base path, update both the handler and the component:
+**Custom Base Path**: If you want a different base path, update the config wrapper, handler, and component:
 
 ```typescript
+// next.config.ts
+export default withAssetManager(nextConfig, { base: '/api/assets' })
+
 // route.ts
 const { GET, POST } = createHandler({ base: '/api/assets' })
 
 // layout.tsx
 <AssetManagerScript base="/api/assets" />
+```
+
+**Composing with Other Plugins**: `withAssetManager` follows the standard `withX` convention used by `@sentry/nextjs`, `@next/bundle-analyzer`, `next-intl`, etc. Compose by nesting — the innermost wrapper runs first:
+
+```typescript
+// next.config.ts
+import { withAssetManager } from "nextjs-asset-manager"
+import { withSentryConfig } from "@sentry/nextjs"
+
+const nextConfig: NextConfig = {}
+
+// Nesting: each wrapper receives the output of the inner one
+export default withSentryConfig(withAssetManager(nextConfig))
+```
+
+For many plugins, a helper function can improve readability:
+
+```typescript
+import { withAssetManager } from "nextjs-asset-manager"
+import { withSentryConfig } from "@sentry/nextjs"
+import withBundleAnalyzer from "@next/bundle-analyzer"
+
+const nextConfig: NextConfig = {}
+
+const compose = (...fns: ((c: NextConfig) => NextConfig)[]) =>
+  fns.reduceRight((config, fn) => fn(config), nextConfig)
+
+export default compose(
+  withSentryConfig,
+  withBundleAnalyzer({ enabled: process.env.ANALYZE === "true" }),
+  withAssetManager,
+)
 ```
 
 **Web API Adapter**: Next.js App Router uses Web API `Request`/`Response` objects, while the core middleware uses Node.js HTTP. The package includes an adapter that bridges these transparently.

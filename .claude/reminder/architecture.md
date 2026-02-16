@@ -515,7 +515,14 @@ The `nextjs-asset-manager` package provides a thin adapter layer between Next.js
   - Injects two `next/Script` tags: global `window.__VAM_BASE_URL__` setup + floating icon loader
   - Props: `base?: string` (default: `'/api/asset-manager'`)
 
-- **`index.ts`** - Re-exports: `createHandler`, `AssetManagerScript`, core types
+- **`with-asset-manager.ts`** - `withAssetManager(nextConfig, options?)` config wrapper
+  - Follows the `withX` community convention (like `@sentry/nextjs`, `@next/bundle-analyzer`)
+  - Deep-merges `logging.incomingRequests.ignore` with a regex matching the base path
+  - Suppresses dev server request logging for asset manager API routes
+  - Respects existing user config: `logging: false`, `incomingRequests: false`, existing ignore patterns
+  - Pure object transform — no side effects, no Next.js runtime imports
+
+- **`index.ts`** - Re-exports: `createHandler`, `withAssetManager`, `AssetManagerScript`, core types
 
 ### Key Design Decisions
 - **Published as `nextjs-asset-manager`** (not `@vite-asset-manager/nextjs`) to match Next.js ecosystem conventions

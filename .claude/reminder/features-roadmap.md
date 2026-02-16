@@ -736,6 +736,7 @@ Official Next.js 14+ integration package published as `nextjs-asset-manager`.
 
 **Implementation**:
 - `packages/nextjs/src/handler.ts` - `createHandler()` factory returning `{ GET, POST }` route handlers
+- `packages/nextjs/src/with-asset-manager.ts` - `withAssetManager()` config wrapper (suppresses dev server request logging)
 - `packages/nextjs/src/adapter.ts` - Web API ↔ Node.js HTTP adapter (bridges `Request`/`Response` to `IncomingMessage`/`ServerResponse`)
 - `packages/nextjs/src/singleton.ts` - `globalThis` singleton management (survives Next.js HMR)
 - `packages/nextjs/src/components/AssetManagerScript.tsx` - `'use client'` component for floating icon injection
@@ -748,6 +749,7 @@ Official Next.js 14+ integration package published as `nextjs-asset-manager`.
 - Default includes: `['app', 'public', 'src']` (Next.js directory structure)
 - Uses `globalThis` with `Symbol.for()` for HMR-safe singleton (Prisma pattern)
 - Dev-only: returns 404 in production via `NODE_ENV` check
+- `withAssetManager()` config wrapper follows `withX` convention to suppress dev server request logging
 
 ---
 
