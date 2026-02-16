@@ -241,8 +241,9 @@ export default defineNuxtConfig({
 The `nextjs-asset-manager` package provides first-class Next.js 14+ support. Published under `nextjs-asset-manager` (not under `@vite-asset-manager/` scope).
 
 **Structure**:
-- `src/index.ts` - Main exports (`createHandler`, `AssetManagerScript`, core type re-exports)
+- `src/index.ts` - Main exports (`createHandler`, `withAssetManager`, `AssetManagerScript`, core type re-exports)
 - `src/handler.ts` - `createHandler()` factory returning `{ GET, POST }` route handlers
+- `src/with-asset-manager.ts` - `withAssetManager()` config wrapper to suppress dev server request logging
 - `src/adapter.ts` - Web API (`Request`/`Response`) ↔ Node.js HTTP (`IncomingMessage`/`ServerResponse`) bridge
 - `src/singleton.ts` - `globalThis` singleton management (survives Next.js HMR re-evaluation)
 - `src/components/AssetManagerScript.tsx` - `'use client'` component for floating icon injection
@@ -256,6 +257,10 @@ The `nextjs-asset-manager` package provides first-class Next.js 14+ support. Pub
 
 **Configuration** (Next.js App Router):
 ```typescript
+// next.config.ts — suppress dev server request logging
+import { withAssetManager } from 'nextjs-asset-manager'
+export default withAssetManager(nextConfig)
+
 // app/api/asset-manager/[[...path]]/route.ts
 import { createHandler } from 'nextjs-asset-manager'
 const { GET, POST } = createHandler()
