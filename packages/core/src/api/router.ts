@@ -5,6 +5,7 @@ import type { ImporterScanner } from '../services/importer-scanner.js'
 import type { DuplicateScanner } from '../services/duplicate-scanner.js'
 import type { ThumbnailService } from '../services/thumbnail.js'
 import type { EditorType } from '../types/index.js'
+import { AssetManagerError } from '../errors.js'
 import { handleGetAssets, handleGetGroupedAssets, handleSearch, handleGetStats, handleGetDuplicates } from './handlers/asset-handler.js'
 import { handleThumbnail, handleServeFile } from './handlers/file-handler.js'
 import { handleGetImporters, handleOpenInEditor, handleRevealInFinder } from './handlers/system-handler.js'
@@ -31,39 +32,58 @@ export function createApiRouter(
     try {
       switch (apiPath) {
         case '/assets':
-          return handleGetAssets(res, scanner, query)
+          handleGetAssets(res, scanner, query)
+          return
         case '/assets/grouped':
-          return handleGetGroupedAssets(res, scanner, query)
+          handleGetGroupedAssets(res, scanner, query)
+          return
         case '/search':
-          return handleSearch(res, scanner, query)
+          handleSearch(res, scanner, query)
+          return
         case '/thumbnail':
-          return handleThumbnail(res, thumbnailService, root, query)
+          await handleThumbnail(res, thumbnailService, root, query)
+          return
         case '/file':
-          return handleServeFile(res, root, query, req.headers.range)
+          await handleServeFile(res, root, query, req.headers.range)
+          return
         case '/stats':
-          return handleGetStats(res, scanner, duplicateScanner)
+          handleGetStats(res, scanner, duplicateScanner)
+          return
         case '/duplicates':
-          return handleGetDuplicates(res, scanner, duplicateScanner, query)
+          handleGetDuplicates(res, scanner, duplicateScanner, query)
+          return
         case '/importers':
-          return handleGetImporters(res, importerScanner, query)
+          handleGetImporters(res, importerScanner, query)
+          return
         case '/open-in-editor':
-          return handleOpenInEditor(req, res, root, editor, query)
+          await handleOpenInEditor(req, res, root, editor, query)
+          return
         case '/reveal-in-finder':
-          return handleRevealInFinder(req, res, root, query)
+          await handleRevealInFinder(req, res, root, query)
+          return
         case '/bulk-download':
-          return handleBulkDownload(req, res, root)
+          await handleBulkDownload(req, res, root)
+          return
         case '/bulk-delete':
-          return handleBulkDelete(req, res, root)
+          await handleBulkDelete(req, res, root)
+          return
         case '/events':
-          return handleSSE(res)
+          handleSSE(res)
+          return
         default:
           next()
       }
     } catch (error) {
-      console.error('[asset-manager] API error:', error)
-      res.statusCode = 500
-      res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify({ error: 'Internal server error' }))
+      if (error instanceof AssetManagerError) {
+        res.statusCode = error.statusCode
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify({ error: error.message, code: error.code }))
+      } else {
+        console.error('[asset-manager] API error:', error)
+        res.statusCode = 500
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify({ error: 'Internal server error' }))
+      }
     }
   }
 }

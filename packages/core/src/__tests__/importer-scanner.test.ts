@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { EventEmitter } from 'events'
-import type { ResolvedOptions } from '@vite-asset-manager/core'
+import type { ResolvedOptions } from '../types'
 
 class MockFSWatcher extends EventEmitter {
   async close() {
@@ -30,7 +30,7 @@ vi.mock('fs/promises', () => ({
   }
 }))
 
-import { ImporterScanner } from '../../packages/core/src/services/importer-scanner'
+import { ImporterScanner } from '../services/importer-scanner'
 
 const mockChokidar = { watch: mockChokidarWatch }
 const mockFs = { readFile: mockFsReadFile }

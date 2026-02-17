@@ -8,7 +8,7 @@ vi.mock('launch-editor', () => ({
   default: mockLaunchEditorFn
 }))
 
-import { launchEditor } from '../../packages/core/src/services/editor-launcher'
+import { launchEditor } from '../services/editor-launcher'
 
 // TODO: Fix launch-editor mocking - tests are timing out
 describe.skip('launchEditor', () => {

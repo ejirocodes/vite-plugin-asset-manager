@@ -33,7 +33,7 @@ export class AssetManager {
     this.scanner = new AssetScanner(root, options)
     this.importerScanner = new ImporterScanner(root, options)
     this.duplicateScanner = new DuplicateScanner(root, options)
-    this.thumbnailService = new ThumbnailService(options.thumbnailSize)
+    this.thumbnailService = new ThumbnailService(options.thumbnailSize, options.debug)
   }
 
   /**

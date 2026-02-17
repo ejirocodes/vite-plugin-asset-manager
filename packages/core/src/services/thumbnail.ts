@@ -6,12 +6,14 @@ import os from 'os'
 
 export class ThumbnailService {
   private size: number
+  private debug: boolean
   private cache: Map<string, Buffer> = new Map()
   private cacheDir: string
   private supportedFormats = ['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif', '.tiff']
 
-  constructor(size: number = 200) {
+  constructor(size: number = 200, debug: boolean = false) {
     this.size = size
+    this.debug = debug
     this.cacheDir = path.join(os.tmpdir(), 'vite-asset-manager-thumbnails')
   }
 
@@ -41,7 +43,9 @@ export class ThumbnailService {
       await this.saveToDiskCache(cacheKey, thumbnail)
       return thumbnail
     } catch (error) {
-      console.warn(`[asset-manager] Failed to generate thumbnail for ${absolutePath}:`, error)
+      if (this.debug) {
+        console.warn(`[asset-manager] Failed to generate thumbnail for ${absolutePath}:`, error)
+      }
       return null
     }
   }

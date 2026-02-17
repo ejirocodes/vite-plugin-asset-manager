@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { IncomingMessage, ServerResponse } from 'http'
 import { EventEmitter } from 'stream'
-import type { Asset, AssetGroup, Importer } from '../../packages/core/src/types'
-import { createMockAsset } from '../setup'
+import type { Asset, AssetGroup, Importer } from '../types'
+import { createMockAsset } from '../../../../tests/setup'
 
 vi.mock('fs', () => ({
   default: {
@@ -16,12 +16,12 @@ vi.mock('fs', () => ({
   }
 }))
 
-vi.mock('../../packages/core/src/services/editor-launcher', () => ({
+vi.mock('../services/editor-launcher', () => ({
   launchEditor: vi.fn()
 }))
 
-import { createApiRouter, broadcastSSE } from '../../packages/core/src/api/router'
-import { launchEditor } from '../../packages/core/src/services/editor-launcher'
+import { createApiRouter, broadcastSSE } from '../api/router'
+import { launchEditor } from '../services/editor-launcher'
 import fs from 'fs'
 
 const mockFs = vi.mocked(fs)

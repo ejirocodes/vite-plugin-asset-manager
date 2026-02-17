@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { EventEmitter } from 'events'
-import type { ResolvedOptions, Asset } from '../../packages/core/src/types'
+import type { ResolvedOptions, Asset } from '../types'
 
 class MockFSWatcher extends EventEmitter {
   async close() {
@@ -36,7 +36,7 @@ vi.mock('fs', () => ({
   createReadStream: mockFsCreateReadStream
 }))
 
-import { DuplicateScanner } from '../../packages/core/src/services/duplicate-scanner'
+import { DuplicateScanner } from '../services/duplicate-scanner'
 
 const mockChokidar = { watch: mockChokidarWatch }
 const mockFs = {

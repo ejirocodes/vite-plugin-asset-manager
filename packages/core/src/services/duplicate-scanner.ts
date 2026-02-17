@@ -78,8 +78,10 @@ export class DuplicateScanner extends EventEmitter {
         }
         this.duplicateGroups.get(hash)!.add(asset.path)
       }
-    } catch {
-      // File might have been deleted or is unreadable
+    } catch (error) {
+      if (this.options.debug) {
+        console.warn(`[asset-manager] Failed to process asset: ${asset.path}`, error)
+      }
     }
   }
 
@@ -107,7 +109,10 @@ export class DuplicateScanner extends EventEmitter {
       })
 
       return hash
-    } catch {
+    } catch (error) {
+      if (this.options.debug) {
+        console.warn(`[asset-manager] Failed to compute hash: ${relativePath}`, error)
+      }
       return null
     }
   }
@@ -231,7 +236,11 @@ export class DuplicateScanner extends EventEmitter {
         if (!affectedHashes.includes(hash)) {
           affectedHashes.push(hash)
         }
-      } catch {}
+      } catch (error) {
+        if (this.options.debug) {
+          console.warn(`[asset-manager] Failed to rehash: ${normalizedPath}`, error)
+        }
+      }
     }
 
     if (affectedHashes.length > 0) {

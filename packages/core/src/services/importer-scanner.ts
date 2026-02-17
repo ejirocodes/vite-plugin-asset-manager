@@ -163,7 +163,11 @@ export class ImporterScanner extends EventEmitter {
     try {
       await fs.access(path.join(this.root, 'index.html'))
       await this.scanFile('index.html')
-    } catch {}
+    } catch (error) {
+      if (this.options.debug) {
+        console.warn('[asset-manager] index.html not found or unreadable', error)
+      }
+    }
   }
 
   private async scanFile(relativePath: string): Promise<void> {
@@ -202,8 +206,10 @@ export class ImporterScanner extends EventEmitter {
       }
 
       this.reverseIndex.set(relativePath, newAssets)
-    } catch {
-      // File might have been deleted or is unreadable
+    } catch (error) {
+      if (this.options.debug) {
+        console.warn(`[asset-manager] Failed to scan file: ${relativePath}`, error)
+      }
     }
   }
 

@@ -65,7 +65,8 @@ export async function handleBulkDownload(
     console.error('[asset-manager] ZIP creation error:', err)
     if (!res.headersSent) {
       res.statusCode = 500
-      res.end('ZIP creation failed')
+      res.setHeader('Content-Type', 'application/json')
+      res.end(JSON.stringify({ error: 'ZIP creation failed', code: 'INTERNAL_ERROR' }))
     }
   })
 
