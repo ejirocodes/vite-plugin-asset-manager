@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { IncomingMessage, ServerResponse } from 'http'
 import { EventEmitter } from 'stream'
 import type { Asset, AssetGroup, Importer } from '../types'
-import { createMockAsset } from '../../../../tests/setup'
+import { createMockAsset } from '../../../../../tests/setup'
 
 vi.mock('fs', () => ({
   default: {
@@ -20,7 +20,7 @@ vi.mock('../services/editor-launcher', () => ({
   launchEditor: vi.fn()
 }))
 
-import { createApiRouter, broadcastSSE } from '../api/router'
+import { createApiRouter, broadcastSSE } from './router'
 import { launchEditor } from '../services/editor-launcher'
 import fs from 'fs'
 

@@ -30,7 +30,7 @@ vi.mock('fs/promises', () => ({
   }
 }))
 
-import { ImporterScanner } from '../services/importer-scanner'
+import { ImporterScanner } from './importer-scanner'
 
 const mockChokidar = { watch: mockChokidarWatch }
 const mockFs = { readFile: mockFsReadFile }
