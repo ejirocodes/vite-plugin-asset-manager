@@ -3,7 +3,7 @@ import type { ParsedUrlQuery } from 'querystring'
 import path from 'path'
 import fs from 'fs'
 import type { ThumbnailService } from '../../services/thumbnail.js'
-import { MIME_TYPES, validateFilePath } from '../utils.js'
+import { MIME_TYPES, sendJson, validateFilePath } from '../utils.js'
 
 export async function handleThumbnail(
   res: ServerResponse,
@@ -14,7 +14,7 @@ export async function handleThumbnail(
   const validated = validateFilePath(root, query.path as string)
   if ('error' in validated) {
     res.statusCode = validated.status
-    res.end(validated.error)
+    sendJson(res, { error: validated.error })
     return
   }
 
@@ -49,7 +49,7 @@ export async function handleServeFile(
   const validated = validateFilePath(root, query.path as string)
   if ('error' in validated) {
     res.statusCode = validated.status
-    res.end(validated.error)
+    sendJson(res, { error: validated.error })
     return
   }
 
@@ -61,7 +61,7 @@ export async function handleServeFile(
     await fs.promises.access(absolutePath, fs.constants.R_OK)
   } catch {
     res.statusCode = 404
-    res.end('File not found')
+    sendJson(res, { error: 'File not found' })
     return
   }
 

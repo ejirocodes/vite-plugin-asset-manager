@@ -1,6 +1,9 @@
 // Types
 export * from './types/index.js'
 
+// Errors
+export { AssetManagerError } from './errors.js'
+
 // Services
 export {
   AssetScanner,

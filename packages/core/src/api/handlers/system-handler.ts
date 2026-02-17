@@ -6,6 +6,7 @@ import { launchEditor } from '../../services/editor-launcher.js'
 import { revealInFileExplorer } from '../../services/file-revealer.js'
 import type { EditorType } from '../../types/index.js'
 import { sendJson, validateFilePath } from '../utils.js'
+import { AssetManagerError } from '../../errors.js'
 
 export function handleGetImporters(
   res: ServerResponse,
@@ -59,8 +60,12 @@ export async function handleOpenInEditor(
     await launchEditor(absolutePath, line, column, editor)
     sendJson(res, { success: true })
   } catch (error) {
-    res.statusCode = 500
-    sendJson(res, { error: error instanceof Error ? error.message : 'Failed to open editor' })
+    throw new AssetManagerError(
+      error instanceof Error ? error.message : 'Failed to open editor',
+      500,
+      'INTERNAL_ERROR',
+      { handler: 'open-in-editor', file: absolutePath }
+    )
   }
 }
 
@@ -97,9 +102,11 @@ export async function handleRevealInFinder(
     await revealInFileExplorer(absolutePath)
     sendJson(res, { success: true })
   } catch (error) {
-    res.statusCode = 500
-    sendJson(res, {
-      error: error instanceof Error ? error.message : 'Failed to reveal file'
-    })
+    throw new AssetManagerError(
+      error instanceof Error ? error.message : 'Failed to reveal file',
+      500,
+      'INTERNAL_ERROR',
+      { handler: 'reveal-in-finder', file: absolutePath }
+    )
   }
 }

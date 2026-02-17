@@ -238,7 +238,10 @@ export class AssetScanner extends EventEmitter {
           directory: path.dirname(relativePath)
         }
         this.cache.set(relativePath, asset)
-      } catch {
+      } catch (error) {
+        if (this.options.debug) {
+          console.warn(`[asset-manager] Failed to stat file: ${absolutePath}`, error)
+        }
         return
       }
     }

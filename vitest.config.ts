@@ -33,7 +33,7 @@ export default defineConfig({
           name: 'server',
           globals: true,
           environment: 'node',
-          include: ['tests/**/*.test.ts'],
+          include: ['packages/core/src/**/*.test.ts'],
           setupFiles: ['./tests/setup.ts'],
           pool: 'threads'
         }
