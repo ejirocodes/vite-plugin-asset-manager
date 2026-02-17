@@ -1,7 +1,18 @@
-import { memo, useCallback } from 'react'
-import { DownloadIcon, EyeSlashIcon, EyeIcon } from '@phosphor-icons/react'
+import { memo, useCallback, useState } from 'react'
+import { DownloadIcon, EyeSlashIcon, EyeIcon, TrashIcon } from '@phosphor-icons/react'
 import { Button } from '@/ui/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/ui/components/ui/alert-dialog'
 import { useIgnoredAssets } from '@/ui/providers/ignored-assets-provider'
+import { useBulkOperations } from '@/ui/hooks/useBulkOperations'
 import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '@/ui/types'
 
@@ -12,7 +23,9 @@ interface ActionsSectionProps {
 export const ActionsSection = memo(function ActionsSection({ asset }: ActionsSectionProps) {
   const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
   const { isIgnored, toggleIgnored } = useIgnoredAssets()
+  const { isDeleting, bulkDelete } = useBulkOperations()
   const ignored = isIgnored(asset.path)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const handleDownload = useCallback(() => {
     const link = document.createElement('a')
@@ -26,6 +39,15 @@ export const ActionsSection = memo(function ActionsSection({ asset }: ActionsSec
   const handleToggleIgnore = useCallback(() => {
     toggleIgnored(asset.path)
   }, [asset.path, toggleIgnored])
+
+  const handleDeleteClick = useCallback(() => {
+    setDeleteDialogOpen(true)
+  }, [])
+
+  const handleDeleteConfirm = useCallback(async () => {
+    await bulkDelete([asset])
+    setDeleteDialogOpen(false)
+  }, [asset, bulkDelete])
 
   return (
     <div className="p-4">
@@ -66,7 +88,39 @@ export const ActionsSection = memo(function ActionsSection({ asset }: ActionsSec
             )}
           </Button>
         )}
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
+          className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+        >
+          <TrashIcon weight="bold" className="w-4 h-4" />
+          {isDeleting ? 'Deleting...' : 'Delete'}
+        </Button>
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete asset?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The following file will be permanently deleted from your
+              computer:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="text-xs font-mono bg-muted/50 rounded p-2 text-muted-foreground truncate">
+            {asset.path}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDeleteConfirm}>
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 })
