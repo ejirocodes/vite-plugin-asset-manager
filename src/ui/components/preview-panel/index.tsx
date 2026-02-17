@@ -165,7 +165,7 @@ export const PreviewPanel = memo(function PreviewPanel({
         <DetailsSection asset={asset} imageDimensions={imageDimensions} />
         <Separator />
         <ImportersSection asset={asset} />
-        {(asset.duplicatesCount ?? 0) > 0 && (
+        {asset.duplicatesCount > 0 && (
           <>
             <Separator />
             <DuplicatesSection asset={asset} onSelectAsset={onSelectAsset} />

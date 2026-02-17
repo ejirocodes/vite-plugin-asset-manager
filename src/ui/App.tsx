@@ -191,7 +191,7 @@ export default function App() {
     if (showDuplicatesOnly) {
       filtered = filtered
         .map(group => {
-          const duplicateAssets = group.assets.filter(a => (a.duplicatesCount ?? 0) > 0)
+          const duplicateAssets = group.assets.filter(a => a.duplicatesCount > 0)
           return {
             ...group,
             assets: duplicateAssets,

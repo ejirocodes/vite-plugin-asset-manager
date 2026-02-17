@@ -103,7 +103,7 @@ export function handleGetDuplicates(
     const assets = scanner.getAssets().filter(a => paths.includes(a.path))
     sendJson(res, { duplicates: assets, total: assets.length, hash })
   } else {
-    const assets = scanner.getAssets().filter(a => (a.duplicatesCount ?? 0) > 0)
+    const assets = scanner.getAssets().filter(a => a.duplicatesCount > 0)
     sendJson(res, { duplicates: assets, total: assets.length })
   }
 }

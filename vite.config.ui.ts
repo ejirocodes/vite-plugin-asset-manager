@@ -12,7 +12,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: '../../dist/client',
+    outDir: '../../packages/core/dist/client',
     emptyOutDir: true,
     rollupOptions: {
       input: path.resolve(__dirname, 'src/ui/index.html'),

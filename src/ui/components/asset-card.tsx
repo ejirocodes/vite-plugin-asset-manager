@@ -194,7 +194,7 @@ export const AssetCard = memo(function AssetCard({
                   ignored
                 </span>
               )}
-              {(asset.duplicatesCount ?? 0) > 0 && (
+              {asset.duplicatesCount > 0 && (
                 <span className="text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-blue-500/10 text-blue-400 shrink-0">
                   {asset.duplicatesCount} dupe{asset.duplicatesCount === 1 ? '' : 's'}
                 </span>

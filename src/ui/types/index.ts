@@ -18,9 +18,9 @@ export interface Asset {
   size: number
   mtime: number
   directory: string
-  importersCount?: number
-  contentHash?: string
-  duplicatesCount?: number
+  importersCount: number
+  contentHash: string
+  duplicatesCount: number
   ignored?: boolean
 }
 

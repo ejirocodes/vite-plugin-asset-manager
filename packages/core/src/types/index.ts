@@ -63,9 +63,15 @@ export interface Asset {
   duplicatesCount?: number
 }
 
+export type EnrichedAsset = Asset & {
+  importersCount: number
+  contentHash: string
+  duplicatesCount: number
+}
+
 export interface AssetGroup {
   directory: string
-  assets: Asset[]
+  assets: EnrichedAsset[]
   count: number
 }
 

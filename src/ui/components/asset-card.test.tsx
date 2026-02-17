@@ -118,7 +118,10 @@ describe('AssetCard', () => {
     type: 'image',
     size: 2048,
     mtime: Date.now(),
-    directory: 'src/assets'
+    directory: 'src/assets',
+    importersCount: 1,
+    contentHash: 'abc123',
+    duplicatesCount: 0
   }
 
   const mockVideoAsset: Asset = {
@@ -346,13 +349,13 @@ describe('AssetCard', () => {
       expect(screen.queryByText('unused')).not.toBeInTheDocument()
     })
 
-    it('should not show unused badge when importersCount is undefined', () => {
-      const assetWithoutCount: Asset = {
+    it('should not show unused badge when asset has importers', () => {
+      const assetWithImporters: Asset = {
         ...mockImageAsset,
-        importersCount: undefined
+        importersCount: 3
       }
 
-      render(<AssetCard asset={assetWithoutCount} />)
+      render(<AssetCard asset={assetWithImporters} />)
 
       expect(screen.queryByText('unused')).not.toBeInTheDocument()
     })

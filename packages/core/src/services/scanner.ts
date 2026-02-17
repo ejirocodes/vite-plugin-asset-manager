@@ -3,7 +3,7 @@ import fg from 'fast-glob'
 import path from 'path'
 import fs from 'fs/promises'
 import chokidar, { type FSWatcher } from 'chokidar'
-import type { Asset, AssetGroup, AssetType, Importer, ResolvedOptions } from '../types/index.js'
+import type { Asset, EnrichedAsset, AssetGroup, AssetType, Importer, ResolvedOptions } from '../types/index.js'
 
 export interface ScannerEvents {
   change: [{ event: string; path: string }]
@@ -29,7 +29,7 @@ export class AssetScanner extends EventEmitter {
     }
   }
 
-  async scan(): Promise<Asset[]> {
+  async scan(): Promise<EnrichedAsset[]> {
     if (this.scanPromise) {
       await this.scanPromise
       return this.getAssets()
@@ -129,19 +129,19 @@ export class AssetScanner extends EventEmitter {
     return 'other'
   }
 
-  getAssets(): Asset[] {
-    return Array.from(this.cache.values())
+  getAssets(): EnrichedAsset[] {
+    return Array.from(this.cache.values()) as EnrichedAsset[]
   }
 
   getGroupedAssets(): AssetGroup[] {
-    const groups = new Map<string, Asset[]>()
+    const groups = new Map<string, EnrichedAsset[]>()
 
     for (const asset of this.cache.values()) {
       const dir = asset.directory
       if (!groups.has(dir)) {
         groups.set(dir, [])
       }
-      groups.get(dir)!.push(asset)
+      groups.get(dir)!.push(asset as EnrichedAsset)
     }
 
     return Array.from(groups.entries())
@@ -153,7 +153,7 @@ export class AssetScanner extends EventEmitter {
       .sort((a, b) => a.directory.localeCompare(b.directory))
   }
 
-  search(query: string): Asset[] {
+  search(query: string): EnrichedAsset[] {
     const normalizedQuery = query.toLowerCase().trim()
     if (!normalizedQuery) return this.getAssets()
 
@@ -164,8 +164,8 @@ export class AssetScanner extends EventEmitter {
     )
   }
 
-  getAsset(relativePath: string): Asset | undefined {
-    return this.cache.get(relativePath)
+  getAsset(relativePath: string): EnrichedAsset | undefined {
+    return this.cache.get(relativePath) as EnrichedAsset | undefined
   }
 
   /**
