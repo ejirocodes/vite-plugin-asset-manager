@@ -35,6 +35,7 @@ describe('useSearch', () => {
 
     expect(result.current.results).toEqual([])
     expect(result.current.searching).toBe(false)
+    expect(result.current.searched).toBe(false)
     expect(result.current.search).toBeInstanceOf(Function)
     expect(result.current.clear).toBeInstanceOf(Function)
   })
@@ -49,6 +50,7 @@ describe('useSearch', () => {
     expect(fetch).toHaveBeenCalledWith('/__asset_manager__/api/search?q=logo')
     expect(result.current.results).toHaveLength(1)
     expect(result.current.results[0].name).toBe('logo.png')
+    expect(result.current.searched).toBe(true)
   })
 
   it('should encode query parameters', async () => {
@@ -151,12 +153,14 @@ describe('useSearch', () => {
     })
 
     expect(result.current.results).toHaveLength(1)
+    expect(result.current.searched).toBe(true)
 
     act(() => {
       result.current.clear()
     })
 
     expect(result.current.results).toEqual([])
+    expect(result.current.searched).toBe(false)
   })
 
   it('should handle special characters in query', async () => {

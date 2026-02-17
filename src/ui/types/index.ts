@@ -61,6 +61,7 @@ export interface UseAssetsResult {
 export interface UseSearchResult {
   results: Asset[]
   searching: boolean
+  searched: boolean
   search: (query: string) => Promise<void>
   clear: () => void
 }
