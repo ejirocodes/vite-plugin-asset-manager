@@ -5,6 +5,7 @@ import type { Asset, UseSearchResult } from '../types'
 export function useSearch(advancedParams?: URLSearchParams): UseSearchResult {
   const [results, setResults] = useState<Asset[]>([])
   const [searching, setSearching] = useState(false)
+  const [searched, setSearched] = useState(false)
 
   const advancedParamsString = advancedParams?.toString() ?? ''
 
@@ -32,6 +33,7 @@ export function useSearch(advancedParams?: URLSearchParams): UseSearchResult {
         setResults([])
       } finally {
         setSearching(false)
+        setSearched(true)
       }
     },
     [advancedParamsString]
@@ -39,7 +41,8 @@ export function useSearch(advancedParams?: URLSearchParams): UseSearchResult {
 
   const clear = useCallback(() => {
     setResults([])
+    setSearched(false)
   }, [])
 
-  return { results, searching, search, clear }
+  return { results, searching, searched, search, clear }
 }

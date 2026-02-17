@@ -94,7 +94,7 @@ export default function App() {
 
   const { groups, loading } = useAssets(selectedType, undefined, filterParams)
   const { stats } = useStats()
-  const { results, searching, search, clear } = useSearch(filterParams)
+  const { results, searching, searched, search, clear } = useSearch(filterParams)
   const { isIgnored } = useIgnoredAssets()
   const { isDeleting, bulkDelete } = useBulkOperations()
   const [searchQuery, setSearchQuery] = useState('')
@@ -158,7 +158,7 @@ export default function App() {
   const displayGroups = useMemo(() => {
     let baseGroups = groups
 
-    if (searchQuery && results.length > 0) {
+    if (searchQuery && (results.length > 0 || (searched && !searching))) {
       const grouped = new Map<string, Asset[]>()
       results.forEach(asset => {
         const dir = asset.directory
@@ -206,7 +206,7 @@ export default function App() {
       ...group,
       assets: sortAssets(group.assets, sortOption)
     }))
-  }, [groups, results, searchQuery, sortOption, showUnusedOnly, showDuplicatesOnly, isIgnored])
+  }, [groups, results, searchQuery, searched, searching, sortOption, showUnusedOnly, showDuplicatesOnly, isIgnored])
 
   const flatAssetList = useMemo(() => {
     return displayGroups.flatMap(group => group.assets)
