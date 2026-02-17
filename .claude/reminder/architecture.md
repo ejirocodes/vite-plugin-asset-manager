@@ -72,52 +72,7 @@ The project uses a pnpm workspace monorepo with four packages:
 - Returns Promise that resolves on success or rejects with error
 
 ### 2e. Floating Icon Component (`src/client/floating-icon/`)
-Framework-agnostic overlay button that opens the Asset Manager panel. Built as self-executing IIFE, injectable into any Vite app.
-
-**Architecture** (8 files):
-- **index.ts**: Entry point with `initFloatingIcon()` function and auto-initialization
-- **constants.ts**: Z-index values (99998-100000), dimensions, colors, drag thresholds (5px)
-- **dom.ts**: DOM element creation and manipulation
-  - 5 elements: container, trigger button, overlay, panel, iframe
-  - Functions: `createElements()`, `mountElements()`, `unmountElements()`, `applyPosition()`, `updatePanelState()`
-- **state.ts**: Composable-style state managers
-  - `createPositionState()` - Position (left/right edge, vertical offset, localStorage)
-  - `createPanelState()` - Panel open/closed state (localStorage)
-  - `createDragState()` - Drag state for click vs drag detection
-- **events.ts**: Event handler setup
-  - Drag handlers: Pointer events with 5px threshold, momentum-based edge snapping
-  - Click handlers: Distinguishes drag from click, triggers panel toggle
-  - Keyboard handlers: Escape to close, Option+Shift+A to toggle
-- **styles.ts**: CSS injection with CSS variables, responsive design, backdrop blur
-- **icons.ts**: Embedded Vite gradient SVG icon (VITE_ICON constant)
-- **tsconfig.json**: ES2020 target with DOM libs
-
-**Build Configuration** (`vite.config.floating-icon.ts`):
-- Format: IIFE (self-executing)
-- Output: `dist/client/floating-icon.js`
-- Options: `emptyOutDir: false` (preserves UI build), `inlineDynamicImports: true`
-- Build command: `pnpm run build:floating-icon`
-
-**Plugin Integration** (`src/plugin.ts`):
-- Injects via `transformIndexHtml()` hook when `floatingIcon: true`
-- Two script tags injected into HTML body:
-  1. Inline script: Sets `window.__VAM_BASE_URL__` with base path
-  2. Module script: Loads `floating-icon.js` from base URL
-- Auto-initialization: Triggered when `__VAM_BASE_URL__` global exists
-
-**Features**:
-- Draggable with momentum-based edge snapping
-- localStorage persistence (position + panel state)
-- Keyboard shortcuts (⌥⇧A toggle, Escape close)
-- Modal overlay with backdrop blur
-- Cursor feedback (grab/grabbing)
-- Cross-browser (Pointer Events API)
-- Framework-agnostic (no dependencies)
-
-**State Management Pattern**:
-- Composable-style inspired by Vue DevTools
-- Separate state managers for position, panel, drag
-- Getter/setter pattern with localStorage sync
+Framework-agnostic overlay button that opens the Asset Manager panel. Built as self-executing IIFE. See "Floating Icon System" section below for full architecture details.
 
 ### 3. Thumbnail Service (`packages/core/src/services/thumbnail.ts`)
 - **Sharp** for image processing (faster than ImageMagick, pure JS alternatives)
@@ -548,32 +503,6 @@ The `nextjs-asset-manager` package provides a thin adapter layer between Next.js
 ### Build
 - Config: `tsup.config.ts` — ESM + CJS, external core/react/next
 - Build order: core → nuxt → **nextjs** (part of `build:packages`)
-
-## Future Considerations / In Progress
-
-### Completed
-- ~~**Importers tracking**~~ ✓ Implemented - Shows which files import each asset with click-to-open-in-editor
-- ~~Copy import path to clipboard~~ ✓ Implemented via CodeSnippets section
-- ~~Open in Editor~~ ✓ Implemented - Opens importing files at exact line/column
-- ~~SSE Real-Time Updates~~ ✓ Implemented - Replaced WebSocket with Server-Sent Events
-- ~~Sidebar Type Filtering~~ ✓ Implemented - Filter by asset type from sidebar
-- ~~Asset Sorting~~ ✓ Implemented - 8 sort options via dropdown
-- ~~Test Infrastructure~~ ✓ Implemented - 16 test files (6 server + 10 UI)
-- ~~Bulk Operations~~ ✓ Implemented - Multi-select, copy paths, download ZIP, bulk delete
-- ~~Unused Asset Detection~~ ✓ Implemented - Badge on cards, sidebar filter, stats tracking
-- ~~Ignored Assets~~ ✓ Implemented - localStorage-persisted hiding without deletion
-- ~~Context Menu~~ ✓ Implemented - Right-click menu with 7 actions, platform-specific file reveal
-- ~~Duplicate Detection~~ ✓ Implemented - MD5 content hashing with streaming, duplicate count badges, real-time updates
-- ~~Keyboard Navigation~~ ✓ Implemented - Full keyboard support with arrow keys, vim bindings, shortcuts for all actions
-- ~~Advanced Filters~~ ✓ Implemented - Filter by size (4 presets), date modified (5 presets), and file extension (multi-select)
-- ~~Virtual Scrolling~~ ✓ Implemented - Row-based virtualization with @tanstack/react-virtual for large asset collections
-- ~~Performance Optimizations~~ ✓ Implemented - Vercel React best practices (primitive deps, stable callbacks, single-pass filtering)
-
-### Planned
-- Drag-and-drop upload
-- Asset optimization suggestions (oversized images)
-- Custom date/size ranges (currently presets only)
-- Image dimension filtering
 
 ### 6l. Virtual Scrolling System
 - **Library**: `@tanstack/react-virtual` for row-based virtualization
