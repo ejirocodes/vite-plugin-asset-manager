@@ -38,7 +38,6 @@ vi.mock('fs', () => ({
 
 import { DuplicateScanner } from '../services/duplicate-scanner'
 
-const mockChokidar = { watch: mockChokidarWatch }
 const mockFs = {
   createReadStream: mockFsCreateReadStream,
   promises: {
@@ -74,6 +73,8 @@ function createMockAsset(overrides: Partial<Asset> = {}): Asset {
   }
 }
 
+const emptyAssetProvider = { getAssets: () => [] as Asset[] }
+
 describe('DuplicateScanner', () => {
   let mockWatcher: MockFSWatcher
   let scanner: DuplicateScanner
@@ -81,8 +82,8 @@ describe('DuplicateScanner', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockWatcher = new MockFSWatcher()
-    mockChokidar.watch.mockReturnValue(mockWatcher as unknown as chokidar.FSWatcher)
-    scanner = new DuplicateScanner('/project', DEFAULT_OPTIONS)
+    mockChokidarWatch.mockReturnValue(mockWatcher as unknown as chokidar.FSWatcher)
+    scanner = new DuplicateScanner('/project', DEFAULT_OPTIONS, emptyAssetProvider)
   })
 
   afterEach(() => {
@@ -99,6 +100,39 @@ describe('DuplicateScanner', () => {
       await scanner.init()
       await scanner.init()
       // Should not throw and be idempotent
+    })
+
+    it('should scan assets from provider on init', async () => {
+      const content = Buffer.from('test content')
+      mockFs.promises.stat.mockResolvedValue({
+        size: content.length,
+        mtimeMs: Date.now()
+      } as any)
+      mockFs.promises.readFile.mockResolvedValue(content)
+
+      const asset = createMockAsset()
+      const provider = { getAssets: () => [asset] }
+      const s = new DuplicateScanner('/project', DEFAULT_OPTIONS, provider)
+      await s.init()
+
+      const info = s.getDuplicateInfo(asset.path)
+      expect(info.hash).toBeTruthy()
+      expect(info.hash.length).toBe(32)
+      s.destroy()
+    })
+
+    it('should start watcher when watch option is true', async () => {
+      const s = new DuplicateScanner('/project', { ...DEFAULT_OPTIONS, watch: true }, emptyAssetProvider)
+      await s.init()
+
+      expect(mockChokidarWatch).toHaveBeenCalled()
+      s.destroy()
+    })
+
+    it('should not start watcher when watch option is false', async () => {
+      await scanner.init()
+
+      expect(mockChokidarWatch).not.toHaveBeenCalled()
     })
   })
 

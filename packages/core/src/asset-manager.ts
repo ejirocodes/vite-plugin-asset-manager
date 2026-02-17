@@ -32,7 +32,7 @@ export class AssetManager {
 
     this.scanner = new AssetScanner(root, options)
     this.importerScanner = new ImporterScanner(root, options)
-    this.duplicateScanner = new DuplicateScanner(root, options)
+    this.duplicateScanner = new DuplicateScanner(root, options, this.scanner)
     this.thumbnailService = new ThumbnailService(options.thumbnailSize, options.debug)
   }
 
@@ -48,11 +48,8 @@ export class AssetManager {
     await this.importerScanner.init()
     await this.duplicateScanner.init()
 
-    // Enrich assets with importer counts
+    // Enrich assets with metadata
     this.scanner.enrichWithImporterCounts(this.importerScanner)
-
-    // Scan for duplicates
-    await this.duplicateScanner.scanAssets(this.scanner.getAssets())
     this.scanner.enrichWithDuplicateInfo(this.duplicateScanner)
 
     this.initialized = true
@@ -64,10 +61,8 @@ export class AssetManager {
    */
   setupWatchers(onEvent: AssetManagerEventHandler): void {
     // Asset scanner change events
-    this.scanner.on('change', async (event) => {
-      // Re-scan duplicates when assets change
-      await this.duplicateScanner.scanAssets(this.scanner.getAssets())
-      this.scanner.enrichWithDuplicateInfo(this.duplicateScanner)
+    this.scanner.on('change', (event) => {
+      this.scanner.enrichWithImporterCounts(this.importerScanner)
       onEvent('asset-manager:update', event)
     })
 

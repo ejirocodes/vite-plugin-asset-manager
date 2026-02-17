@@ -20,6 +20,7 @@ const STREAMING_THRESHOLD = 1024 * 1024
 export class DuplicateScanner extends EventEmitter {
   private root: string
   private options: ResolvedOptions
+  private assetProvider: { getAssets(): Asset[] }
   /** Maps relative path -> { hash, mtime, size } for cache validation */
   private hashCache: Map<string, { hash: string; mtime: number; size: number }> = new Map()
   /** Maps hash -> set of relative paths (for grouping duplicates) */
@@ -30,14 +31,19 @@ export class DuplicateScanner extends EventEmitter {
   private scanPromise?: Promise<void>
   private initialized = false
 
-  constructor(root: string, options: ResolvedOptions) {
+  constructor(root: string, options: ResolvedOptions, assetProvider: { getAssets(): Asset[] }) {
     super()
     this.root = root
     this.options = options
+    this.assetProvider = assetProvider
   }
 
   async init(): Promise<void> {
     if (this.initialized) return
+    await this.scanAssets(this.assetProvider.getAssets())
+    if (this.options.watch) {
+      this.initWatcher()
+    }
     this.initialized = true
   }
 
