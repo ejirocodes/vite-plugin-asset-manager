@@ -1,4 +1,4 @@
-import type { Asset } from '@/shared/types'
+import type { Asset } from '@/ui/types'
 
 export type SortField = 'name' | 'size' | 'mtime' | 'type'
 export type SortDirection = 'asc' | 'desc'

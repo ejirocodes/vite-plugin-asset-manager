@@ -19,7 +19,7 @@ import type {
   ExtensionFilter,
   SizeFilterPreset,
   DateFilterPreset
-} from '@/shared/types'
+} from '../types'
 import { cn } from '@/ui/lib/utils'
 
 interface AdvancedFiltersProps {

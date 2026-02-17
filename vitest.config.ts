@@ -57,7 +57,6 @@ export default defineConfig({
       reportsDirectory: './coverage',
       include: [
         'src/server/**/*.ts',
-        'src/shared/**/*.ts',
         'src/plugin.ts',
         'src/ui/**/*.{ts,tsx}'
       ],
