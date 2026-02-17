@@ -62,7 +62,29 @@ packages/
 │       │   ├── editor-launcher.ts   # Opens files in configured editor
 │       │   └── file-revealer.ts     # Cross-platform file reveal utility
 │       ├── api/
-│       │   └── router.ts            # REST endpoints + SSE handling
+│       │   ├── router.ts            # API router orchestrator
+│       │   ├── handlers/
+│       │   │   ├── asset-handler.ts     # Asset data endpoints
+│       │   │   ├── file-handler.ts      # File serving endpoints
+│       │   │   ├── system-handler.ts    # System integration endpoints
+│       │   │   └── bulk-handler.ts      # Bulk operation endpoints
+│       │   ├── sse-manager.ts       # SSE client management
+│       │   ├── filters.ts           # Query parameter parsing
+│       │   └── utils.ts             # Shared HTTP utilities
+│       ├── errors.ts               # Error type hierarchy (AssetManagerError)
+│       ├── __tests__/              # Server-side tests (co-located)
+│       │   ├── scanner.test.ts
+│       │   ├── api.test.ts
+│       │   ├── thumbnail.test.ts
+│       │   ├── importer-scanner.test.ts
+│       │   ├── editor-launcher.test.ts
+│       │   ├── duplicate-scanner.test.ts
+│       │   └── mocks/             # Test mocks for dependencies
+│       │       ├── chokidar.ts
+│       │       ├── fast-glob.ts
+│       │       ├── fs.ts
+│       │       ├── launch-editor.ts
+│       │       └── sharp.ts
 │       ├── middleware/
 │       │   └── create-middleware.ts # Middleware factory (sirv + API)
 │       └── types/
@@ -136,7 +158,9 @@ src/                         # Main vite-plugin-asset-manager
     ├── hooks/
     │   ├── useAssets.ts        # Asset fetching and SSE subscription
     │   ├── useAssets.test.ts   # Tests
-    │   ├── useAssetActions.ts  # Context menu action handlers
+    │   ├── useAssetClipboard.ts # Clipboard operations (copy path, copy import code)
+    │   ├── useAssetFileActions.ts # File system actions (open in editor, reveal in finder)
+    │   ├── useAssetMutations.ts # Asset mutations (delete, toggle ignore)
     │   ├── useAdvancedFilters.ts # Size/date/extension filtering
     │   ├── useBulkOperations.ts # Bulk delete operations
     │   ├── useDuplicates.ts    # Fetch duplicate assets by content hash
@@ -165,20 +189,7 @@ src/                         # Main vite-plugin-asset-manager
 
 tests/
 ├── setup.ts          # Global test setup, mock utilities
-├── setup-ui.ts       # UI test setup (jsdom, EventSource mock)
-├── mocks/            # Test mocks for dependencies
-│   ├── chokidar.ts
-│   ├── fast-glob.ts
-│   ├── fs.ts
-│   ├── launch-editor.ts
-│   └── sharp.ts
-└── server/           # Server-side tests
-    ├── scanner.test.ts
-    ├── api.test.ts
-    ├── thumbnail.test.ts
-    ├── importer-scanner.test.ts
-    ├── editor-launcher.test.ts
-    └── duplicate-scanner.test.ts
+└── setup-ui.ts       # UI test setup (jsdom, EventSource mock)
 
 .agents/
 └── skills/           # Agent skill definitions
@@ -207,9 +218,15 @@ Edit these files:
 Current categories (8): `image`, `video`, `audio`, `document`, `font`, `data`, `text`, `other`
 
 ### Adding new API endpoints
-Edit [packages/core/src/api/router.ts](packages/core/src/api/router.ts):
-- Add case to switch statement
-- Create handler function
+The API is split into modular handlers in `packages/core/src/api/handlers/`:
+- `asset-handler.ts` - Asset data endpoints (assets, grouped, search, stats)
+- `file-handler.ts` - File serving endpoints (thumbnail, file)
+- `system-handler.ts` - System integration endpoints (importers, duplicates, editor, finder)
+- `bulk-handler.ts` - Bulk operation endpoints (download, delete)
+
+To add a new endpoint:
+1. Add the handler function to the appropriate handler file (or create a new one)
+2. Register the route in `router.ts`
 
 Current endpoints: `/assets`, `/assets/grouped`, `/search`, `/thumbnail`, `/file`, `/stats`, `/importers`, `/duplicates`, `/open-in-editor`, `/reveal-in-finder`, `/bulk-download`, `/bulk-delete`, `/events` (SSE)
 
@@ -321,7 +338,10 @@ Each includes test assets in `src/assets/` and `public/` directories.
 - **Trigger**: Right-click any asset card
 - **Actions**: 7 actions in 5 groups (Open Preview, Copy Path, Copy Import Code, Open in Editor, Reveal in Finder/Explorer, Mark as Ignored, Delete)
 - **Auto-select**: Right-clicking unselected asset automatically selects it
-- **Hook**: `useAssetActions()` from `@/ui/hooks/useAssetActions`
+- **Hooks** (split into 3 focused hooks):
+  - `useAssetClipboard()` from `@/ui/hooks/useAssetClipboard` - Copy path, copy import code
+  - `useAssetFileActions()` from `@/ui/hooks/useAssetFileActions` - Open in editor, reveal in finder
+  - `useAssetMutations()` from `@/ui/hooks/useAssetMutations` - Delete, toggle ignore
 - **Component**: `<AssetContextMenu>` from `@/ui/components/asset-context-menu`
 - **Server**: `/reveal-in-finder` endpoint + `file-revealer.ts` utility
 
