@@ -34,7 +34,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/ui/components/ui/alert-dialog'
-import { useAssetActions } from '@/ui/hooks/useAssetActions'
+import { useAssetClipboard } from '@/ui/hooks/useAssetClipboard'
+import { useAssetFileActions } from '@/ui/hooks/useAssetFileActions'
+import { useAssetMutations } from '@/ui/hooks/useAssetMutations'
 import type { Asset } from '../types'
 
 interface AssetContextMenuProps {
@@ -56,8 +58,14 @@ export const AssetContextMenu = memo(function AssetContextMenu({
   onToggleSelect,
   autoSelect = true
 }: AssetContextMenuProps) {
-  const actions = useAssetActions({ asset, onPreview })
+  const clipboard = useAssetClipboard(asset)
+  const fileActions = useAssetFileActions(asset)
+  const mutations = useAssetMutations(asset)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+
+  const handlePreview = useCallback(() => {
+    onPreview?.(asset)
+  }, [asset, onPreview])
 
   const handleContextMenu = useCallback(
     (_e: React.MouseEvent) => {
@@ -73,24 +81,24 @@ export const AssetContextMenu = memo(function AssetContextMenu({
   }, [])
 
   const handleDeleteConfirm = useCallback(async () => {
-    await actions.handleDelete()
+    await mutations.handleDelete()
     setDeleteDialogOpen(false)
-  }, [actions])
+  }, [mutations])
 
   return (
     <ContextMenu>
       <ContextMenuTrigger onContextMenu={handleContextMenu}>{children}</ContextMenuTrigger>
 
       <ContextMenuContent className="w-56">
-        <ContextMenuItem onClick={actions.handlePreview}>
+        <ContextMenuItem onClick={handlePreview}>
           <EyeIcon weight="bold" className="w-4 h-4 mr-2" />
           Open Preview
         </ContextMenuItem>
 
-        <ContextMenuItem onClick={actions.handleCopyPath}>
+        <ContextMenuItem onClick={clipboard.handleCopyPath}>
           <CopySimpleIcon weight="bold" className="w-4 h-4 mr-2" />
           Copy Path
-          {actions.copyPathState === 'copied' && (
+          {clipboard.copyPathState === 'copied' && (
             <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-emerald-500" />
           )}
         </ContextMenuItem>
@@ -103,24 +111,24 @@ export const AssetContextMenu = memo(function AssetContextMenu({
             Copy Import Code
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
-            <ContextMenuItem onClick={() => actions.handleCopyImportCode('html')}>
+            <ContextMenuItem onClick={() => clipboard.handleCopyImportCode('html')}>
               <FileHtmlIcon weight="bold" className="w-4 h-4 mr-2" />
               HTML
-              {actions.copyCodeState === 'copied' && (
+              {clipboard.copyCodeState === 'copied' && (
                 <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-emerald-500" />
               )}
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => actions.handleCopyImportCode('react')}>
+            <ContextMenuItem onClick={() => clipboard.handleCopyImportCode('react')}>
               <FramerLogoIcon weight="bold" className="w-4 h-4 mr-2" />
               React
-              {actions.copyCodeState === 'copied' && (
+              {clipboard.copyCodeState === 'copied' && (
                 <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-emerald-500" />
               )}
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => actions.handleCopyImportCode('vue')}>
+            <ContextMenuItem onClick={() => clipboard.handleCopyImportCode('vue')}>
               <FileVueIcon weight="bold" className="w-4 h-4 mr-2" />
               Vue
-              {actions.copyCodeState === 'copied' && (
+              {clipboard.copyCodeState === 'copied' && (
                 <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-emerald-500" />
               )}
             </ContextMenuItem>
@@ -129,15 +137,15 @@ export const AssetContextMenu = memo(function AssetContextMenu({
 
         <ContextMenuSeparator />
 
-        <ContextMenuItem onClick={actions.handleOpenInEditor} disabled={!actions.hasImporters}>
+        <ContextMenuItem onClick={fileActions.handleOpenInEditor} disabled={!fileActions.hasImporters}>
           <CodeBlockIcon weight="bold" className="w-4 h-4 mr-2" />
           Open in Editor
-          {actions.hasImporters && (
+          {fileActions.hasImporters && (
             <span className="ml-auto text-[10px] text-muted-foreground">⌘O</span>
           )}
         </ContextMenuItem>
 
-        <ContextMenuItem onClick={actions.handleRevealInFinder}>
+        <ContextMenuItem onClick={fileActions.handleRevealInFinder}>
           <FolderOpenIcon weight="bold" className="w-4 h-4 mr-2" />
           Reveal in {isMac ? 'Finder' : 'Explorer'}
           <span className="ml-auto text-[10px] text-muted-foreground">⌘⇧R</span>
@@ -146,8 +154,8 @@ export const AssetContextMenu = memo(function AssetContextMenu({
         {asset.importersCount === 0 && (
           <>
             <ContextMenuSeparator />
-            <ContextMenuItem onClick={actions.handleToggleIgnore}>
-              {actions.ignored ? (
+            <ContextMenuItem onClick={mutations.handleToggleIgnore}>
+              {mutations.ignored ? (
                 <>
                   <EyeIcon weight="bold" className="w-4 h-4 mr-2" />
                   Unmark as Ignored
@@ -167,10 +175,10 @@ export const AssetContextMenu = memo(function AssetContextMenu({
         <ContextMenuItem
           variant="destructive"
           onClick={handleDeleteClick}
-          disabled={actions.isDeleting}
+          disabled={mutations.isDeleting}
         >
           <TrashIcon weight="bold" className="w-4 h-4 mr-2" />
-          {actions.isDeleting ? 'Deleting...' : 'Delete'}
+          {mutations.isDeleting ? 'Deleting...' : 'Delete'}
           <span className="ml-auto text-[10px]">⌫</span>
         </ContextMenuItem>
 
@@ -201,7 +209,7 @@ export const AssetContextMenu = memo(function AssetContextMenu({
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDeleteConfirm}>
-              {actions.isDeleting ? 'Deleting...' : 'Delete'}
+              {mutations.isDeleting ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

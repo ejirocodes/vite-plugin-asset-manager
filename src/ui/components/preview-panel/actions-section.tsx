@@ -11,8 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/ui/components/ui/alert-dialog'
-import { useIgnoredAssets } from '@/ui/providers/ignored-assets-provider'
-import { useBulkOperations } from '@/ui/hooks/useBulkOperations'
+import { useAssetMutations } from '@/ui/hooks/useAssetMutations'
 import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '@/ui/types'
 
@@ -22,9 +21,7 @@ interface ActionsSectionProps {
 
 export const ActionsSection = memo(function ActionsSection({ asset }: ActionsSectionProps) {
   const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
-  const { isIgnored, toggleIgnored } = useIgnoredAssets()
-  const { isDeleting, bulkDelete } = useBulkOperations()
-  const ignored = isIgnored(asset.path)
+  const { isDeleting, handleDelete, handleToggleIgnore, ignored } = useAssetMutations(asset)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const handleDownload = useCallback(() => {
@@ -36,18 +33,14 @@ export const ActionsSection = memo(function ActionsSection({ asset }: ActionsSec
     document.body.removeChild(link)
   }, [fileUrl, asset.name])
 
-  const handleToggleIgnore = useCallback(() => {
-    toggleIgnored(asset.path)
-  }, [asset.path, toggleIgnored])
-
   const handleDeleteClick = useCallback(() => {
     setDeleteDialogOpen(true)
   }, [])
 
   const handleDeleteConfirm = useCallback(async () => {
-    await bulkDelete([asset])
+    await handleDelete()
     setDeleteDialogOpen(false)
-  }, [asset, bulkDelete])
+  }, [handleDelete])
 
   return (
     <div className="p-4">
