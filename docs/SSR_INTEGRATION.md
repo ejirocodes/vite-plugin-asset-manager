@@ -1,175 +1,24 @@
 # SSR Framework Integration Guide
 
-This guide explains how to integrate the Vite Plugin Asset Manager with Server-Side Rendering (SSR) frameworks.
+This guide covers **manual script injection** for SSR frameworks that don't have an official integration package.
 
-## Overview
+## Official Integration Packages
 
-The plugin uses two injection methods depending on your framework:
+If you're using **Nuxt** or **Next.js**, use the official packages instead of manual setup:
 
-1. **Automatic (transformIndexHtml)**: For frameworks with static `index.html` files
-   ✅ React, Vue, Svelte, Solid, Preact, Lit, Qwik, Vanilla
-
-2. **Official Framework Packages**: Native integration with auto-injection
-   ✅ Nuxt (`@vite-asset-manager/nuxt`)
-   ✅ Next.js (`nextjs-asset-manager`)
-
-3. **Manual Component Injection**: For other SSR frameworks
-   ⚠️ TanStack Start, Remix, SvelteKit, Solid Start
+- **Nuxt 3/4**: [`@vite-asset-manager/nuxt`](https://www.npmjs.com/package/@vite-asset-manager/nuxt) — zero-config module with automatic floating icon injection and DevTools integration
+- **Next.js 14+**: [`nextjs-asset-manager`](https://www.npmjs.com/package/nextjs-asset-manager) — App Router route handlers with automatic floating icon via client component
 
 ---
 
-## Why Manual Setup is Needed for SSR
+## Why Manual Setup is Needed
 
 SSR frameworks dynamically generate HTML and don't use static `index.html` files. This means:
 
 - The `transformIndexHtml()` Vite hook is not called (no static HTML file exists)
 - Scripts must be injected directly in the SSR component tree
-- This applies to all modern SSR frameworks (TanStack Start, Remix, Nuxt, SvelteKit, Solid Start)
 
 **The Solution**: Add the floating icon scripts directly in your framework's root component.
-
----
-
-## Next.js Setup
-
-### Recommended: Official Next.js Package
-
-The easiest way to use Asset Manager with Next.js is via the official package `nextjs-asset-manager`:
-
-#### Step 1: Install the Package
-
-```bash
-npm install nextjs-asset-manager -D
-# or
-pnpm add nextjs-asset-manager -D
-```
-
-#### Step 2: Wrap Your Next.js Config
-
-Wrap your `next.config.ts` with `withAssetManager` to automatically suppress dev server request logging for asset manager API routes:
-
-```typescript
-// next.config.ts
-import type { NextConfig } from "next"
-import { withAssetManager } from "nextjs-asset-manager"
-
-const nextConfig: NextConfig = {
-  // Your existing config
-}
-
-export default withAssetManager(nextConfig)
-```
-
-If you use a custom base path, pass it as an option:
-
-```typescript
-export default withAssetManager(nextConfig, { base: '/api/assets' })
-```
-
-#### Step 3: Create an API Route Handler
-
-Create a catch-all API route to handle all Asset Manager requests:
-
-```typescript
-// app/api/asset-manager/[[...path]]/route.ts
-import { createHandler } from 'nextjs-asset-manager'
-
-const { GET, POST } = createHandler({
-  // Optional: customize settings
-  include: ['src', 'public', 'app'],   // Directories to scan (default: ['app', 'public', 'src'])
-  launchEditor: 'code',                // Editor for "Open in Editor" (default: 'code')
-  watch: true,                         // Real-time updates (default: true)
-  debug: false,                        // Enable debug logging
-  aliases: { '@/': 'src/' },           // Path aliases for import detection
-})
-
-export { GET, POST }
-```
-
-#### Step 4: Add the Client Component
-
-Add `AssetManagerScript` to your root layout for floating icon injection:
-
-```tsx
-// app/layout.tsx
-import { AssetManagerScript } from 'nextjs-asset-manager'
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>
-        {children}
-        <AssetManagerScript />
-      </body>
-    </html>
-  )
-}
-```
-
-That's it! The package automatically:
-- ✅ Suppresses dev server request logging for asset manager routes
-- ✅ Creates API endpoints for asset management
-- ✅ Injects the floating icon (no manual script injection)
-- ✅ Only runs in development mode (returns 404 in production)
-- ✅ Survives Next.js HMR re-evaluation (globalThis singleton)
-
-#### Step 5: Access the Dashboard
-
-- **Floating Icon**: Click the overlay button or press `Option+Shift+A` (⌥⇧A)
-- **Direct URL**: Visit `http://localhost:3000/api/asset-manager/`
-
-### Next.js-Specific Notes
-
-**Default Base Path**: The default base path is `/api/asset-manager` instead of `/__asset_manager__`. This is because Next.js treats folders starting with `_` as [private folders](https://nextjs.org/docs/app/getting-started/project-structure#private-folders) and excludes them from routing.
-
-**Custom Base Path**: If you want a different base path, update the config wrapper, handler, and component:
-
-```typescript
-// next.config.ts
-export default withAssetManager(nextConfig, { base: '/api/assets' })
-
-// route.ts
-const { GET, POST } = createHandler({ base: '/api/assets' })
-
-// layout.tsx
-<AssetManagerScript base="/api/assets" />
-```
-
-**Composing with Other Plugins**: `withAssetManager` follows the standard `withX` convention used by `@sentry/nextjs`, `@next/bundle-analyzer`, `next-intl`, etc. Compose by nesting — the innermost wrapper runs first:
-
-```typescript
-// next.config.ts
-import { withAssetManager } from "nextjs-asset-manager"
-import { withSentryConfig } from "@sentry/nextjs"
-
-const nextConfig: NextConfig = {}
-
-// Nesting: each wrapper receives the output of the inner one
-export default withSentryConfig(withAssetManager(nextConfig))
-```
-
-For many plugins, a helper function can improve readability:
-
-```typescript
-import { withAssetManager } from "nextjs-asset-manager"
-import { withSentryConfig } from "@sentry/nextjs"
-import withBundleAnalyzer from "@next/bundle-analyzer"
-
-const nextConfig: NextConfig = {}
-
-const compose = (...fns: ((c: NextConfig) => NextConfig)[]) =>
-  fns.reduceRight((config, fn) => fn(config), nextConfig)
-
-export default compose(
-  withSentryConfig,
-  withBundleAnalyzer({ enabled: process.env.ANALYZE === "true" }),
-  withAssetManager,
-)
-```
-
-**Web API Adapter**: Next.js App Router uses Web API `Request`/`Response` objects, while the core middleware uses Node.js HTTP. The package includes an adapter that bridges these transparently.
-
-**HMR Singleton**: The package uses a `globalThis` singleton pattern (similar to Prisma) to prevent re-initialization during Next.js hot module replacement.
 
 ---
 
@@ -368,124 +217,6 @@ export default function Root() {
 
 ---
 
-## Nuxt Setup
-
-### Recommended: Official Nuxt Module
-
-The easiest way to use Asset Manager with Nuxt is via the official module `@vite-asset-manager/nuxt`:
-
-#### Step 1: Install the Module
-
-```bash
-npm install @vite-asset-manager/nuxt
-# or
-pnpm add @vite-asset-manager/nuxt
-```
-
-#### Step 2: Add to Nuxt Config
-
-```typescript
-// nuxt.config.ts
-export default defineNuxtConfig({
-  modules: ['@vite-asset-manager/nuxt'],
-
-  // Optional: customize settings
-  assetManager: {
-    base: '/__asset_manager__',     // Default
-    include: ['assets', 'public'],   // Directories to scan
-    floatingIcon: true,              // Show floating icon
-    watch: true,                     // Real-time updates
-    launchEditor: 'code',            // Editor for "Open in Editor"
-    devtools: true,                  // Add Nuxt DevTools tab
-    debug: false                     // Enable debug logging
-  }
-})
-```
-
-That's it! The module automatically:
-- ✅ Injects the floating icon (no manual script injection)
-- ✅ Handles Nuxt 3 and Nuxt 4 directory structure differences
-- ✅ Adds an Asset Manager tab to Nuxt DevTools
-- ✅ Only runs in development mode
-
-#### Step 3: Access the Dashboard
-
-- **Floating Icon**: Click the overlay button or press `Option+Shift+A` (⌥⇧A)
-- **Direct URL**: Visit `http://localhost:3000/__asset_manager__/`
-- **Nuxt DevTools**: Open DevTools (Shift+Option+D) and find the "Asset Manager" tab
-
----
-
-### Alternative: Manual Vite Plugin Setup
-
-If you prefer manual configuration or need more control, you can use the Vite plugin directly:
-
-#### Step 1: Configure the Plugin
-
-Add the plugin to your `nuxt.config.ts` using the `vite` configuration option:
-
-> **Important for Nuxt 4**: Nuxt 4 sets Vite's root to the `app/` directory. You must configure paths relative to `app/`, include source directories for unused asset detection, and set up aliases correctly.
-
-```typescript
-// nuxt.config.ts
-import AssetManager from 'vite-plugin-asset-manager'
-
-export default defineNuxtConfig({
-  vite: {
-    plugins: [
-      AssetManager({
-        // Paths are relative to app/ directory (Nuxt's Vite root)
-        // Include both asset directories AND source directories
-        include: [
-          'assets',           // app/assets/ - your assets
-          '../public',        // public/ - static files (one level up from app/)
-          'components',       // For unused asset detection
-          'pages',
-          'layouts',
-          'composables',
-          'plugins'
-        ],
-        // Configure aliases to match Nuxt's path resolution
-        aliases: {
-          '@/': 'assets/',    // @/image.png → assets/image.png
-          '~/': ''            // ~/assets/image.png → assets/image.png
-        },
-        // Enable debug mode if assets aren't showing
-        debug: true
-      })
-    ]
-  }
-})
-```
-
-#### Step 2: Add Scripts to Root Component
-
-For Nuxt 3, create or edit `app.vue`:
-
-```vue
-<script setup lang="ts">
-const isDev = process.env.NODE_ENV === 'development'
-</script>
-
-<template>
-  <div>
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-
-    <!-- Vite Plugin Asset Manager - Floating Icon Injection -->
-    <ClientOnly v-if="isDev">
-      <script>
-        window.__VAM_BASE_URL__ = "/__asset_manager__";
-      </script>
-      <script type="module" src="/__asset_manager__/floating-icon.js" />
-    </ClientOnly>
-  </div>
-</template>
-```
-
----
-
 ## SvelteKit Setup
 
 ### Step 1: Configure the Plugin
@@ -532,11 +263,9 @@ All SSR frameworks use the same plugin options. The configuration file varies by
 
 | Framework | Config File | Plugin Location |
 |-----------|-------------|-----------------|
-| Next.js | `app/api/.../route.ts` | `createHandler()` from `nextjs-asset-manager` |
 | TanStack Start | `vite.config.ts` | `plugins: [...]` |
 | Remix | `vite.config.ts` | `plugins: [...]` |
 | Solid Start | `app.config.ts` | `vite.plugins: [...]` |
-| Nuxt (Module) | `nuxt.config.ts` | `modules: ['@vite-asset-manager/nuxt']` |
 | SvelteKit | `vite.config.ts` | `plugins: [...]` |
 
 ### Available Options
@@ -646,101 +375,6 @@ The keyboard shortcut `Option+Shift+A` (⌥⇧A) requires:
 2. `window.__VAM_BASE_URL__` defined before `floating-icon.js` loads
 3. Page must be focused (click anywhere on the page first)
 
-### Nuxt: Dashboard Shows 0 Assets
-
-If the Asset Manager UI loads but shows no assets in a Nuxt project:
-
-1. **Enable debug mode** to see what paths are being scanned:
-   ```typescript
-   // nuxt.config.ts
-   AssetManager({
-     include: ['assets', '../public'],
-     debug: true  // Check terminal output
-   })
-   ```
-
-2. **Check terminal output** for debug info showing:
-   - `Root:` - The base path Vite/Nuxt is using (usually `app/` for Nuxt 4)
-   - `Include paths:` - Your configured directories
-   - `Files found:` - Number of assets discovered
-
-3. **Adjust include paths** based on the root shown:
-   ```typescript
-   // If root is app/ directory (Nuxt 4 default):
-   include: ['assets', '../public']
-
-   // If root is project root:
-   include: ['app/assets', 'public']
-
-   // For Nuxt 3 with src/ directory:
-   include: ['src/assets', 'public']
-   ```
-
-4. **Common Nuxt 4 directory structures**:
-   ```
-   project/
-   ├── app/              ← Vite root is here!
-   │   ├── assets/       → include: ['assets']
-   │   │   ├── css/
-   │   │   ├── img/
-   │   │   └── video/
-   │   └── components/
-   ├── public/           → include: ['../public'] (one level up)
-   │   ├── favicon.svg
-   │   └── images/
-   └── nuxt.config.ts
-   ```
-
-5. **Verify with API directly**:
-   - Visit `http://localhost:3000/__asset_manager__/api/stats`
-   - If it shows `{"total":0}`, the scanner isn't finding files
-   - Check the debug output in your terminal
-
-### Nuxt: Unused Assets Not Detected
-
-If assets show but "unused" detection doesn't work:
-
-1. **Include source directories** - The importer scanner needs to scan your Vue/JS files:
-   ```typescript
-   include: [
-     'assets',        // Asset directories
-     '../public',
-     'components',    // Source directories for importer scanning
-     'pages',
-     'layouts',
-     'composables'
-   ]
-   ```
-
-2. **Configure aliases** - Nuxt uses `@/` and `~/` aliases differently than standard Vite:
-   ```typescript
-   aliases: {
-     '@/': 'assets/',   // Adjust based on your import patterns
-     '~/': ''
-   }
-   ```
-
-3. **Check your imports** - The importer scanner detects:
-   - ES imports: `import img from '@/images/logo.png'`
-   - CSS url(): `url('@/images/bg.png')`
-   - HTML src/href: `<img src="@/images/logo.png">`
-
-### Nuxt: Real-Time Updates Not Working
-
-If you need to refresh to see changes:
-
-1. **Check the SSE connection** - Open browser DevTools → Network → filter by "events"
-   - You should see a persistent connection to `/__asset_manager__/api/events`
-
-2. **Restart the dev server** after configuration changes
-
-3. **Ensure watch mode is enabled** (it's on by default):
-   ```typescript
-   AssetManager({
-     watch: true  // Default, but verify it's not disabled
-   })
-   ```
-
 ---
 
 ## Performance Considerations
@@ -826,72 +460,13 @@ To ensure scripts are only injected in development:
 
 ---
 
-## Comparison with Non-SSR Frameworks
-
-### Static HTML Frameworks (Automatic)
-
-For frameworks with static `index.html` files (React, Vue, Svelte, Solid, Preact, Lit, Qwik, Vanilla):
-
-- ✅ Fully automatic - no manual setup needed
-- ✅ Plugin injects scripts via `transformIndexHtml()` hook
-- ✅ Zero configuration required
-
-### Official Integration Packages (Automatic)
-
-For frameworks with official packages (Nuxt, Next.js):
-
-- ✅ Automatic setup with minimal configuration
-- ✅ Floating icon auto-injection
-- ✅ Framework-specific defaults and conventions
-- ✅ Dev-only (zero production footprint)
-
-### Streaming SSR Frameworks (Manual)
-
-For streaming SSR frameworks (TanStack Start, Remix, Solid Start):
-
-- ⚠️ Manual script injection required in root component
-- ⚠️ Must maintain scripts if changing frameworks
-- ✅ Full control over injection timing and conditions
-- ✅ Works reliably with progressive HTML streaming
-
----
-
-## Future Enhancements
-
-We're exploring ways to make SSR integration more automatic:
-
-- **Framework-specific plugins**: Dedicated plugins for TanStack Start, Remix, etc.
-- **Auto-detection**: Detect framework and provide setup instructions
-- **CLI setup command**: `npx vite-plugin-asset-manager setup tanstack-start`
-- **Alternative injection methods**: Vite middleware hooks, framework-specific APIs
-
----
-
 ## Getting Help
 
 If you encounter issues:
 
 1. Check this guide's Troubleshooting section
-2. Visit the [GitHub Issues](https://github.com/your-repo/vite-plugin-asset-manager/issues)
-3. Search existing issues or create a new one
-4. Include:
-   - Framework and version (e.g., TanStack Start 1.0.0)
-   - Browser console errors
-   - Relevant config files
-   - Whether `/__asset_manager__/` URL works directly
-
----
-
-## Contributing
-
-Have experience with other SSR frameworks? Contributions are welcome!
-
-- Add setup guides for additional frameworks
-- Improve automatic detection
-- Test with framework-specific edge cases
-- Submit PRs with examples
-
----
+2. Visit the [GitHub Issues](https://github.com/ejirocodes/vite-plugin-asset-manager/issues)
+3. Include your framework/version, browser console errors, and relevant config files
 
 ## License
 
