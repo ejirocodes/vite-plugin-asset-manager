@@ -54,6 +54,8 @@ The project uses a pnpm workspace monorepo with four packages:
 
 ### 2c. Duplicate Scanner (`packages/core/src/services/duplicate-scanner.ts`)
 - Content-based duplicate detection using MD5 hashing
+- **Dependency injection**: Accepts `assetProvider: { getAssets(): Asset[] }` (receives scanner instance) instead of requiring external orchestration
+- **Self-managed lifecycle**: `init()` performs initial scan and starts file watcher internally
 - **Hash computation**: MD5 of file contents, streaming for files >1MB
 - **Two-tier cache**: hashCache (path -> {hash, mtime, size}) + duplicateGroups (hash -> Set<paths>)
 - **Cache validation**: Reuses hash if mtime and size unchanged
@@ -126,6 +128,16 @@ Framework-agnostic overlay button that opens the Asset Manager panel. Built as s
 - **SVGs served directly**: No thumbnail generation needed (already lightweight/scalable)
 
 ### 4. API Design
+
+The API router (`packages/core/src/api/router.ts`) is split into modular handler files:
+- `handlers/asset-handler.ts` - Asset data endpoints (assets, grouped, search, stats)
+- `handlers/file-handler.ts` - File serving endpoints (thumbnail, file)
+- `handlers/system-handler.ts` - System integration endpoints (importers, duplicates, editor, finder)
+- `handlers/bulk-handler.ts` - Bulk operation endpoints (download, delete)
+- `sse-manager.ts` - SSE client management and event broadcasting
+- `filters.ts` - Query parameter parsing for advanced filters
+- `utils.ts` - Shared HTTP utilities (JSON response, error handling)
+
 | Endpoint | Purpose |
 |----------|---------|
 | `GET /api/assets` | List all assets (filterable by directory/type) |
@@ -233,7 +245,10 @@ The preview panel is a fixed sidebar (not a Sheet/Dialog) with 13 total componen
 - **Integration**: Works with all filters (type, unused, search, sort)
 
 ### 6h. Context Menu System
-- **Hook**: `useAssetActions.ts` - Centralized action handlers for 7 actions (preview, copy path, copy code, editor, reveal, ignore, delete)
+- **Hooks** (split from former `useAssetActions` into 3 focused hooks):
+  - `useAssetClipboard.ts` - Clipboard operations (copy path, copy import code)
+  - `useAssetFileActions.ts` - File system actions (open in editor, reveal in finder)
+  - `useAssetMutations.ts` - Asset mutations (delete, toggle ignore)
 - **Component**: `asset-context-menu.tsx` - Right-click menu with 5 groups of actions
 - **Trigger**: Right-click on asset card (auto-selects if not already selected)
 - **Actions**:
@@ -355,7 +370,7 @@ Each category has a distinct color in the sidebar:
 ### 8. Real-Time Updates (SSE)
 The plugin uses Server-Sent Events for real-time updates instead of WebSocket:
 
-**Server side** (`packages/core/src/api/router.ts`):
+**Server side** (`packages/core/src/api/sse-manager.ts`):
 - `sseClients` - Set of active SSE connections
 - `handleSSE()` - Sets up SSE response headers and adds client to set
 - `broadcastSSE(event, data)` - Sends events to all connected clients

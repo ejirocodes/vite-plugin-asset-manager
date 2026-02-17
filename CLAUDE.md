@@ -160,12 +160,17 @@ Each playground imports the plugin directly from `../../src/index` (no pnpm link
    - `services/scanner.ts` - EventEmitter-based file scanner using fast-glob + chokidar for watching
    - `services/thumbnail.ts` - Sharp-based thumbnail generation with dual-tier caching (memory + disk in OS temp)
    - `services/importer-scanner.ts` - Detects which source files import each asset (ES imports, dynamic imports, require, CSS url, HTML attributes)
-   - `services/duplicate-scanner.ts` - Content-based duplicate detection using MD5 hashing with streaming support for large files
+   - `services/duplicate-scanner.ts` - Content-based duplicate detection using MD5 hashing with streaming support for large files; accepts `assetProvider` for dependency injection and manages its own lifecycle (init + watcher)
    - `services/editor-launcher.ts` - Opens files in configured editor at specific line/column using launch-editor
    - `services/file-revealer.ts` - Cross-platform utility to reveal files in system file explorer (Finder/Explorer)
-   - `api/router.ts` - HTTP API router with endpoints: `/assets`, `/assets/grouped`, `/search`, `/thumbnail`, `/file`, `/stats`, `/importers`, `/duplicates`, `/open-in-editor`, `/reveal-in-finder`, `/bulk-download`, `/bulk-delete`, `/events` (SSE)
+   - `api/router.ts` - HTTP API router orchestrator, delegates to handler modules
+   - `api/handlers/` - Modular route handlers: `asset-handler.ts` (assets, grouped, search, stats), `file-handler.ts` (thumbnail, file serving), `system-handler.ts` (importers, duplicates, editor, finder), `bulk-handler.ts` (bulk download/delete)
+   - `api/sse-manager.ts` - SSE client management and event broadcasting
+   - `api/filters.ts` - Query parameter parsing for advanced filters
+   - `api/utils.ts` - Shared HTTP utilities (JSON response, error handling)
    - `middleware/create-middleware.ts` - Middleware factory, serves API at `{base}/api/*` and dashboard UI via sirv
    - `asset-manager.ts` - `AssetManager` orchestrator class that initializes all services
+   - `errors.ts` - Error type hierarchy (`AssetManagerError` with statusCode, code, context)
    - `types/index.ts` - All shared TypeScript types
 
 4. **UI Layer** (`src/ui/`)
@@ -188,7 +193,7 @@ Each playground imports the plugin directly from `../../src/index` (no pnpm link
        - `details-section.tsx`, `actions-section.tsx`, `code-snippets.tsx` - Panel sections
        - `importers-section.tsx` - Shows files that import the asset with click-to-open-in-editor
        - `duplicates-section.tsx` - Shows other files with identical content hash
-     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetActions()` for context menu actions, `useDuplicates()` for duplicate file queries, `useKeyboardNavigation()` for full keyboard navigation support, `useAdvancedFilters()` for size/date/extension filtering, `useResponsiveColumns()` for viewport-aware grid columns, `useVirtualGrid()` for virtualized rendering with @tanstack/react-virtual, `useEmbeddedMode()` for detecting if dashboard runs inside floating icon panel
+     - `hooks/` - `useAssets()` for fetching/subscriptions, `useSearch()` for debounced search, `useImporters()` for importer data and editor launch, `useSSE()` for real-time SSE connection, `useStats()` for asset statistics, `useBulkOperations()` for multi-asset actions, `useAssetClipboard()` for clipboard operations (copy path, copy import code), `useAssetFileActions()` for file system actions (open in editor, reveal in finder), `useAssetMutations()` for asset mutations (delete, toggle ignore), `useDuplicates()` for duplicate file queries, `useKeyboardNavigation()` for full keyboard navigation support, `useAdvancedFilters()` for size/date/extension filtering, `useResponsiveColumns()` for viewport-aware grid columns, `useVirtualGrid()` for virtualized rendering with @tanstack/react-virtual, `useEmbeddedMode()` for detecting if dashboard runs inside floating icon panel
      - `providers/theme-provider.tsx` - Theme context using next-themes
      - `providers/ignored-assets-provider.tsx` - Manages ignored assets (localStorage-persisted)
      - `lib/utils.ts` - Tailwind `cn()` utility, `lib/code-snippets.ts` - Import snippet generators
@@ -345,7 +350,7 @@ pnpm run test:server   # Run server tests only (Node environment)
 pnpm run test:client   # Run UI tests only (jsdom environment)
 
 # Run a specific test file
-pnpm run test tests/server/scanner.test.ts
+pnpm run test packages/core/src/__tests__/scanner.test.ts
 pnpm run test src/ui/hooks/useAssets.test.ts
 
 # Run tests matching a pattern
@@ -354,7 +359,8 @@ pnpm run test -t "scanner"
 
 ### Test Structure (16 test files: 6 server + 10 UI)
 
-- `tests/server/` - Server-side tests (scanner, thumbnail, api, importer-scanner, editor-launcher, duplicate-scanner)
+- `packages/core/src/__tests__/` - Server-side tests (co-located with core package): scanner, thumbnail, api, importer-scanner, editor-launcher, duplicate-scanner
+- `packages/core/src/__tests__/mocks/` - Test mocks for dependencies (chokidar, fast-glob, fs, launch-editor, sharp)
 - `src/ui/**/*.test.{ts,tsx}` - UI component and hook tests (co-located): useAssets, useSearch, useSSE, useImporters, useDuplicates, useVirtualGrid, useResponsiveColumns, asset-card, search-bar, ignored-assets-provider
 - `tests/setup.ts` - Global test setup, exports `createMockAsset()` and `createMockImporter()` utilities
 - `tests/setup-ui.ts` - UI-specific setup (jsdom), mocks for EventSource, fetch, clipboard
@@ -379,7 +385,7 @@ ESLint uses flat config (`eslint.config.js`) with separate rules for plugin code
 | Bulk Operations | `useBulkOperations`, `BulkActionsBar` | Multi-select with Shift/Ctrl+click, copy paths, ZIP download, bulk delete |
 | Unused Detection | `Asset.importersCount`, `useStats` | Badge on cards, sidebar filter, tracks assets with no importers |
 | Ignored Assets | `IgnoredAssetsProvider`, `useIgnoredAssets` | localStorage-persisted hiding without deletion |
-| Context Menu | `useAssetActions`, `AssetContextMenu` | Right-click for preview, copy, reveal in Finder, delete |
+| Context Menu | `useAssetClipboard`, `useAssetFileActions`, `useAssetMutations`, `AssetContextMenu` | Right-click for preview, copy, reveal in Finder, delete |
 | Duplicates | `DuplicateScanner`, `useDuplicates` | MD5 content hashing, badge showing duplicate count |
 | Keyboard Nav | `useKeyboardNavigation` | Arrow keys, vim-style `j`/`k`, shortcuts for all actions |
 | Advanced Filters | `useAdvancedFilters`, `AdvancedFilters` | Filter by size, date, extension with presets |

@@ -27,7 +27,7 @@ The plugin provides a comprehensive asset management solution with:
 
 Comprehensive test suite implemented with Vitest (16 test files):
 
-**Server tests** (`tests/server/` - 6 files):
+**Server tests** (`packages/core/src/__tests__/` - 6 files, co-located with core package):
 - `scanner.test.ts` - Asset discovery, caching, watching
 - `importer-scanner.test.ts` - Import detection across multiple patterns
 - `api.test.ts` - All REST endpoints including SSE
@@ -35,7 +35,7 @@ Comprehensive test suite implemented with Vitest (16 test files):
 - `editor-launcher.test.ts` - Editor integration
 - `duplicate-scanner.test.ts` - Content-based duplicate detection
 
-**Test mocks** (`tests/mocks/` - 5 files):
+**Test mocks** (`packages/core/src/__tests__/mocks/` - 5 files):
 - `chokidar.ts`, `fast-glob.ts`, `fs.ts`, `launch-editor.ts`, `sharp.ts`
 
 **Test setup** (`tests/` - 2 files):
@@ -433,7 +433,9 @@ Multi-select functionality for batch actions is fully implemented.
 **Enhancement**: Right-click context menu on asset cards
 
 **Implementation**:
-- `src/ui/hooks/useAssetActions.ts` - Core action hook with 7 handlers
+- `src/ui/hooks/useAssetClipboard.ts` - Clipboard operations (copy path, copy import code)
+- `src/ui/hooks/useAssetFileActions.ts` - File system actions (open in editor, reveal in finder)
+- `src/ui/hooks/useAssetMutations.ts` - Asset mutations (delete, toggle ignore)
 - `src/ui/components/asset-context-menu.tsx` - Context menu UI component
 - `src/ui/components/asset-card.tsx` - Wrapped with context menu
 - `packages/core/src/services/file-revealer.ts` - Cross-platform file reveal utility
