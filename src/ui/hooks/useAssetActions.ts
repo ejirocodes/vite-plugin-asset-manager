@@ -4,7 +4,7 @@ import { useIgnoredAssets } from '../providers/ignored-assets-provider'
 import { useImporters } from './useImporters'
 import { useBulkOperations } from './useBulkOperations'
 import { generateCodeSnippets, type SnippetType } from '@/ui/lib/code-snippets'
-import { getApiBase } from '@/ui/lib/api-base'
+import { revealAssetInFinder } from '@/ui/lib/asset-api'
 import type { Asset } from '../types'
 
 interface UseAssetActionsProps {
@@ -102,17 +102,8 @@ export function useAssetActions({ asset, onPreview }: UseAssetActionsProps): Use
 
   const handleRevealInFinder = useCallback(async () => {
     try {
-      const response = await fetch(
-        `${getApiBase()}/api/reveal-in-finder?path=${encodeURIComponent(asset.path)}`,
-        { method: 'POST' }
-      )
+      await revealAssetInFinder(asset.path)
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Failed to reveal file')
-      }
-
-      // Detect platform using userAgent (modern approach)
       const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
       toast.success(`File revealed in ${isMac ? 'Finder' : 'Explorer'}`)
     } catch (err) {

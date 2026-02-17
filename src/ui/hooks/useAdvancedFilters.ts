@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import type { SizeFilter, DateFilter, ExtensionFilter } from '@/shared/types'
+import type { SizeFilter, DateFilter, ExtensionFilter } from '../types'
 
 const SIZE_BOUNDS: Record<string, { min?: number; max?: number }> = {
   small: { max: 100 * 1024 },

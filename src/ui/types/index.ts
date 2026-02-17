@@ -48,7 +48,7 @@ export type {
   DateFilterPreset,
   ExtensionFilter,
   AdvancedFilters
-} from '@/shared/types'
+} from '@vite-asset-manager/core'
 
 export interface UseAssetsResult {
   groups: AssetGroup[]

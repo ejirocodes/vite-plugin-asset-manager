@@ -1,5 +1,5 @@
 import { vi, beforeEach, afterEach } from 'vitest'
-import type { Asset, Importer, AssetType, ImportType } from '../src/shared/types'
+import type { Asset, Importer, AssetType, ImportType } from '@vite-asset-manager/core'
 
 beforeEach(() => {
   vi.clearAllMocks()
