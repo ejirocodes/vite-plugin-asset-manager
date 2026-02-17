@@ -74,17 +74,15 @@ export function createAssetManagerMiddleware(
   const clientDir = findClientDir()
   const staticServe = sirv(clientDir, { single: true, dev: true })
 
-  // The dashboard UI is built with a hardcoded base path. When the configured
-  // base differs (e.g. '/api/asset-manager' for Next.js), rewrite asset paths
-  // in index.html so JS/CSS references point to the correct location.
-  const BUILD_TIME_BASE = '/__asset_manager__'
-  let rewrittenHtml: string | null = null
-  if (base !== BUILD_TIME_BASE) {
-    const htmlPath = path.join(clientDir, 'index.html')
-    if (fs.existsSync(htmlPath)) {
-      const raw = fs.readFileSync(htmlPath, 'utf-8')
-      rewrittenHtml = raw.replaceAll(BUILD_TIME_BASE, base)
-    }
+  // Inject <base> tag into index.html so relative asset paths (./assets/...)
+  // resolve correctly regardless of whether the document URL has a trailing
+  // slash. Without this, /api/asset-manager (no slash) resolves ./assets/foo
+  // to /api/assets/foo instead of /api/asset-manager/assets/foo.
+  let indexHtml: string | null = null
+  const htmlPath = path.join(clientDir, 'index.html')
+  if (fs.existsSync(htmlPath)) {
+    const raw = fs.readFileSync(htmlPath, 'utf-8')
+    indexHtml = raw.replace('<head>', `<head>\n    <base href="${base}/">`)
   }
 
   return (req: IncomingMessage, res: ServerResponse, next: NextFunction) => {
@@ -100,12 +98,11 @@ export function createAssetManagerMiddleware(
 
     // Handle static UI requests
     if (pathname === base || pathname.startsWith(`${base}/`)) {
-      // If the base path differs from build-time default, serve rewritten
-      // index.html directly for non-asset requests (SPA fallback)
+      // Serve index.html with <base> tag for root requests
       const subPath = pathname.slice(base.length)
-      if (rewrittenHtml && (subPath === '' || subPath === '/')) {
+      if (indexHtml && (subPath === '' || subPath === '/')) {
         res.setHeader('Content-Type', 'text/html')
-        res.end(rewrittenHtml)
+        res.end(indexHtml)
         return
       }
 
