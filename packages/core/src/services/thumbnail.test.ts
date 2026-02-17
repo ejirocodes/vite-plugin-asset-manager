@@ -38,7 +38,7 @@ vi.mock('fs/promises', () => ({
   }
 }))
 
-import { ThumbnailService } from '../services/thumbnail'
+import { ThumbnailService } from './thumbnail'
 
 const mockFs = {
   stat: mockFsStat,

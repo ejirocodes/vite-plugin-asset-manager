@@ -36,7 +36,7 @@ vi.mock('fs', () => ({
   createReadStream: mockFsCreateReadStream
 }))
 
-import { DuplicateScanner } from '../services/duplicate-scanner'
+import { DuplicateScanner } from './duplicate-scanner'
 
 const mockFs = {
   createReadStream: mockFsCreateReadStream,

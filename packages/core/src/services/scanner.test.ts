@@ -30,7 +30,7 @@ vi.mock('fs/promises', () => ({
   }
 }))
 
-import { AssetScanner } from '../services/scanner'
+import { AssetScanner } from './scanner'
 
 const mockChokidar = { watch: mockChokidarWatch }
 const mockFs = { stat: mockFsStat }

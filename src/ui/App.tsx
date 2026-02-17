@@ -39,6 +39,7 @@ import {
 } from '@phosphor-icons/react'
 import { useEmbeddedMode } from './hooks/useEmbeddedMode'
 import { openAssetInEditor, revealAssetInFinder } from '@/ui/lib/asset-api'
+import { toast } from 'sonner'
 import type { Asset, AssetType } from './types'
 
 const LoadingSpinner = (
@@ -302,16 +303,19 @@ export default function App() {
   const handleOpenInEditor = useCallback(async (asset: Asset) => {
     try {
       await openAssetInEditor(asset.path)
-    } catch (err) {
-      console.error('Failed to open in editor:', err)
+      toast.success('Opening in editor...')
+    } catch {
+      toast.error('Failed to open in editor')
     }
   }, [])
 
   const handleRevealInFinder = useCallback(async (asset: Asset) => {
     try {
       await revealAssetInFinder(asset.path)
-    } catch (err) {
-      console.error('Failed to reveal in finder:', err)
+      const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
+      toast.success(`File revealed in ${isMac ? 'Finder' : 'Explorer'}`)
+    } catch {
+      toast.error('Failed to reveal file in system explorer')
     }
   }, [])
 
