@@ -17,7 +17,7 @@ export default defineConfig({
       name: 'ViteAssetManagerFloatingIcon',
       fileName: () => 'floating-icon.js'
     },
-    outDir: 'dist/client',
+    outDir: 'packages/core/dist/client',
     emptyOutDir: false,
     minify: 'esbuild',
     rollupOptions: {

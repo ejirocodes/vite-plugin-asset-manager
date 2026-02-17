@@ -39,20 +39,7 @@ const __dirname = path.dirname(__filename)
  * When installed from npm, __dirname = node_modules/@vite-asset-manager/core/dist/
  */
 function findClientDir(): string {
-  // Standalone install: client/ alongside index.js in dist/
-  const colocated = path.join(__dirname, 'client')
-  if (fs.existsSync(colocated)) return colocated
-
-  // Monorepo development: root dist/client/ (from build:ui)
-  const fromRoot = path.resolve(__dirname, '../../../../dist/client')
-  if (fs.existsSync(fromRoot)) return fromRoot
-
-  // Monorepo fallback
-  const fromPackageRoot = path.resolve(__dirname, '../../../dist/client')
-  if (fs.existsSync(fromPackageRoot)) return fromPackageRoot
-
-  // Default fallback
-  return colocated
+  return path.join(__dirname, 'client')
 }
 
 /**

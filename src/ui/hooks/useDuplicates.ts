@@ -3,19 +3,13 @@ import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset, UseDuplicatesResult } from '../types'
 import { useSSE } from './useSSE'
 
-export function useDuplicates(contentHash: string | undefined): UseDuplicatesResult {
+export function useDuplicates(contentHash: string): UseDuplicatesResult {
   const [duplicates, setDuplicates] = useState<Asset[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { subscribe } = useSSE()
 
   const fetchDuplicates = useCallback(async () => {
-    if (!contentHash) {
-      setDuplicates([])
-      setLoading(false)
-      return
-    }
-
     try {
       setLoading(true)
       setError(null)

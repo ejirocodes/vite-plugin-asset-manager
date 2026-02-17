@@ -1,5 +1,5 @@
 import type { ParsedUrlQuery } from 'querystring'
-import type { Asset, AssetGroup, AssetType } from '../types/index.js'
+import type { EnrichedAsset, AssetGroup, AssetType } from '../types/index.js'
 
 export interface ParsedFilters {
   type?: AssetType
@@ -27,7 +27,7 @@ export function parseFilters(query: ParsedUrlQuery): ParsedFilters {
   }
 }
 
-export function applyAssetFilters(assets: Asset[], filters: ParsedFilters): Asset[] {
+export function applyAssetFilters(assets: EnrichedAsset[], filters: ParsedFilters): EnrichedAsset[] {
   let result = assets
   if (filters.minSize !== undefined) result = result.filter(a => a.size >= filters.minSize!)
   if (filters.maxSize !== undefined) result = result.filter(a => a.size <= filters.maxSize!)
@@ -42,7 +42,7 @@ export function applyAssetFilters(assets: Asset[], filters: ParsedFilters): Asse
 
 function filterGroupAssets(
   groups: AssetGroup[],
-  predicate: (a: Asset) => boolean
+  predicate: (a: EnrichedAsset) => boolean
 ): AssetGroup[] {
   return groups
     .map(group => {
@@ -63,7 +63,7 @@ export function applyGroupFilters(groups: AssetGroup[], filters: ParsedFilters):
     result = filterGroupAssets(result, a => a.importersCount === 0)
   }
   if (filters.duplicates) {
-    result = filterGroupAssets(result, a => (a.duplicatesCount ?? 0) > 0)
+    result = filterGroupAssets(result, a => a.duplicatesCount > 0)
   }
   if (filters.minSize !== undefined || filters.maxSize !== undefined) {
     const min = filters.minSize

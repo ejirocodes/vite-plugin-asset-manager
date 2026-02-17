@@ -74,17 +74,6 @@ describe('useDuplicates', () => {
     expect(result.current.duplicates).toHaveLength(2)
   })
 
-  it('should handle undefined content hash', async () => {
-    const { result } = renderHook(() => useDuplicates(undefined))
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
-
-    expect(fetch).not.toHaveBeenCalled()
-    expect(result.current.duplicates).toEqual([])
-  })
-
   it('should handle empty content hash', async () => {
     const { result } = renderHook(() => useDuplicates(''))
 
@@ -92,8 +81,7 @@ describe('useDuplicates', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    expect(fetch).not.toHaveBeenCalled()
-    expect(result.current.duplicates).toEqual([])
+    expect(fetch).toHaveBeenCalledWith('/__asset_manager__/api/duplicates?hash=')
   })
 
   it('should handle fetch errors', async () => {
