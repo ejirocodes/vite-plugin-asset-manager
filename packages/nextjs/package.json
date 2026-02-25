@@ -1,6 +1,6 @@
 {
   "name": "nextjs-asset-manager",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Next.js integration for asset management dashboard — browse, search, and manage all your project assets",
   "author": "Ejiro Asiuwhu <ejiroasiuwhu10@gmail.com>",
