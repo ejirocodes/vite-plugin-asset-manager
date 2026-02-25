@@ -26,6 +26,10 @@
   <a href="#keyboard-shortcuts">Shortcuts</a>
 </p>
 
+<p align="center">
+  <img src="./.github/assets/demo.gif" alt="Vite Plugin Asset Manager Demo" width="800" />
+</p>
+
 ---
 
 ## Installation
