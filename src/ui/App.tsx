@@ -141,7 +141,7 @@ export default function App() {
   const [pendingDeleteAssets, setPendingDeleteAssets] = useState<Asset[] | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const mainRef = useRef<HTMLElement>(null)
-  const hasInitializedDirs = useRef(false)
+  const [dirsInitialized, setDirsInitialized] = useState(false)
   const [srAnnouncement, setSrAnnouncement] = useState('')
 
   const handlePreview = useCallback((asset: Asset) => {
@@ -160,17 +160,18 @@ export default function App() {
     setShowDuplicatesOnly(prev => !prev)
   }, [])
 
-  useEffect(() => {
+  const resetKey = `${selectedType}-${showUnusedOnly}-${showDuplicatesOnly}-${searchQuery}-${filterParamsString}`
+  const [prevResetKey, setPrevResetKey] = useState(resetKey)
+  if (prevResetKey !== resetKey) {
+    setPrevResetKey(resetKey)
     setSelectedAssets(new Set())
     setLastSelectedId(null)
-  }, [selectedType, showUnusedOnly, showDuplicatesOnly, searchQuery, filterParams])
+  }
 
-  useEffect(() => {
-    if (groups.length > 0 && !hasInitializedDirs.current) {
-      hasInitializedDirs.current = true
-      setExpandedDirs(new Set(groups.map(g => g.directory)))
-    }
-  }, [groups])
+  if (groups.length > 0 && !dirsInitialized) {
+    setDirsInitialized(true)
+    setExpandedDirs(new Set(groups.map(g => g.directory)))
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -381,13 +382,15 @@ export default function App() {
     }
   }, [focusedAssetId, isGridFocused, flatAssetList])
 
-  useEffect(() => {
+  const [prevSelectedSize, setPrevSelectedSize] = useState(0)
+  if (selectedAssets.size !== prevSelectedSize) {
+    setPrevSelectedSize(selectedAssets.size)
     if (selectedAssets.size > 0) {
       setSrAnnouncement(
         `${selectedAssets.size} asset${selectedAssets.size === 1 ? '' : 's'} selected`
       )
     }
-  }, [selectedAssets.size])
+  }
 
   const totalVisibleAssets = useMemo(
     () => displayGroups.reduce((sum, g) => sum + g.count, 0),
