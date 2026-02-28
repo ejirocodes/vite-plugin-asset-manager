@@ -88,7 +88,7 @@ export const Sidebar = memo(function Sidebar({
       <div className="p-5 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-            <LightningIcon weight="fill" />
+            <LightningIcon weight="fill" className="w-4.5 h-4.5 text-primary-foreground" />
           </div>
           <div>
             <h1 className="font-mono text-sm font-semibold tracking-wide text-foreground">
@@ -253,12 +253,12 @@ const NavItem = memo(function NavItem({
     <button
       onClick={onClick}
       className={`
-        w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm transition-all border
+        w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm transition-colors duration-150 border
         focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background
         ${
           active
             ? 'bg-primary/10 text-primary border-primary/20'
-            : 'text-muted-foreground hover:text-foreground hover:bg-card/50 border-transparent'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent'
         }
       `}
     >

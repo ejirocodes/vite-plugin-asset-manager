@@ -51,7 +51,7 @@ export function SortControls({ value, onChange }: SortControlsProps) {
         size="sm"
         className={cn(
           'h-7! px-2.5 gap-1.5',
-          'bg-input/20 dark:bg-input/30 border-border/50 hover:bg-input/30 dark:hover:bg-input/40'
+          'bg-input/30 dark:bg-input/40 border-border/60 hover:bg-input/40 dark:hover:bg-input/50'
         )}
       >
         <ArrowsDownUpIcon weight="bold" className="w-3.5 h-3.5 text-muted-foreground" />

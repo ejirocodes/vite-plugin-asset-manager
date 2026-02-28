@@ -30,7 +30,6 @@
   --status-info: oklch(0.623 0.214 259.815);
   --checker-square: oklch(0.918 0.003 264.542);
   --checker-bg: oklch(0.985 0.002 247.839);
-  --glow-color: oklch(0.541 0.281 293.009 / 0.15);
   --shadow-lift: 0 8px 24px -8px rgba(0, 0, 0, 0.15);
   --accent: oklch(0.606 0.25 292.717);
   --background: oklch(1 0 0);
@@ -121,7 +120,6 @@ body {
   --checker-square: #27272a;
   --checker-bg: #18181b;
   /* Animation */
-  --glow-color: oklch(0.606 0.25 292.717 / 0.15);
   --shadow-lift: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
   --background: #09090b;
   --foreground: #fafafa;
@@ -211,25 +209,12 @@ body {
   }
 }
 
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 transparent;
-  }
-  50% {
-    box-shadow: 0 0 0 4px var(--glow-color);
-  }
-}
-
 .animate-fade-in-up {
-  animation: fadeInUp 0.3s ease-out forwards;
+  animation: fadeInUp 300ms ease-out forwards;
 }
 
 .animate-slide-in-right {
-  animation: slideInRight 0.3s ease-out forwards;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: slideInRight 300ms ease-out forwards;
 }
 
 /* Staggered animation delays */
@@ -244,7 +229,7 @@ body {
 
 /* Hover lift effect */
 .hover-lift {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
 }
 
 .hover-lift:hover {
@@ -288,7 +273,7 @@ body {
 @media (max-width: 767px) {
   /* Reduce animations on mobile for better performance */
   .animate-fade-in-up {
-    animation-duration: 0.2s;
+    animation-duration: 200ms;
   }
 
   /* Adjust font sizes for mobile readability */
