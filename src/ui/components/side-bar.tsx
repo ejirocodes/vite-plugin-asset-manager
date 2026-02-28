@@ -19,18 +19,6 @@ import packageJson from '../../../package.json'
 import type { AssetType } from '../types'
 import { useSSE, type SSEConnectionStatus } from '../hooks/useSSE'
 
-const colorClasses = {
-  violet: 'text-violet-400 bg-violet-500/10',
-  pink: 'text-pink-400 bg-pink-500/10',
-  cyan: 'text-cyan-400 bg-cyan-500/10',
-  amber: 'text-amber-400 bg-amber-500/10',
-  rose: 'text-rose-400 bg-rose-500/10',
-  emerald: 'text-emerald-400 bg-emerald-500/10',
-  purple: 'text-purple-400 bg-purple-500/10',
-  zinc: 'text-zinc-400 bg-zinc-500/10',
-  blue: 'text-blue-400 bg-blue-500/10'
-} as const
-
 interface SidebarProps {
   total: number
   searchQuery: string
@@ -64,7 +52,7 @@ const statusConfig: Record<SSEConnectionStatus, { dotClass: string; label: strin
     label: 'Connecting...'
   },
   connected: {
-    dotClass: 'bg-status-success animate-pulse',
+    dotClass: 'bg-status-success',
     label: 'Watching'
   },
   reconnecting: {
@@ -99,20 +87,15 @@ export const Sidebar = memo(function Sidebar({
     <aside className="w-full md:w-72 bg-sidebar border-r border-sidebar-border flex flex-col noise-bg h-full">
       <div className="p-5 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="w-9 h-9 rounded-lg bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
-              <LightningIcon weight="fill" />
-            </div>
-            <div
-              className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-sidebar ${dotClass}`}
-            />
+          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+            <LightningIcon weight="fill" />
           </div>
           <div>
             <h1 className="font-mono text-sm font-semibold tracking-wide text-foreground">
               ASSET MANAGER
             </h1>
-            <p className="text-[10px] text-muted-foreground font-mono tracking-wider">
-              VITE PLUGIN
+            <p className="text-[10px] text-muted-foreground font-mono tracking-wider tabular-nums">
+              {total} assets
             </p>
           </div>
         </div>
@@ -126,104 +109,6 @@ export const Sidebar = memo(function Sidebar({
           searching={searching}
           onFocus={onSearchFocus}
         />
-      </div>
-
-      <div className="px-3 sm:px-4 pb-4">
-        <div className="rounded-lg bg-card/50 border border-border p-3 sm:p-4">
-          <div className="flex items-baseline justify-between mb-3">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Total Assets
-            </span>
-            <span className="font-mono text-xl sm:text-2xl font-bold text-foreground tabular-nums">
-              {total}
-            </span>
-          </div>
-
-          {stats && (
-            <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
-              <StatBadge
-                icon={<ImagesIcon weight="fill" className="w-3.5 h-3.5" />}
-                label="Images"
-                count={stats.images}
-                color="violet"
-                onClick={() => onTypeSelect('image')}
-                active={selectedType === 'image'}
-              />
-              <StatBadge
-                icon={<VideoCameraIcon weight="fill" className="w-3.5 h-3.5" />}
-                label="Videos"
-                count={stats.videos}
-                color="pink"
-                onClick={() => onTypeSelect('video')}
-                active={selectedType === 'video'}
-              />
-              <StatBadge
-                icon={<MusicNoteIcon weight="fill" className="w-3.5 h-3.5" />}
-                label="Audio"
-                count={stats.audio}
-                color="cyan"
-                onClick={() => onTypeSelect('audio')}
-                active={selectedType === 'audio'}
-              />
-              <StatBadge
-                icon={<FileTextIcon weight="fill" className="w-3.5 h-3.5" />}
-                label="Docs"
-                count={stats.documents}
-                color="amber"
-                onClick={() => onTypeSelect('document')}
-                active={selectedType === 'document'}
-              />
-              <StatBadge
-                icon={<TextTIcon weight="fill" className="w-3.5 h-3.5" />}
-                label="Fonts"
-                count={stats.fonts}
-                color="rose"
-                onClick={() => onTypeSelect('font')}
-                active={selectedType === 'font'}
-              />
-              <StatBadge
-                icon={<DatabaseIcon weight="fill" className="w-3.5 h-3.5" />}
-                label="Data"
-                count={stats.data}
-                color="emerald"
-                onClick={() => onTypeSelect('data')}
-                active={selectedType === 'data'}
-              />
-              <StatBadge
-                icon={<ArticleIcon weight="fill" className="w-3.5 h-3.5" />}
-                label="Text"
-                count={stats.text}
-                color="purple"
-                onClick={() => onTypeSelect('text')}
-                active={selectedType === 'text'}
-              />
-              <StatBadge
-                icon={<FileIcon weight="fill" className="w-3.5 h-3.5" />}
-                label="Other"
-                count={stats.other}
-                color="zinc"
-                onClick={() => onTypeSelect('other')}
-                active={selectedType === 'other'}
-              />
-              <StatBadge
-                icon={<WarningCircleIcon weight="fill" className="w-3.5 h-3.5" />}
-                label="Unused"
-                count={stats.unused}
-                color="amber"
-                onClick={onUnusedFilterToggle}
-                active={showUnusedOnly}
-              />
-              <StatBadge
-                icon={<CopyIcon weight="fill" className="w-3.5 h-3.5" />}
-                label="Dupes"
-                count={stats.duplicateFiles}
-                color="blue"
-                onClick={onDuplicatesFilterToggle}
-                active={showDuplicatesOnly}
-              />
-            </div>
-          )}
-        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-2">
@@ -296,13 +181,18 @@ export const Sidebar = memo(function Sidebar({
                 active={selectedType === 'other'}
                 onClick={() => onTypeSelect('other')}
               />
-              <div className="my-2 border-t border-sidebar-border" />
+              <div className="mt-4 mb-2">
+                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider px-2">
+                  Audit
+                </div>
+              </div>
               <NavItem
                 icon={<WarningCircleIcon weight="duotone" className="w-4 h-4" />}
                 label="Unused Assets"
                 count={stats.unused}
                 active={showUnusedOnly}
                 onClick={onUnusedFilterToggle}
+                countColor="warning"
               />
               <NavItem
                 icon={<CopyIcon weight="duotone" className="w-4 h-4" />}
@@ -310,6 +200,7 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.duplicateFiles}
                 active={showDuplicatesOnly}
                 onClick={onDuplicatesFilterToggle}
+                countColor="info"
               />
             </>
           )}
@@ -332,64 +223,32 @@ export const Sidebar = memo(function Sidebar({
   )
 })
 
-const StatBadge = memo(function StatBadge({
-  icon,
-  label,
-  count,
-  color,
-  onClick,
-  active = false
-}: {
-  icon: React.ReactNode
-  label: string
-  count: number
-  color: keyof typeof colorClasses
-  onClick?: () => void
-  active?: boolean
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`
-        relative flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1.5 rounded-md
-        transition-all duration-200 ease-out
-        ${colorClasses[color]}
-        ${
-          active
-            ? 'shadow-[inset_0_0_12px_rgba(255,255,255,0.15)] brightness-110 scale-[1.02]'
-            : 'hover:brightness-110 hover:scale-[1.01]'
-        }
-        active:scale-[0.98]
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background
-      `}
-    >
-      {active && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-3/5 rounded-full bg-white/40" />
-      )}
-      {icon}
-      <span
-        className={`text-[9px] sm:text-[10px] font-medium truncate transition-colors ${active ? 'text-foreground' : 'text-muted-foreground'}`}
-      >
-        {label}
-      </span>
-      <span className="ml-auto font-mono text-xs font-semibold tabular-nums">{count}</span>
-    </button>
-  )
-})
+const countColorClasses: Record<string, string> = {
+  warning: 'text-status-warning',
+  info: 'text-status-info'
+}
 
 const NavItem = memo(function NavItem({
   icon,
   label,
   count,
   active = false,
-  onClick
+  onClick,
+  countColor
 }: {
   icon: React.ReactNode
   label: string
   count: number
   active?: boolean
   onClick?: () => void
+  countColor?: 'warning' | 'info'
 }) {
+  const countClass = active
+    ? 'text-primary'
+    : countColor && count > 0
+      ? countColorClasses[countColor]
+      : 'text-muted-foreground/60'
+
   return (
     <button
       onClick={onClick}
@@ -405,12 +264,7 @@ const NavItem = memo(function NavItem({
     >
       {icon}
       <span className="font-medium">{label}</span>
-      <span
-        className={`
-        ml-auto font-mono text-xs tabular-nums
-        ${active ? 'text-primary' : 'text-muted-foreground/60'}
-      `}
-      >
+      <span className={`ml-auto font-mono text-xs tabular-nums ${countClass}`}>
         {count}
       </span>
     </button>

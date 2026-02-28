@@ -79,8 +79,7 @@ vi.mock('./card-previews', () => ({
 vi.mock('./file-icon', () => ({
   FileIcon: ({ extension }: { extension: string }) => (
     <span data-testid="file-icon">{extension}</span>
-  ),
-  getFileTypeColor: () => 'text-blue-500'
+  )
 }))
 
 let mockIgnoredPaths = new Set<string>()

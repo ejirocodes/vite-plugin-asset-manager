@@ -1,5 +1,5 @@
 import { useState, useRef, memo, useCallback } from 'react'
-import { FileIcon, getFileTypeColor } from './file-icon'
+import { FileIcon } from './file-icon'
 import { VideoCardPreview, FontCardPreview } from './card-previews'
 import { AssetContextMenu } from './asset-context-menu'
 import { CopyIcon, CheckIcon, EyeSlashIcon } from '@phosphor-icons/react'
@@ -80,7 +80,6 @@ export const AssetCard = memo(function AssetCard({
   const handleImageError = useCallback(() => setImageError(true), [])
 
   const staggerClass = `stagger-${Math.min((index % 8) + 1, 8)}`
-  const extColor = getFileTypeColor(asset.extension)
 
   return (
     <AssetContextMenu
@@ -145,26 +144,25 @@ export const AssetCard = memo(function AssetCard({
             )}
           </div>
 
-          <div className="absolute inset-0 bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center backdrop-blur-[2px]">
-            <button
-              onClick={handleCopyPath}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-2.5 sm:py-1.5 min-h-11 sm:min-h-0 rounded-md bg-foreground/10 hover:bg-foreground/20 transition-colors text-xs text-muted-foreground hover:text-foreground"
-              title="Copy path"
-              aria-label="Copy file path"
-            >
-              {copied ? (
-                <>
-                  <CheckIcon weight="bold" className="w-3.5 h-3.5 text-status-success" />
-                  <span className="text-status-success">Copied</span>
-                </>
-              ) : (
-                <>
-                  <CopyIcon weight="bold" className="w-3.5 h-3.5" />
-                  <span>Copy path</span>
-                </>
-              )}
-            </button>
-          </div>
+          <button
+            onClick={handleCopyPath}
+            className={`absolute top-2 right-2 z-10 transition-all duration-100
+              p-2 sm:p-1.5 rounded-md
+              bg-background/80 backdrop-blur-sm border border-border/50
+              text-muted-foreground hover:text-foreground hover:bg-background
+              min-h-11 min-w-11 sm:min-h-0 sm:min-w-0
+              flex items-center justify-center
+              ${copied ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
+            `}
+            title="Copy path"
+            aria-label="Copy file path"
+          >
+            {copied ? (
+              <CheckIcon weight="bold" className="w-3.5 h-3.5 text-status-success" />
+            ) : (
+              <CopyIcon weight="bold" className="w-3.5 h-3.5" />
+            )}
+          </button>
         </div>
 
         <div className="px-3 py-2.5 border-t border-border/50">
@@ -177,10 +175,8 @@ export const AssetCard = memo(function AssetCard({
 
           <div className="flex items-center justify-between gap-2 mt-1.5">
             <div className="flex items-center gap-1 min-w-0 overflow-hidden">
-              <span
-                className={`text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm ${extColor} bg-current/10 shrink-0`}
-              >
-                <span className={extColor}>{asset.extension.replace('.', '')}</span>
+              <span className="text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-muted text-muted-foreground shrink-0">
+                {asset.extension.replace('.', '')}
               </span>
 
               {asset.importersCount === 0 && !ignored && (
