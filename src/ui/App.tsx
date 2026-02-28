@@ -31,8 +31,6 @@ import { sortAssets, type SortOption } from '@/ui/lib/sort-utils'
 import {
   ArrowSquareOutIcon,
   CaretRightIcon,
-  MagnifyingGlassIcon,
-  PackageIcon,
   FolderOpenIcon,
   ListIcon,
   LightningIcon
@@ -49,25 +47,34 @@ const LoadingSpinner = (
   </div>
 )
 
-function EmptyStateSearchResults({ query }: { query: string }) {
+function EmptyStateSearchResults({ query, onClear }: { query: string; onClear: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-      <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
-        <MagnifyingGlassIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
-      </div>
-      <p className="text-lg font-medium text-foreground mb-1">No results found</p>
-      <p className="text-sm">No assets match &ldquo;{query}&rdquo;</p>
+    <div className="flex flex-col items-center justify-center py-16 px-4">
+      <p className="text-sm font-medium text-foreground mb-1">
+        No assets match &ldquo;{query}&rdquo;
+      </p>
+      <p className="text-xs text-muted-foreground mb-3">
+        Check your spelling or try a broader term.
+      </p>
+      <button
+        onClick={onClear}
+        className="text-xs font-medium text-primary hover:text-primary/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded"
+      >
+        Clear search
+      </button>
     </div>
   )
 }
 
 const EmptyStateNoAssetsFiltered = (
-  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-    <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
-      <PackageIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
+  <div className="flex flex-col items-center justify-center py-16 px-4">
+    <p className="text-sm font-medium text-foreground mb-2">No assets discovered</p>
+    <div className="text-xs text-muted-foreground space-y-1 text-center max-w-xs">
+      <p>Assets are scanned from the directories in your plugin config.</p>
+      <p className="font-mono text-[11px] bg-muted/50 rounded px-2 py-1 inline-block mt-2">
+        include: [&apos;src&apos;, &apos;public&apos;]
+      </p>
     </div>
-    <p className="text-lg font-medium text-foreground mb-1">No assets found</p>
-    <p className="text-sm">Add images, videos, or documents to your project</p>
   </div>
 )
 
@@ -459,7 +466,7 @@ export default function App() {
                   </Button>
                 )}
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-md bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-md shadow-primary/20">
+                  <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
                     <LightningIcon weight="fill" className="w-4 h-4 text-white" />
                   </div>
                   <div>
@@ -518,31 +525,31 @@ export default function App() {
                 </div>
                 {displayGroups.length === 0
                   ? searchQuery
-                    ? <EmptyStateSearchResults query={searchQuery} />
+                    ? <EmptyStateSearchResults query={searchQuery} onClear={() => setSearchQuery('')} />
                     : EmptyStateNoAssetsFiltered
                   : displayGroups.map(group => (
                       <div
                         key={group.directory}
-                        className="rounded-xl border border-border bg-card/30 overflow-hidden"
+                        className="rounded-lg border border-border overflow-hidden"
                       >
                         <button
                           onClick={() => toggleDir(group.directory)}
-                          className="w-full flex items-center justify-between cursor-pointer px-4 py-3 hover:bg-muted/30 transition-colors"
+                          className="w-full flex items-center justify-between cursor-pointer px-4 py-3 bg-muted/40 hover:bg-muted/60 transition-colors"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2.5">
                             <CaretRightIcon
                               weight="bold"
-                              className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
+                              className={`w-3.5 h-3.5 text-muted-foreground/70 transition-transform duration-200 ${
                                 expandedDirs.has(group.directory) ? 'rotate-90' : ''
                               }`}
                             />
-                            <FolderOpenIcon weight="duotone" className="w-5 h-5 text-amber-400" />
-                            <span className="font-mono text-sm font-medium text-foreground">
+                            <FolderOpenIcon weight="duotone" className="w-4.5 h-4.5 text-muted-foreground" />
+                            <span className="font-mono text-sm font-semibold text-foreground tracking-tight">
                               {group.directory}
                             </span>
                           </div>
-                          <span className="text-xs text-muted-foreground font-mono bg-muted/50 px-2 py-0.5 rounded-md">
-                            {group.count} {group.count === 1 ? 'item' : 'items'}
+                          <span className="text-[11px] text-muted-foreground/70 font-mono tabular-nums">
+                            {group.count}
                           </span>
                         </button>
                         <div
