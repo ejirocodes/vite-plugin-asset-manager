@@ -40,12 +40,32 @@ import { openAssetInEditor, revealAssetInFinder } from '@/ui/lib/asset-api'
 import { toast } from 'sonner'
 import type { Asset, AssetType } from './types'
 
-const LoadingSpinner = (
-  <div className="flex flex-col items-center justify-center h-full gap-4">
-    <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
-    <p className="text-muted-foreground text-sm">Loading assets...</p>
-  </div>
-)
+const LOADING_MESSAGES = [
+  'Scanning directories\u2026',
+  'Indexing files\u2026',
+  'Generating thumbnails\u2026',
+  'Detecting imports\u2026'
+]
+
+function LoadingSpinner() {
+  const [msgIndex, setMsgIndex] = useState(0)
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setMsgIndex(i => (i + 1) % LOADING_MESSAGES.length)
+    }, 1800)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-4">
+      <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+      <p className="text-muted-foreground text-sm transition-opacity duration-300">
+        {LOADING_MESSAGES[msgIndex]}
+      </p>
+    </div>
+  )
+}
 
 function EmptyStateSearchResults({ query, onClear }: { query: string; onClear: () => void }) {
   return (
@@ -495,7 +515,7 @@ export default function App() {
             </div>
           </header>
           {loading ? (
-            LoadingSpinner
+            <LoadingSpinner />
           ) : (
             <>
               <BulkActionsBar
@@ -534,7 +554,7 @@ export default function App() {
                       >
                         <button
                           onClick={() => toggleDir(group.directory)}
-                          className="w-full flex items-center justify-between cursor-pointer px-4 py-3 bg-muted/40 hover:bg-muted/60 transition-colors"
+                          className="w-full flex items-center justify-between cursor-pointer px-4 py-3 bg-muted/40 hover:bg-muted/60 active:bg-muted/70 transition-colors"
                         >
                           <div className="flex items-center gap-2.5">
                             <CaretRightIcon
@@ -572,6 +592,15 @@ export default function App() {
                       </div>
                     ))}
               </div>
+              {displayGroups.length > 0 && selectedAssets.size === 0 && (
+                <div className="hidden md:flex items-center justify-center gap-4 py-3 text-[11px] text-muted-foreground/50 font-mono select-none">
+                  <span><kbd className="font-sans">↑↓</kbd> Navigate</span>
+                  <span><kbd className="font-sans">Space</kbd> Select</span>
+                  <span><kbd className="font-sans">Enter</kbd> Preview</span>
+                  <span><kbd className="font-sans">/</kbd> Search</span>
+                  <span><kbd className="font-sans">?</kbd> All shortcuts</span>
+                </div>
+              )}
             </>
           )}
         </main>
@@ -579,8 +608,20 @@ export default function App() {
       {selectedAsset && (
         <Suspense
           fallback={
-            <aside className="fixed top-0 right-0 z-50 h-screen w-96 border-l border-border bg-card/80 backdrop-blur-sm flex items-center justify-center">
-              <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+            <aside className="fixed top-0 right-0 z-50 h-screen w-96 border-l border-border bg-card/80 backdrop-blur-sm flex flex-col animate-slide-in-right">
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <div className="h-4 w-32 rounded bg-muted animate-pulse" />
+                <div className="h-6 w-6 rounded bg-muted animate-pulse" />
+              </div>
+              <div className="h-56 bg-muted/30 animate-pulse" />
+              <div className="p-4 space-y-3">
+                {[120, 80, 100, 60, 90].map((w, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div className="h-3 rounded bg-muted animate-pulse" style={{ width: 60 }} />
+                    <div className="h-3 rounded bg-muted animate-pulse" style={{ width: w }} />
+                  </div>
+                ))}
+              </div>
             </aside>
           }
         >
