@@ -32,6 +32,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
         onChange={e => onChange(e.target.value)}
         onFocus={onFocus}
         placeholder="Search assets..."
+        aria-label="Search assets"
         className="
           w-full pl-9 sm:pl-10 pr-10 sm:pr-20 py-2
           bg-input/50 border border-border rounded-lg

@@ -360,7 +360,7 @@ const StatBadge = memo(function StatBadge({
             : 'hover:brightness-110 hover:scale-[1.01]'
         }
         active:scale-[0.98]
-        focus:outline-none focus-visible:brightness-125
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background
       `}
     >
       {active && (
@@ -395,6 +395,7 @@ const NavItem = memo(function NavItem({
       onClick={onClick}
       className={`
         w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-sm transition-all border
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background
         ${
           active
             ? 'bg-primary/10 text-primary border-primary/20'

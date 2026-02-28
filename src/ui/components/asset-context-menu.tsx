@@ -141,14 +141,14 @@ export const AssetContextMenu = memo(function AssetContextMenu({
           <CodeBlockIcon weight="bold" className="w-4 h-4 mr-2" />
           Open in Editor
           {fileActions.hasImporters && (
-            <span className="ml-auto text-[10px] text-muted-foreground">⌘O</span>
+            <span className="ml-auto text-[10px] text-muted-foreground">{isMac ? '⌘O' : 'Ctrl+O'}</span>
           )}
         </ContextMenuItem>
 
         <ContextMenuItem onClick={fileActions.handleRevealInFinder}>
           <FolderOpenIcon weight="bold" className="w-4 h-4 mr-2" />
           Reveal in {isMac ? 'Finder' : 'Explorer'}
-          <span className="ml-auto text-[10px] text-muted-foreground">⌘⇧R</span>
+          <span className="ml-auto text-[10px] text-muted-foreground">{isMac ? '⌘⇧R' : 'Ctrl+Shift+R'}</span>
         </ContextMenuItem>
 
         {asset.importersCount === 0 && (
@@ -179,7 +179,7 @@ export const AssetContextMenu = memo(function AssetContextMenu({
         >
           <TrashIcon weight="bold" className="w-4 h-4 mr-2" />
           {mutations.isDeleting ? 'Deleting...' : 'Delete'}
-          <span className="ml-auto text-[10px]">⌫</span>
+          <span className="ml-auto text-[10px]">{isMac ? '⌫' : 'Del'}</span>
         </ContextMenuItem>
 
         {isSelected && (
