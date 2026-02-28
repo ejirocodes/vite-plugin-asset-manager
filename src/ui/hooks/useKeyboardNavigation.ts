@@ -30,11 +30,15 @@ const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(na
 
 export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
   const optionsRef = useRef(options)
-  optionsRef.current = options
+  useEffect(() => {
+    optionsRef.current = options
+  })
 
   const columns = useResponsiveColumns()
   const columnsRef = useRef(columns)
-  columnsRef.current = columns
+  useEffect(() => {
+    columnsRef.current = columns
+  })
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
