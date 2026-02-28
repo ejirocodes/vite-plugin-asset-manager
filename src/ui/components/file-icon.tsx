@@ -37,41 +37,42 @@ const iconMap = new Map<string, IconConfig>([
   ['avif', { icon: ImageIcon, color: 'text-violet-500' }],
   ['ico', { icon: ImageIcon, color: 'text-violet-500' }],
   ['bmp', { icon: ImageIcon, color: 'text-violet-500' }],
-  // Media (video & audio) — muted slate-blue
-  ['mp4', { icon: VideoCameraIcon, color: 'text-slate-400' }],
-  ['webm', { icon: VideoCameraIcon, color: 'text-slate-400' }],
-  ['mov', { icon: VideoCameraIcon, color: 'text-slate-400' }],
-  ['avi', { icon: VideoCameraIcon, color: 'text-slate-400' }],
-  ['ogg', { icon: VideoCameraIcon, color: 'text-slate-400' }],
-  ['mp3', { icon: MusicNoteIcon, color: 'text-slate-400' }],
-  ['wav', { icon: MusicNoteIcon, color: 'text-slate-400' }],
-  ['flac', { icon: MusicNoteIcon, color: 'text-slate-400' }],
-  ['aac', { icon: MusicNoteIcon, color: 'text-slate-400' }],
-  // Documents — warm stone
-  ['pdf', { icon: FilePdfIcon, color: 'text-stone-400' }],
-  ['doc', { icon: FileDocIcon, color: 'text-stone-400' }],
-  ['docx', { icon: FileDocIcon, color: 'text-stone-400' }],
-  ['xls', { icon: FileXlsIcon, color: 'text-stone-400' }],
-  ['xlsx', { icon: FileXlsIcon, color: 'text-stone-400' }],
-  ['ppt', { icon: FilePptIcon, color: 'text-stone-400' }],
-  ['pptx', { icon: FilePptIcon, color: 'text-stone-400' }],
-  ['txt', { icon: FileTextIcon, color: 'text-stone-400' }],
-  // Fonts — zinc
-  ['woff', { icon: TextTIcon, color: 'text-zinc-400' }],
-  ['woff2', { icon: TextTIcon, color: 'text-zinc-400' }],
-  ['ttf', { icon: TextTIcon, color: 'text-zinc-400' }],
-  ['otf', { icon: TextTIcon, color: 'text-zinc-400' }],
-  ['eot', { icon: TextTIcon, color: 'text-zinc-400' }],
-  // Code & data — muted zinc
-  ['json', { icon: FileCodeIcon, color: 'text-zinc-400' }],
-  ['md', { icon: ArticleIcon, color: 'text-zinc-400' }],
-  ['csv', { icon: TableIcon, color: 'text-zinc-400' }],
-  ['js', { icon: FileCodeIcon, color: 'text-zinc-400' }],
-  ['ts', { icon: FileCodeIcon, color: 'text-zinc-400' }],
-  ['jsx', { icon: FileCodeIcon, color: 'text-zinc-400' }],
-  ['tsx', { icon: FileCodeIcon, color: 'text-zinc-400' }],
-  ['css', { icon: FileCssIcon, color: 'text-zinc-400' }],
-  ['html', { icon: FileCodeIcon, color: 'text-zinc-400' }]
+  // Video — warm rose
+  ['mp4', { icon: VideoCameraIcon, color: 'text-rose-400' }],
+  ['webm', { icon: VideoCameraIcon, color: 'text-rose-400' }],
+  ['mov', { icon: VideoCameraIcon, color: 'text-rose-400' }],
+  ['avi', { icon: VideoCameraIcon, color: 'text-rose-400' }],
+  ['ogg', { icon: VideoCameraIcon, color: 'text-rose-400' }],
+  // Audio — cool teal
+  ['mp3', { icon: MusicNoteIcon, color: 'text-teal-400' }],
+  ['wav', { icon: MusicNoteIcon, color: 'text-teal-400' }],
+  ['flac', { icon: MusicNoteIcon, color: 'text-teal-400' }],
+  ['aac', { icon: MusicNoteIcon, color: 'text-teal-400' }],
+  // Documents — warm amber
+  ['pdf', { icon: FilePdfIcon, color: 'text-amber-500' }],
+  ['doc', { icon: FileDocIcon, color: 'text-amber-500' }],
+  ['docx', { icon: FileDocIcon, color: 'text-amber-500' }],
+  ['xls', { icon: FileXlsIcon, color: 'text-amber-500' }],
+  ['xlsx', { icon: FileXlsIcon, color: 'text-amber-500' }],
+  ['ppt', { icon: FilePptIcon, color: 'text-amber-500' }],
+  ['pptx', { icon: FilePptIcon, color: 'text-amber-500' }],
+  ['txt', { icon: FileTextIcon, color: 'text-amber-500' }],
+  // Fonts — indigo
+  ['woff', { icon: TextTIcon, color: 'text-indigo-400' }],
+  ['woff2', { icon: TextTIcon, color: 'text-indigo-400' }],
+  ['ttf', { icon: TextTIcon, color: 'text-indigo-400' }],
+  ['otf', { icon: TextTIcon, color: 'text-indigo-400' }],
+  ['eot', { icon: TextTIcon, color: 'text-indigo-400' }],
+  // Code & data — emerald
+  ['json', { icon: FileCodeIcon, color: 'text-emerald-400' }],
+  ['md', { icon: ArticleIcon, color: 'text-emerald-400' }],
+  ['csv', { icon: TableIcon, color: 'text-emerald-400' }],
+  ['js', { icon: FileCodeIcon, color: 'text-emerald-400' }],
+  ['ts', { icon: FileCodeIcon, color: 'text-emerald-400' }],
+  ['jsx', { icon: FileCodeIcon, color: 'text-emerald-400' }],
+  ['tsx', { icon: FileCodeIcon, color: 'text-emerald-400' }],
+  ['css', { icon: FileCssIcon, color: 'text-emerald-400' }],
+  ['html', { icon: FileCodeIcon, color: 'text-emerald-400' }]
 ])
 
 const defaultConfig: IconConfig = { icon: FileIconPhosphor, color: 'text-zinc-500' }

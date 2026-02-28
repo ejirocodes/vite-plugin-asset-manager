@@ -131,6 +131,7 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.images}
                 active={selectedType === 'image'}
                 onClick={() => onTypeSelect('image')}
+                iconColor="text-violet-400"
               />
               <NavItem
                 icon={<VideoCameraIcon weight="duotone" className="w-4 h-4" />}
@@ -138,6 +139,7 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.videos}
                 active={selectedType === 'video'}
                 onClick={() => onTypeSelect('video')}
+                iconColor="text-rose-400"
               />
               <NavItem
                 icon={<MusicNoteIcon weight="duotone" className="w-4 h-4" />}
@@ -145,6 +147,7 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.audio}
                 active={selectedType === 'audio'}
                 onClick={() => onTypeSelect('audio')}
+                iconColor="text-teal-400"
               />
               <NavItem
                 icon={<FileTextIcon weight="duotone" className="w-4 h-4" />}
@@ -152,6 +155,7 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.documents}
                 active={selectedType === 'document'}
                 onClick={() => onTypeSelect('document')}
+                iconColor="text-amber-500"
               />
               <NavItem
                 icon={<TextTIcon weight="duotone" className="w-4 h-4" />}
@@ -159,6 +163,7 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.fonts}
                 active={selectedType === 'font'}
                 onClick={() => onTypeSelect('font')}
+                iconColor="text-indigo-400"
               />
               <NavItem
                 icon={<DatabaseIcon weight="duotone" className="w-4 h-4" />}
@@ -166,6 +171,7 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.data}
                 active={selectedType === 'data'}
                 onClick={() => onTypeSelect('data')}
+                iconColor="text-emerald-400"
               />
               <NavItem
                 icon={<ArticleIcon weight="duotone" className="w-4 h-4" />}
@@ -173,6 +179,7 @@ export const Sidebar = memo(function Sidebar({
                 count={stats.text}
                 active={selectedType === 'text'}
                 onClick={() => onTypeSelect('text')}
+                iconColor="text-sky-400"
               />
               <NavItem
                 icon={<FileIcon weight="duotone" className="w-4 h-4" />}
@@ -193,6 +200,7 @@ export const Sidebar = memo(function Sidebar({
                 active={showUnusedOnly}
                 onClick={onUnusedFilterToggle}
                 countColor="warning"
+                iconColor="text-status-warning"
               />
               <NavItem
                 icon={<CopyIcon weight="duotone" className="w-4 h-4" />}
@@ -201,6 +209,7 @@ export const Sidebar = memo(function Sidebar({
                 active={showDuplicatesOnly}
                 onClick={onDuplicatesFilterToggle}
                 countColor="info"
+                iconColor="text-status-info"
               />
             </>
           )}
@@ -234,7 +243,8 @@ const NavItem = memo(function NavItem({
   count,
   active = false,
   onClick,
-  countColor
+  countColor,
+  iconColor
 }: {
   icon: React.ReactNode
   label: string
@@ -242,6 +252,7 @@ const NavItem = memo(function NavItem({
   active?: boolean
   onClick?: () => void
   countColor?: 'warning' | 'info'
+  iconColor?: string
 }) {
   const countClass = active
     ? 'text-primary'
@@ -262,7 +273,7 @@ const NavItem = memo(function NavItem({
         }
       `}
     >
-      {icon}
+      <span className={active ? '' : iconColor || ''}>{icon}</span>
       <span className="font-medium">{label}</span>
       <span className={`ml-auto font-mono text-xs tabular-nums ${countClass}`}>
         {count}
