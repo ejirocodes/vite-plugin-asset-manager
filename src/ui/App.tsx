@@ -573,20 +573,21 @@ export default function App() {
                           </span>
                         </button>
                         <div
-                          className={`
-                      overflow-hidden transition-all duration-300 ease-in-out
-                      ${expandedDirs.has(group.directory) ? 'max-h-500 opacity-100' : 'max-h-0 opacity-0'}
-                    `}
+                          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
+                            expandedDirs.has(group.directory) ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                          }`}
                         >
-                          <div className="border-t border-border">
-                            <AssetGrid
-                              assets={group.assets}
-                              scrollContainerRef={mainRef}
-                              onPreview={handlePreview}
-                              selectedAssets={selectedAssets}
-                              focusedAssetId={focusedAssetId}
-                              onToggleSelect={handleToggleSelect}
-                            />
+                          <div className="overflow-hidden">
+                            <div className="border-t border-border">
+                              <AssetGrid
+                                assets={group.assets}
+                                scrollContainerRef={mainRef}
+                                onPreview={handlePreview}
+                                selectedAssets={selectedAssets}
+                                focusedAssetId={focusedAssetId}
+                                onToggleSelect={handleToggleSelect}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
