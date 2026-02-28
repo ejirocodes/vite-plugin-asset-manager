@@ -173,8 +173,8 @@ The mobile adaptations are thorough: bottom sheet preview panel at `85vh`, icon-
 1. ~~`/simplify` — Merge sidebar redundancy, flatten the rainbow palette, reduce visual noise~~ **DONE**
 2. ~~`/quieter` — Tone down the color diversity, let status colors actually mean something~~ **DONE**
 3. ~~`/bolder` — After simplifying, add back intentional personality that connects to the asset management domain~~ **DONE**
-4. `/polish` — Tighten spacing, transitions, and micro-details
-5. `/delight` — Add memorable touches to empty states, loading, and first-run experience
+4. ~~`/polish` — Tighten spacing, transitions, and micro-details~~ **DONE**
+5. ~~`/delight` — Add memorable touches to empty states, loading, and first-run experience~~ **DONE**
 
 ---
 
@@ -267,3 +267,90 @@ Color is now used to communicate, not to decorate. The only colored elements on 
 
 ### Design Principle Applied
 Utilitarian precision means every element earns its place through function, not decoration. Gradients, colored icons, and styled badges were replaced with solid colors, neutral tones, and direct typography. The interface is bolder *because* it's more restrained — confidence comes from clarity, not ornamentation.
+
+---
+
+## Polish Changelog (2026-02-28)
+
+### Changes Made
+
+**Color token consistency** — 2 hard-coded colors fixed
+- `text-emerald-500` → `text-status-success` in `details-section.tsx` and `code-snippets.tsx`
+- All copy-confirmation check icons now use the design system token, matching `asset-card.tsx` and `asset-context-menu.tsx`
+
+**Motion scale standardization** — Consistent timing across all components
+- Established scale: fast=150ms, normal=200ms, slow=300ms
+- NavItem: `transition-all` → `transition-colors duration-150` (only colors change, no need to animate layout)
+- Card: `transition-all` → `transition-[background-color,border-color,box-shadow]` (specific properties for 60fps)
+- Copy/checkbox overlays: `duration-100` → `duration-150` (fast scale)
+- Filter chips/pills: `transition-all` → `transition-colors` (layout doesn't change)
+- CSS animations: `0.3s` / `0.2s` → explicit `300ms` / `200ms` (readable, consistent)
+- Hover-lift: `ease` → `ease-out` (natural deceleration)
+
+**Copy feedback timeout** — Standardized to 2000ms
+- `asset-card.tsx`: 1500ms → 2000ms (was inconsistent with other copy buttons)
+- All copy confirmation feedback now shows for exactly 2 seconds across the entire UI
+
+**Preview panel heading spacing** — `mb-2` → `mb-3`
+- Details section heading now matches Actions section heading margin
+- Consistent vertical rhythm in preview panel sections
+
+**Sidebar logo icon** — Added explicit color
+- Added `text-primary-foreground` and `w-4.5 h-4.5` to lightning icon
+- Previously relied on inherited color; now explicit and matches mobile header version
+
+**Dead CSS removed**
+- Removed `--glow-color` CSS variable from both `:root` and `.dark` themes (unused after bolder changes)
+- Removed `@keyframes pulse-glow` animation (no elements reference it)
+- Removed `.animate-pulse-glow` utility class
+- ~15 lines of dead code eliminated
+
+**Control visibility** — Sort and filter buttons more findable
+- `bg-input/20` → `bg-input/30`, `border-border/50` → `border-border/60` for both sort dropdown and filter button
+- Dark mode: `bg-input/30` → `bg-input/40`
+- Controls are now visible without requiring squinting, especially in dark mode
+
+**NavItem hover consistency** — `hover:bg-card/50` → `hover:bg-muted/50`
+- Matches hover pattern used in cards, buttons, and filter chips across the UI
+
+### Design Principle Applied
+Polish is about consistency at the detail level. Every transition, color token, timing value, and spacing unit should reference the same scale. When the system is consistent, the interface feels *crafted* rather than assembled.
+
+---
+
+## Delight Changelog (2026-02-28)
+
+**Direction**: Functional delight — utilitarian precision means delight comes from competence, not decoration. Every touch enhances workflow awareness.
+
+### Changes Made
+
+**Loading experience (`App.tsx`)** — Static spinner → contextual messages
+- Replaced static "Loading assets..." text with rotating messages: "Scanning directories…", "Indexing files…", "Generating thumbnails…", "Detecting imports…"
+- Messages rotate every 1.8s with opacity transition, giving users insight into what the tool actually does
+- `LoadingSpinner` refactored from static JSX constant to function component (hooks needed for state)
+
+**Preview panel skeleton (`App.tsx`)** — Spinner → structured skeleton
+- Replaced generic spinner Suspense fallback with a layout-matched skeleton
+- Skeleton mirrors actual panel structure: header bar, preview area, detail rows
+- Five detail rows with varied widths for visual rhythm
+- Uses `animate-pulse` on individual elements (not the whole container)
+
+**Keyboard shortcut hints (`App.tsx`)** — Discoverable shortcuts
+- Added hint bar below the asset grid: `↑↓ Navigate  Space Select  Enter Preview  / Search  ? All shortcuts`
+- Hidden on mobile (`hidden md:flex`), only visible when no assets are selected (bulk bar replaces it)
+- Ultra-subtle: `text-muted-foreground/50` at 11px, won't distract but rewards discovery
+
+**NavItem active accent (`side-bar.tsx`)** — Left border indicator
+- Active NavItem now shows `border-l-primary border-l-2` left accent
+- Matches Linear/Raycast sidebar pattern — a subtle but confident "you are here" signal
+
+**Copy button feedback (`asset-card.tsx`)** — Tactile press
+- Added `active:scale-90` to copy path button
+- Satisfying press-down feedback on click, springs back via existing 150ms transition
+
+**Group header press (`App.tsx`)** — Tactile feedback
+- Added `active:bg-muted/70` to group header collapse/expand button
+- Provides subtle darkening on press, confirming the click registered
+
+### Design Principle Applied
+Delight in a utilitarian tool means the interface feels alive and responsive without being playful. Loading messages show competence ("I'm doing real work"). Keyboard hints reward power users. Tactile press feedback confirms actions. Every delight moment serves the workflow.

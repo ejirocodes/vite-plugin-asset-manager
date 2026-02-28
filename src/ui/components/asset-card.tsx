@@ -146,10 +146,11 @@ export const AssetCard = memo(function AssetCard({
 
           <button
             onClick={handleCopyPath}
-            className={`absolute top-2 right-2 z-10 transition-[opacity,background-color,color] duration-150
+            className={`absolute top-2 right-2 z-10 transition-[opacity,background-color,color,transform] duration-150
               p-2 sm:p-1.5 rounded-md
               bg-background/80 backdrop-blur-sm border border-border/50
               text-muted-foreground hover:text-foreground hover:bg-background
+              active:scale-90
               min-h-11 min-w-11 sm:min-h-0 sm:min-w-0
               flex items-center justify-center
               ${copied ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}

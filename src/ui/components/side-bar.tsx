@@ -257,7 +257,7 @@ const NavItem = memo(function NavItem({
         focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 focus-visible:ring-offset-background
         ${
           active
-            ? 'bg-primary/10 text-primary border-primary/20'
+            ? 'bg-primary/10 text-primary border-primary/20 border-l-primary border-l-2'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 border-transparent'
         }
       `}
