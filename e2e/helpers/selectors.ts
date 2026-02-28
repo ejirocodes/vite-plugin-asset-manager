@@ -14,7 +14,7 @@ export const selectors = {
     grid: '[role="grid"]',
     gridCell: '[role="gridcell"]',
     searchInput: 'input[placeholder="Search assets..."]',
-    previewPanel: 'aside[role="region"]',
+    previewPanel: 'aside[role="dialog"]',
     closePreview: 'button[aria-label="Close preview panel"]',
     sidebarToggle: 'button[aria-label="Toggle sidebar"]',
     groupHeader: 'button:has(span.font-mono)',
