@@ -25,13 +25,13 @@
 
 :root {
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-  /* Legacy variables - light mode */
-  --bg-primary: #ffffff;
-  --bg-secondary: #fafafa;
-  --bg-tertiary: #f4f4f5;
-  --text-primary: #09090b;
-  --text-secondary: #52525b;
-  --text-muted: #71717a;
+  --status-success: oklch(0.765 0.177 163.223);
+  --status-warning: oklch(0.769 0.188 70.08);
+  --status-info: oklch(0.623 0.214 259.815);
+  --checker-square: oklch(0.918 0.003 264.542);
+  --checker-bg: oklch(0.985 0.002 247.839);
+  --glow-color: oklch(0.541 0.281 293.009 / 0.15);
+  --shadow-lift: 0 8px 24px -8px rgba(0, 0, 0, 0.15);
   --accent: oklch(0.606 0.25 292.717);
   --background: oklch(1 0 0);
   --foreground: oklch(0.147 0.004 49.25);
@@ -113,13 +113,16 @@ body {
 
 /* Dark theme */
 .dark {
-  /* Legacy variables - dark mode */
-  --bg-primary: #09090b;
-  --bg-secondary: #18181b;
-  --bg-tertiary: #27272a;
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
+  /* Status semantic colors */
+  --status-success: oklch(0.765 0.177 163.223);
+  --status-warning: oklch(0.769 0.188 70.08);
+  --status-info: oklch(0.707 0.165 254.624);
+  /* Checkerboard pattern */
+  --checker-square: #27272a;
+  --checker-bg: #18181b;
+  /* Animation */
+  --glow-color: oklch(0.606 0.25 292.717 / 0.15);
+  --shadow-lift: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
   --background: #09090b;
   --foreground: #fafafa;
   --card: #18181b;
@@ -176,22 +179,13 @@ body {
 /* Checkerboard pattern for transparent image backgrounds */
 .checkerboard {
   background-image:
-    linear-gradient(45deg, #e4e4e7 25%, transparent 25%),
-    linear-gradient(-45deg, #e4e4e7 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #e4e4e7 75%),
-    linear-gradient(-45deg, transparent 75%, #e4e4e7 75%);
+    linear-gradient(45deg, var(--checker-square) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--checker-square) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--checker-square) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--checker-square) 75%);
   background-size: 12px 12px;
   background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
-  background-color: #fafafa;
-}
-
-.dark .checkerboard {
-  background-image:
-    linear-gradient(45deg, #27272a 25%, transparent 25%),
-    linear-gradient(-45deg, #27272a 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #27272a 75%),
-    linear-gradient(-45deg, transparent 75%, #27272a 75%);
-  background-color: #18181b;
+  background-color: var(--checker-bg);
 }
 
 /* Animation utilities */
@@ -219,10 +213,10 @@ body {
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+    box-shadow: 0 0 0 0 transparent;
   }
   50% {
-    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+    box-shadow: 0 0 0 4px var(--glow-color);
   }
 }
 
@@ -255,7 +249,7 @@ body {
 
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-lift);
 }
 
 /* Focus ring for keyboard navigation */
@@ -311,6 +305,9 @@ body {
 @theme inline {
   --font-sans: 'Figtree', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --color-status-success: var(--status-success);
+  --color-status-warning: var(--status-warning);
+  --color-status-info: var(--status-info);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
