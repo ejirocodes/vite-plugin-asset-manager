@@ -98,13 +98,13 @@ export const AssetCard = memo(function AssetCard({
         aria-selected={isSelected}
         className={`
           group relative cursor-pointer
-          bg-white/80 dark:bg-zinc-900/50 rounded-lg overflow-hidden
-          border border-zinc-200 dark:border-zinc-800/80
+          bg-card/80 rounded-lg overflow-hidden
+          border border-border
           transition-all duration-150 ease-out
-          hover:bg-zinc-50 dark:hover:bg-zinc-900/80 hover:border-zinc-300 dark:hover:border-zinc-700/80
+          hover:bg-muted/50 hover:border-border
           animate-fade-in-up opacity-0 ${staggerClass}
-          ${isSelected ? 'ring-1 ring-violet-500/70 border-violet-500/50 bg-violet-500/5' : ''}
-          ${isFocused ? 'ring-2 ring-blue-500 ring-offset-1 ring-offset-white dark:ring-offset-zinc-950' : ''}
+          ${isSelected ? 'ring-1 ring-primary/70 border-primary/50 bg-primary/5' : ''}
+          ${isFocused ? 'ring-2 ring-primary ring-offset-1 ring-offset-background' : ''}
         `}
       >
         {onToggleSelect && (
@@ -119,12 +119,12 @@ export const AssetCard = memo(function AssetCard({
             <Checkbox
               checked={isSelected}
               onCheckedChange={handleCheckboxChange}
-              className="border-zinc-400 dark:border-zinc-600 data-[state=checked]:bg-violet-500 data-[state=checked]:border-violet-500 min-h-11 min-w-11 sm:min-h-0 sm:min-w-0"
+              className="border-muted-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary min-h-11 min-w-11 sm:min-h-0 sm:min-w-0"
             />
           </div>
         )}
 
-        <div className="relative h-45 bg-zinc-100 dark:bg-zinc-950/50">
+        <div className="relative h-45 bg-muted/50">
           <div className="absolute inset-0 checkerboard opacity-30" />
 
           <div className="relative w-full h-full flex items-center justify-center p-3">
@@ -145,17 +145,17 @@ export const AssetCard = memo(function AssetCard({
             )}
           </div>
 
-          <div className="absolute inset-0 bg-white/70 dark:bg-zinc-950/70 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center backdrop-blur-[2px]">
+          <div className="absolute inset-0 bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center backdrop-blur-[2px]">
             <button
               onClick={handleCopyPath}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-2.5 sm:py-1.5 min-h-11 sm:min-h-0 rounded-md bg-zinc-900/10 dark:bg-white/10 hover:bg-zinc-900/20 dark:hover:bg-white/20 transition-colors text-xs text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-2.5 sm:py-1.5 min-h-11 sm:min-h-0 rounded-md bg-foreground/10 hover:bg-foreground/20 transition-colors text-xs text-muted-foreground hover:text-foreground"
               title="Copy path"
               aria-label="Copy file path"
             >
               {copied ? (
                 <>
-                  <CheckIcon weight="bold" className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-400">Copied</span>
+                  <CheckIcon weight="bold" className="w-3.5 h-3.5 text-status-success" />
+                  <span className="text-status-success">Copied</span>
                 </>
               ) : (
                 <>
@@ -167,9 +167,9 @@ export const AssetCard = memo(function AssetCard({
           </div>
         </div>
 
-        <div className="px-3 py-2.5 border-t border-zinc-200 dark:border-zinc-800/50">
+        <div className="px-3 py-2.5 border-t border-border/50">
           <p
-            className="text-[13px] font-medium text-zinc-800 dark:text-zinc-200 truncate leading-tight"
+            className="text-[13px] font-medium text-foreground truncate leading-tight"
             title={asset.name}
           >
             {asset.name}
@@ -184,24 +184,24 @@ export const AssetCard = memo(function AssetCard({
               </span>
 
               {asset.importersCount === 0 && !ignored && (
-                <span className="text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-amber-500/10 text-amber-500 shrink-0">
+                <span className="text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-status-warning/10 text-status-warning shrink-0">
                   unused
                 </span>
               )}
               {asset.importersCount === 0 && ignored && (
-                <span className="flex items-center gap-0.5 text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-zinc-200 dark:bg-zinc-800 text-zinc-500 shrink-0">
+                <span className="flex items-center gap-0.5 text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-muted text-muted-foreground shrink-0">
                   <EyeSlashIcon weight="fill" className="w-2.5 h-2.5" />
                   ignored
                 </span>
               )}
               {asset.duplicatesCount > 0 && (
-                <span className="text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-blue-500/10 text-blue-400 shrink-0">
+                <span className="text-[10px] font-mono font-medium uppercase px-1.5 py-0.5 rounded-sm bg-status-info/10 text-status-info shrink-0">
                   {asset.duplicatesCount} dupe{asset.duplicatesCount === 1 ? '' : 's'}
                 </span>
               )}
             </div>
 
-            <span className="text-[11px] text-zinc-500 font-mono tabular-nums shrink-0">
+            <span className="text-[11px] text-muted-foreground font-mono tabular-nums shrink-0">
               {formatBytes(asset.size)}
             </span>
           </div>

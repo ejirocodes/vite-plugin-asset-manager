@@ -99,7 +99,7 @@ export const AssetContextMenu = memo(function AssetContextMenu({
           <CopySimpleIcon weight="bold" className="w-4 h-4 mr-2" />
           Copy Path
           {clipboard.copyPathState === 'copied' && (
-            <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-emerald-500" />
+            <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-status-success" />
           )}
         </ContextMenuItem>
 
@@ -115,21 +115,21 @@ export const AssetContextMenu = memo(function AssetContextMenu({
               <FileHtmlIcon weight="bold" className="w-4 h-4 mr-2" />
               HTML
               {clipboard.copyCodeState === 'copied' && (
-                <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-emerald-500" />
+                <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-status-success" />
               )}
             </ContextMenuItem>
             <ContextMenuItem onClick={() => clipboard.handleCopyImportCode('react')}>
               <FramerLogoIcon weight="bold" className="w-4 h-4 mr-2" />
               React
               {clipboard.copyCodeState === 'copied' && (
-                <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-emerald-500" />
+                <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-status-success" />
               )}
             </ContextMenuItem>
             <ContextMenuItem onClick={() => clipboard.handleCopyImportCode('vue')}>
               <FileVueIcon weight="bold" className="w-4 h-4 mr-2" />
               Vue
               {clipboard.copyCodeState === 'copied' && (
-                <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-emerald-500" />
+                <CheckIcon weight="bold" className="w-3 h-3 ml-auto text-status-success" />
               )}
             </ContextMenuItem>
           </ContextMenuSubContent>

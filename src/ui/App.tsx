@@ -459,7 +459,7 @@ export default function App() {
                   </Button>
                 )}
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-md bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-md shadow-violet-500/20">
+                  <div className="w-7 h-7 rounded-md bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-md shadow-primary/20">
                     <LightningIcon weight="fill" className="w-4 h-4 text-white" />
                   </div>
                   <div>

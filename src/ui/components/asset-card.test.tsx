@@ -369,8 +369,8 @@ describe('AssetCard', () => {
       render(<AssetCard asset={unusedAsset} />)
 
       const badge = screen.getByText('unused')
-      expect(badge).toHaveClass('bg-amber-500/10')
-      expect(badge).toHaveClass('text-amber-500')
+      expect(badge).toHaveClass('bg-status-warning/10')
+      expect(badge).toHaveClass('text-status-warning')
     })
   })
 
@@ -443,7 +443,7 @@ describe('AssetCard', () => {
       render(<AssetCard asset={ignoredAsset} />)
 
       const badge = screen.getByText('ignored')
-      expect(badge).toHaveClass('text-zinc-500')
+      expect(badge).toHaveClass('text-muted-foreground')
     })
 
     it('should not show ignored badge for used assets even if in ignore list', () => {

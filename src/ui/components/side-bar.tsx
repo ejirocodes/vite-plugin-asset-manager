@@ -60,19 +60,19 @@ interface SidebarProps {
 
 const statusConfig: Record<SSEConnectionStatus, { dotClass: string; label: string }> = {
   connecting: {
-    dotClass: 'bg-amber-500 animate-pulse',
+    dotClass: 'bg-status-warning animate-pulse',
     label: 'Connecting...'
   },
   connected: {
-    dotClass: 'bg-emerald-500 animate-pulse',
+    dotClass: 'bg-status-success animate-pulse',
     label: 'Watching'
   },
   reconnecting: {
-    dotClass: 'bg-amber-500 animate-pulse',
+    dotClass: 'bg-status-warning animate-pulse',
     label: 'Reconnecting...'
   },
   disconnected: {
-    dotClass: 'bg-zinc-500',
+    dotClass: 'bg-muted-foreground',
     label: 'Disconnected'
   }
 }
@@ -100,7 +100,7 @@ export const Sidebar = memo(function Sidebar({
       <div className="p-5 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-9 h-9 rounded-lg bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+            <div className="w-9 h-9 rounded-lg bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
               <LightningIcon weight="fill" />
             </div>
             <div
