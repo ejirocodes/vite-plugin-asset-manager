@@ -69,7 +69,7 @@ export const AssetCard = memo(function AssetCard({
       try {
         await navigator.clipboard.writeText(asset.path)
         setCopied(true)
-        setTimeout(() => setCopied(false), 1500)
+        setTimeout(() => setCopied(false), 2000)
       } catch (err) {
         console.error('Failed to copy path:', err)
       }
@@ -99,7 +99,7 @@ export const AssetCard = memo(function AssetCard({
           group relative cursor-pointer
           bg-card/80 rounded-lg overflow-hidden
           border border-border
-          transition-all duration-150 ease-out
+          transition-[background-color,border-color,box-shadow] duration-150 ease-out
           hover:bg-muted/50 hover:border-border
           animate-fade-in-up opacity-0 ${staggerClass}
           ${isSelected ? 'ring-1 ring-primary/70 border-primary/50 bg-primary/5' : ''}
@@ -108,7 +108,7 @@ export const AssetCard = memo(function AssetCard({
       >
         {onToggleSelect && (
           <div
-            className={`absolute top-2 left-2 z-10 transition-opacity duration-100 ${
+            className={`absolute top-2 left-2 z-10 transition-opacity duration-150 ${
               isSelected
                 ? 'opacity-100'
                 : 'opacity-0 group-hover:opacity-100 sm:group-hover:opacity-100'
@@ -146,7 +146,7 @@ export const AssetCard = memo(function AssetCard({
 
           <button
             onClick={handleCopyPath}
-            className={`absolute top-2 right-2 z-10 transition-all duration-100
+            className={`absolute top-2 right-2 z-10 transition-[opacity,background-color,color] duration-150
               p-2 sm:p-1.5 rounded-md
               bg-background/80 backdrop-blur-sm border border-border/50
               text-muted-foreground hover:text-foreground hover:bg-background

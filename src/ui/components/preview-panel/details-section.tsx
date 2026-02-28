@@ -118,7 +118,7 @@ const DetailRow = memo(function DetailRow({
             aria-label={`Copy ${label}`}
           >
             {copied ? (
-              <CheckIcon weight="bold" className="w-3 h-3 text-emerald-500" />
+              <CheckIcon weight="bold" className="w-3 h-3 text-status-success" />
             ) : (
               <CopyIcon weight="bold" className="w-3 h-3 text-muted-foreground" />
             )}
@@ -147,7 +147,7 @@ export const DetailsSection = memo(function DetailsSection({
 
   return (
     <div className="p-4">
-      <h3 className="text-xs font-medium text-muted-foreground mb-2">Details</h3>
+      <h3 className="text-xs font-medium text-muted-foreground mb-3">Details</h3>
       <div className="divide-y divide-border">
         <DetailRow label="Filepath" value={asset.absolutePath} copyable externalLink={fileUrl} />
         <DetailRow label="Public Path" value={publicPath} copyable />

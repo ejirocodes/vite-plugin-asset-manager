@@ -54,7 +54,7 @@ export const CodeSnippets = memo(function CodeSnippets({ asset }: CodeSnippetsPr
                 aria-label="Copy code"
               >
                 {copiedTab === snippet.type ? (
-                  <CheckIcon weight="bold" className="w-4 h-4 text-emerald-500" />
+                  <CheckIcon weight="bold" className="w-4 h-4 text-status-success" />
                 ) : (
                   <CopyIcon weight="bold" className="w-4 h-4" />
                 )}

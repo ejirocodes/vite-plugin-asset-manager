@@ -95,8 +95,8 @@ export const AdvancedFilters = memo(function AdvancedFilters({
           variant="outline"
           size="sm"
           className={cn(
-            'h-7! gap-1.5 px-2.5 font-medium transition-all duration-200',
-            'bg-input/20 dark:bg-input/30 border-border/50 hover:bg-input/30 dark:hover:bg-input/40',
+            'h-7! gap-1.5 px-2.5 font-medium transition-colors duration-150',
+            'bg-input/30 dark:bg-input/40 border-border/60 hover:bg-input/40 dark:hover:bg-input/50',
             activeCount > 0 && 'border-primary/40 bg-primary/5 hover:bg-primary/10'
           )}
         >
@@ -264,7 +264,7 @@ function FilterChip({ selected, onClick, children }: FilterChipProps) {
         'relative flex flex-col items-start',
         'px-2.5 py-2 rounded-lg',
         'text-left text-xs',
-        'border transition-all duration-150',
+        'border transition-colors duration-150',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
         selected
           ? 'bg-primary/10 border-primary/30 text-primary'
@@ -296,7 +296,7 @@ function FilterPill({ selected, onClick, children, mono }: FilterPillProps) {
       className={cn(
         'inline-flex items-center gap-1',
         'px-2 py-1 rounded-md',
-        'text-xs transition-all duration-150',
+        'text-xs transition-colors duration-150',
         'border focus:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         mono && 'font-mono',
         selected
