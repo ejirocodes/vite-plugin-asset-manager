@@ -98,24 +98,6 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
         }
       }
 
-      const cycleFocus = (direction: 1 | -1) => {
-        if (flatAssetList.length === 0) return
-
-        const currentIndex = focusedAssetId
-          ? flatAssetList.findIndex(a => a.id === focusedAssetId)
-          : -1
-
-        let newIndex: number
-        if (currentIndex === -1) {
-          newIndex = direction === 1 ? 0 : flatAssetList.length - 1
-        } else {
-          newIndex = (currentIndex + direction + flatAssetList.length) % flatAssetList.length
-        }
-
-        setFocusedAssetId(flatAssetList[newIndex].id)
-        setIsGridFocused(true)
-      }
-
       // ===== GLOBAL SHORTCUTS (work anywhere) =====
 
       // / - Focus search
@@ -167,17 +149,9 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
           return
         }
 
-        // Tab - Cycle focus forward through grid
-        if (e.key === 'Tab' && !e.shiftKey) {
-          e.preventDefault()
-          cycleFocus(1)
-          return
-        }
-
-        // Shift+Tab - Cycle focus backward through grid
-        if (e.key === 'Tab' && e.shiftKey) {
-          e.preventDefault()
-          cycleFocus(-1)
+        // Tab - Let natural DOM tab order handle focus (no trap)
+        if (e.key === 'Tab') {
+          setIsGridFocused(false)
           return
         }
 

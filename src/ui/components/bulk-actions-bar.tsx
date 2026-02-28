@@ -109,6 +109,7 @@ export const BulkActionsBar = memo(function BulkActionsBar({
           size="icon-sm"
           onClick={allSelected ? onDeselectAll : onSelectAll}
           title={allSelected ? 'Deselect all' : 'Select all'}
+          aria-label={allSelected ? 'Deselect all assets' : 'Select all assets'}
         >
           {allSelected ? (
             <CheckSquareIcon weight="fill" className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />

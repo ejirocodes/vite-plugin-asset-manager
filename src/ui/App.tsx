@@ -344,10 +344,13 @@ export default function App() {
 
   useEffect(() => {
     if (focusedAssetId && isGridFocused) {
-      const asset = flatAssetList.find(a => a.id === focusedAssetId)
-      if (asset) {
-        setSrAnnouncement(`Focused on ${asset.name}`)
-      }
+      const timer = setTimeout(() => {
+        const asset = flatAssetList.find(a => a.id === focusedAssetId)
+        if (asset) {
+          setSrAnnouncement(`Focused on ${asset.name}`)
+        }
+      }, 300)
+      return () => clearTimeout(timer)
     }
   }, [focusedAssetId, isGridFocused, flatAssetList])
 

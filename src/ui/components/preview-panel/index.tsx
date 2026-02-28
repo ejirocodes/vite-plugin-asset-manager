@@ -29,6 +29,7 @@ export const PreviewPanel = memo(function PreviewPanel({
   flatAssetList = [],
   onAssetChange
 }: PreviewPanelProps) {
+  const panelRef = useRef<HTMLElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const [dimensionsState, setDimensionsState] = useState<{
     assetId: string
@@ -110,6 +111,39 @@ export const PreviewPanel = memo(function PreviewPanel({
     closeButtonRef.current?.focus()
   }, [])
 
+  // Focus trap: keep Tab/Shift+Tab within the panel
+  useEffect(() => {
+    const panelEl = panelRef.current
+    if (!panelEl) return
+
+    const handleFocusTrap = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+
+      const focusableEls = panelEl.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusableEls.length === 0) return
+
+      const firstEl = focusableEls[0]
+      const lastEl = focusableEls[focusableEls.length - 1]
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstEl) {
+          e.preventDefault()
+          lastEl.focus()
+        }
+      } else {
+        if (document.activeElement === lastEl) {
+          e.preventDefault()
+          firstEl.focus()
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleFocusTrap)
+    return () => document.removeEventListener('keydown', handleFocusTrap)
+  }, [asset])
+
   const handleDimensionsLoad = useCallback(
     (dimensions: { width: number; height: number }) => {
       setDimensionsState({ assetId: asset.id, dimensions })
@@ -119,7 +153,9 @@ export const PreviewPanel = memo(function PreviewPanel({
 
   return (
     <aside
-      role="region"
+      ref={panelRef}
+      role="dialog"
+      aria-modal="true"
       aria-label={`Preview of ${asset.name}`}
       style={{
         width: typeof window !== 'undefined' && window.innerWidth >= 768 ? panelWidth : undefined
