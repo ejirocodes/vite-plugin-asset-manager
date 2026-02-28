@@ -37,7 +37,7 @@ import {
   ListIcon,
   LightningIcon
 } from '@phosphor-icons/react'
-import { useEmbeddedMode } from './hooks/useEmbeddedMode'
+import { isEmbedded } from './hooks/useEmbeddedMode'
 import { openAssetInEditor, revealAssetInFinder } from '@/ui/lib/asset-api'
 import { toast } from 'sonner'
 import type { Asset, AssetType } from './types'
@@ -49,15 +49,17 @@ const LoadingSpinner = (
   </div>
 )
 
-const EmptyStateSearchResults = (searchQuery: string) => (
-  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-    <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
-      <MagnifyingGlassIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
+function EmptyStateSearchResults({ query }: { query: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+      <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mb-6">
+        <MagnifyingGlassIcon weight="duotone" className="w-10 h-10 text-muted-foreground/50" />
+      </div>
+      <p className="text-lg font-medium text-foreground mb-1">No results found</p>
+      <p className="text-sm">No assets match &ldquo;{query}&rdquo;</p>
     </div>
-    <p className="text-lg font-medium text-foreground mb-1">No results found</p>
-    <p className="text-sm">No assets match "{searchQuery}"</p>
-  </div>
-)
+  )
+}
 
 const EmptyStateNoAssetsFiltered = (
   <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
@@ -70,7 +72,6 @@ const EmptyStateNoAssetsFiltered = (
 )
 
 export default function App() {
-  const isEmbedded = useEmbeddedMode()
   const [selectedType, setSelectedType] = useState<AssetType | null>(null)
   const [showUnusedOnly, setShowUnusedOnly] = useState(false)
   const [showDuplicatesOnly, setShowDuplicatesOnly] = useState(false)
@@ -230,16 +231,15 @@ export default function App() {
         const next = new Set(prev)
 
         if (shiftKey && lastSelectedId) {
-          const allAssets = displayGroups.flatMap(g => g.assets)
-          const lastIndex = allAssets.findIndex(a => a.id === lastSelectedId)
-          const currentIndex = allAssets.findIndex(a => a.id === assetId)
+          const lastIndex = flatAssetList.findIndex(a => a.id === lastSelectedId)
+          const currentIndex = flatAssetList.findIndex(a => a.id === assetId)
 
           if (lastIndex !== -1 && currentIndex !== -1) {
             const [start, end] =
               lastIndex < currentIndex ? [lastIndex, currentIndex] : [currentIndex, lastIndex]
 
             for (let i = start; i <= end; i++) {
-              next.add(allAssets[i].id)
+              next.add(flatAssetList[i].id)
             }
           }
         } else {
@@ -254,7 +254,7 @@ export default function App() {
       })
       setLastSelectedId(assetId)
     },
-    [lastSelectedId, displayGroups]
+    [lastSelectedId, flatAssetList]
   )
 
   const handleSelectAll = useCallback(() => {
@@ -319,6 +319,10 @@ export default function App() {
     }
   }, [])
 
+  const handleKeyboardDelete = useCallback((assets: Asset[]) => {
+    setPendingDeleteAssets(assets)
+  }, [])
+
   useKeyboardNavigation({
     flatAssetList,
     focusedAssetId,
@@ -331,13 +335,9 @@ export default function App() {
     clearSelection: handleDeselectAll,
     previewAsset: selectedAsset,
     setPreviewAsset: setSelectedAsset,
-    searchQuery,
-    setSearchQuery,
-    searchInputRef: searchInputRef as React.RefObject<HTMLInputElement>,
+    searchInputRef,
     onCopyPaths: handleCopyPaths,
-    onDelete: (assets: Asset[]) => {
-      setPendingDeleteAssets(assets)
-    },
+    onDelete: handleKeyboardDelete,
     onOpenInEditor: handleOpenInEditor,
     onRevealInFinder: handleRevealInFinder
   })
@@ -518,7 +518,7 @@ export default function App() {
                 </div>
                 {displayGroups.length === 0
                   ? searchQuery
-                    ? EmptyStateSearchResults(searchQuery)
+                    ? <EmptyStateSearchResults query={searchQuery} />
                     : EmptyStateNoAssetsFiltered
                   : displayGroups.map(group => (
                       <div

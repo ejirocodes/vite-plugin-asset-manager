@@ -1,4 +1,4 @@
-import { memo, useRef, useState, useEffect, useCallback } from 'react'
+import { memo, useRef, useState, useCallback } from 'react'
 import { PlayIcon } from '@phosphor-icons/react'
 import { FileIcon } from '../file-icon'
 import { getApiBase } from '@/ui/lib/api-base'
@@ -10,39 +10,11 @@ interface VideoCardPreviewProps {
 
 export const VideoCardPreview = memo(function VideoCardPreview({ asset }: VideoCardPreviewProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
   const [error, setError] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
 
   const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
 
   const handleError = useCallback(() => setError(true), [])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting)
-      },
-      { threshold: 0.1 }
-    )
-
-    observer.observe(container)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    if (isVisible) {
-      video.play().catch(() => {})
-    } else {
-      video.pause()
-    }
-  }, [isVisible])
 
   if (error) {
     return (
@@ -53,13 +25,14 @@ export const VideoCardPreview = memo(function VideoCardPreview({ asset }: VideoC
   }
 
   return (
-    <div ref={containerRef} className="relative w-full h-full">
+    <div className="relative w-full h-full">
       <video
         ref={videoRef}
-        src={isVisible ? fileUrl : undefined}
+        src={fileUrl}
         muted
         loop
         playsInline
+        autoPlay
         preload="metadata"
         onError={handleError}
         className="w-full h-full object-cover"

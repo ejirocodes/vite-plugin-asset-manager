@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset, UseDuplicatesResult } from '../types'
 import { useSSE } from './useSSE'
@@ -8,10 +8,16 @@ export function useDuplicates(contentHash: string): UseDuplicatesResult {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { subscribe } = useSSE()
+  const initialFetchDone = useRef(false)
 
   const fetchDuplicates = useCallback(async () => {
+    if (!contentHash) {
+      setDuplicates([])
+      setLoading(false)
+      return
+    }
     try {
-      setLoading(true)
+      if (!initialFetchDone.current) setLoading(true)
       setError(null)
       const res = await fetch(
         `${getApiBase()}/api/duplicates?hash=${encodeURIComponent(contentHash)}`
@@ -23,24 +29,19 @@ export function useDuplicates(contentHash: string): UseDuplicatesResult {
       setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setLoading(false)
+      initialFetchDone.current = true
     }
   }, [contentHash])
 
   useEffect(() => {
+    initialFetchDone.current = false
     fetchDuplicates()
 
     const unsubscribe = subscribe('asset-manager:duplicates-update', () => {
       fetchDuplicates()
     })
 
-    const unsubscribeAssets = subscribe('asset-manager:update', () => {
-      fetchDuplicates()
-    })
-
-    return () => {
-      unsubscribe()
-      unsubscribeAssets()
-    }
+    return unsubscribe
   }, [contentHash, fetchDuplicates, subscribe])
 
   return { duplicates, loading, error }

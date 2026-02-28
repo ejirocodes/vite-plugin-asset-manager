@@ -142,7 +142,7 @@ export const PreviewPanel = memo(function PreviewPanel({
 
     document.addEventListener('keydown', handleFocusTrap)
     return () => document.removeEventListener('keydown', handleFocusTrap)
-  }, [asset])
+  }, [])
 
   const handleDimensionsLoad = useCallback(
     (dimensions: { width: number; height: number }) => {

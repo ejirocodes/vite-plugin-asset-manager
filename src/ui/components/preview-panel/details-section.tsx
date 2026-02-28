@@ -2,19 +2,12 @@ import { memo, useCallback, useState } from 'react'
 import { CopyIcon, CheckIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { getApiBase } from '@/ui/lib/api-base'
+import { formatBytes } from '@/ui/lib/utils'
 import type { Asset } from '@/ui/types'
 
 interface DetailsSectionProps {
   asset: Asset
   imageDimensions?: { width: number; height: number } | null
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
 function formatDate(timestamp: number): string {
