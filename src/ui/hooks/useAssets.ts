@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { getApiBase } from '@/ui/lib/api-base'
 import type { AssetGroup, AssetType, UseAssetsResult } from '../types'
 import { useSSE } from './useSSE'
@@ -13,19 +13,19 @@ export function useAssets(
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { subscribe } = useSSE()
+  const initialFetchDone = useRef(false)
 
   const advancedParamsString = advancedParams?.toString() ?? ''
 
   const fetchAssets = useCallback(async () => {
     try {
-      setLoading(true)
+      if (!initialFetchDone.current) setLoading(true)
       setError(null)
 
       const params = new URLSearchParams()
       if (typeFilter) params.append('type', typeFilter)
       if (unusedFilter) params.append('unused', 'true')
       if (advancedParamsString) {
-        // Reconstruct URLSearchParams from string
         const advancedUrlParams = new URLSearchParams(advancedParamsString)
         advancedUrlParams.forEach((value, key) => params.append(key, value))
       }
@@ -44,10 +44,12 @@ export function useAssets(
       setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setLoading(false)
+      initialFetchDone.current = true
     }
   }, [typeFilter, unusedFilter, advancedParamsString])
 
   useEffect(() => {
+    initialFetchDone.current = false
     fetchAssets()
 
     const unsubscribe = subscribe('asset-manager:update', () => {

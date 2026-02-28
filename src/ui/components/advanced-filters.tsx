@@ -181,7 +181,7 @@ export const AdvancedFilters = memo(function AdvancedFilters({
               scrollable
             >
               <div className="flex flex-wrap gap-1">
-                {availableExtensions.sort().map(ext => (
+                {[...availableExtensions].sort().map(ext => (
                   <FilterPill
                     key={ext}
                     selected={extensionFilter?.extensions?.includes(ext)}

@@ -1,4 +1,4 @@
-import { memo, useState, useEffect, useId, useRef } from 'react'
+import { memo, useState, useEffect, useId } from 'react'
 import { FileIcon } from '../file-icon'
 import { getApiBase } from '@/ui/lib/api-base'
 import type { Asset } from '@/ui/types'
@@ -10,55 +10,29 @@ interface FontCardPreviewProps {
 export const FontCardPreview = memo(function FontCardPreview({ asset }: FontCardPreviewProps) {
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
   const fontId = useId()
   const fontFamily = `card-font-${fontId.replace(/:/g, '-')}`
   const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    let cancelled = false
+    const font = new FontFace(fontFamily, `url(${fileUrl})`)
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.1 }
-    )
-
-    observer.observe(container)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (!isVisible) return
-
-    const loadFont = async () => {
-      try {
-        const font = new FontFace(fontFamily, `url(${fileUrl})`)
-        await font.load()
-        document.fonts.add(font)
-        setLoaded(true)
-      } catch (err) {
-        console.error('Failed to load font:', err)
-        setError(true)
-      }
-    }
-
-    loadFont()
+    font.load().then(() => {
+      if (cancelled) return
+      document.fonts.add(font)
+      setLoaded(true)
+    }).catch(err => {
+      if (cancelled) return
+      console.error('Failed to load font:', err)
+      setError(true)
+    })
 
     return () => {
-      document.fonts.forEach(font => {
-        if (font.family === fontFamily) {
-          document.fonts.delete(font)
-        }
-      })
+      cancelled = true
+      document.fonts.delete(font)
     }
-  }, [isVisible, fileUrl, fontFamily])
+  }, [fileUrl, fontFamily])
 
   if (error) {
     return (
@@ -69,10 +43,7 @@ export const FontCardPreview = memo(function FontCardPreview({ asset }: FontCard
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-full flex items-center justify-center bg-card"
-    >
+    <div className="relative w-full h-full flex items-center justify-center bg-card">
       {loaded ? (
         <span style={{ fontFamily }} className="text-5xl text-foreground select-none">
           Ag

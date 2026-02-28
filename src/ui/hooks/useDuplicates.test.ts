@@ -81,7 +81,8 @@ describe('useDuplicates', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    expect(fetch).toHaveBeenCalledWith('/__asset_manager__/api/duplicates?hash=')
+    expect(fetch).not.toHaveBeenCalled()
+    expect(result.current.duplicates).toHaveLength(0)
   })
 
   it('should handle fetch errors', async () => {

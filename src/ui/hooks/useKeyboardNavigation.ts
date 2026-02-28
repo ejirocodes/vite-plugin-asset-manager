@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useResponsiveColumns } from './useResponsiveColumns'
 import type { Asset } from '../types'
 
@@ -18,9 +18,7 @@ interface UseKeyboardNavigationOptions {
   previewAsset: Asset | null
   setPreviewAsset: (asset: Asset | null) => void
 
-  searchQuery: string
-  setSearchQuery: (query: string) => void
-  searchInputRef: React.RefObject<HTMLInputElement>
+  searchInputRef: React.RefObject<HTMLInputElement | null>
 
   onCopyPaths: (assets: Asset[]) => void
   onDelete: (assets: Asset[]) => void
@@ -28,33 +26,40 @@ interface UseKeyboardNavigationOptions {
   onRevealInFinder: (asset: Asset) => void
 }
 
+const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
+
 export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
-  const {
-    flatAssetList,
-    focusedAssetId,
-    setFocusedAssetId,
-    isGridFocused,
-    setIsGridFocused,
-    selectedAssets,
-    toggleSelection,
-    selectAll,
-    clearSelection,
-    previewAsset,
-    setPreviewAsset,
-    searchInputRef,
-    onCopyPaths,
-    onDelete,
-    onOpenInEditor,
-    onRevealInFinder
-  } = options
+  const optionsRef = useRef(options)
+  optionsRef.current = options
 
   const columns = useResponsiveColumns()
+  const columnsRef = useRef(columns)
+  columnsRef.current = columns
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const {
+        flatAssetList,
+        focusedAssetId,
+        setFocusedAssetId,
+        isGridFocused,
+        setIsGridFocused,
+        selectedAssets,
+        toggleSelection,
+        selectAll,
+        clearSelection,
+        previewAsset,
+        setPreviewAsset,
+        searchInputRef,
+        onCopyPaths,
+        onDelete,
+        onOpenInEditor,
+        onRevealInFinder
+      } = optionsRef.current
+      const cols = columnsRef.current
+
       const target = e.target as HTMLElement
       const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
-      const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
       const modKey = isMac ? e.metaKey : e.ctrlKey
 
       const getTargetAssets = (): Asset[] => {
@@ -82,9 +87,9 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
         } else if (key === 'ArrowLeft') {
           newIndex = Math.max(currentIndex - 1, 0)
         } else if (key === 'ArrowDown' || key === 'j') {
-          newIndex = Math.min(currentIndex + columns, flatAssetList.length - 1)
+          newIndex = Math.min(currentIndex + cols, flatAssetList.length - 1)
         } else if (key === 'ArrowUp' || key === 'k') {
-          newIndex = Math.max(currentIndex - columns, 0)
+          newIndex = Math.max(currentIndex - cols, 0)
         }
 
         // If no item focused yet, start at first item
@@ -212,23 +217,5 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [
-    flatAssetList,
-    focusedAssetId,
-    setFocusedAssetId,
-    isGridFocused,
-    setIsGridFocused,
-    selectedAssets,
-    toggleSelection,
-    selectAll,
-    clearSelection,
-    previewAsset,
-    setPreviewAsset,
-    searchInputRef,
-    onCopyPaths,
-    onDelete,
-    onOpenInEditor,
-    onRevealInFinder,
-    columns
-  ])
+  }, [])
 }

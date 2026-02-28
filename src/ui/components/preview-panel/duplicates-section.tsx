@@ -1,19 +1,12 @@
 import { memo } from 'react'
 import { CopyIcon, SpinnerGapIcon, FolderIcon } from '@phosphor-icons/react'
 import { useDuplicates } from '@/ui/hooks/useDuplicates'
+import { formatBytes } from '@/ui/lib/utils'
 import type { Asset } from '@/ui/types'
 
 interface DuplicatesSectionProps {
   asset: Asset
   onSelectAsset?: (asset: Asset) => void
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
 export const DuplicatesSection = memo(function DuplicatesSection({

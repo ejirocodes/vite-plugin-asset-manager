@@ -115,7 +115,6 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "jsdom": "^27.4.0",
     "memfs": "^4.56.10",
-    "next-themes": "^0.4.6",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
     "react": "^19.2.4",
