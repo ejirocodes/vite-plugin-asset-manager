@@ -12,7 +12,7 @@ import {
   AlertDialogTitle
 } from '@/ui/components/ui/alert-dialog'
 import { useAssetMutations } from '@/ui/hooks/useAssetMutations'
-import { getApiBase } from '@/ui/lib/api-base'
+import { getTransport } from '@/ui/lib/transport'
 import type { Asset } from '@/ui/types'
 
 interface ActionsSectionProps {
@@ -20,7 +20,7 @@ interface ActionsSectionProps {
 }
 
 export const ActionsSection = memo(function ActionsSection({ asset }: ActionsSectionProps) {
-  const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = getTransport().getFileUrl(asset.path)
   const { isDeleting, handleDelete, handleToggleIgnore, ignored } = useAssetMutations(asset)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 

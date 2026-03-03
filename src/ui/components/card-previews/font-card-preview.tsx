@@ -1,6 +1,6 @@
 import { memo, useState, useEffect, useId } from 'react'
 import { FileIcon } from '../file-icon'
-import { getApiBase } from '@/ui/lib/api-base'
+import { getTransport } from '@/ui/lib/transport'
 import type { Asset } from '@/ui/types'
 
 interface FontCardPreviewProps {
@@ -12,7 +12,7 @@ export const FontCardPreview = memo(function FontCardPreview({ asset }: FontCard
   const [error, setError] = useState(false)
   const fontId = useId()
   const fontFamily = `card-font-${fontId.replace(/:/g, '-')}`
-  const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = getTransport().getFileUrl(asset.path)
 
   useEffect(() => {
     let cancelled = false

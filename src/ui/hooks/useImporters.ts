@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { toast } from 'sonner'
-import { getApiBase } from '@/ui/lib/api-base'
+import { getTransport } from '@/ui/lib/transport'
 import type { Importer, UseImportersResult } from '../types'
-import { useSSE } from './useSSE'
+import { useAssetUpdates } from './useAssetUpdates'
 
 export function useImporters(assetPath: string): UseImportersResult {
   const [importers, setImporters] = useState<Importer[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { subscribe } = useSSE()
+  const { subscribe } = useAssetUpdates()
 
   const fetchImporters = useCallback(async () => {
     if (!assetPath) {
@@ -20,11 +20,7 @@ export function useImporters(assetPath: string): UseImportersResult {
     try {
       setLoading(true)
       setError(null)
-      const res = await fetch(
-        `${getApiBase()}/api/importers?path=${encodeURIComponent(assetPath)}`
-      )
-      if (!res.ok) throw new Error('Failed to fetch importers')
-      const data = await res.json()
+      const data = await getTransport().getImporters(assetPath)
       setImporters(data.importers)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
@@ -35,18 +31,7 @@ export function useImporters(assetPath: string): UseImportersResult {
 
   const openInEditor = useCallback(async (importer: Importer) => {
     try {
-      const res = await fetch(
-        `${getApiBase()}/api/open-in-editor?` +
-          `file=${encodeURIComponent(importer.filePath)}` +
-          `&line=${importer.line}` +
-          `&column=${importer.column}`,
-        { method: 'POST' }
-      )
-
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Failed to open editor')
-      }
+      await getTransport().openInEditor(importer.filePath, importer.line, importer.column)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to open in editor')
     }

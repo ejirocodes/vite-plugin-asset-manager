@@ -1,5 +1,5 @@
 import { memo, useState, useCallback } from 'react'
-import { getApiBase } from '@/ui/lib/api-base'
+import { getTransport } from '@/ui/lib/transport'
 import type { Asset } from '@/ui/types'
 
 interface ImagePreviewProps {
@@ -12,7 +12,7 @@ export const ImagePreview = memo(function ImagePreview({
   onDimensionsLoad
 }: ImagePreviewProps) {
   const [error, setError] = useState(false)
-  const fileUrl = `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
+  const fileUrl = getTransport().getFileUrl(asset.path)
 
   const handleLoad = useCallback(
     (e: React.SyntheticEvent<HTMLImageElement>) => {

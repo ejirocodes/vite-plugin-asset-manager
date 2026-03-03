@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { getApiBase } from '@/ui/lib/api-base'
+import { getTransport } from '@/ui/lib/transport'
 import type { Asset, UseDuplicatesResult } from '../types'
-import { useSSE } from './useSSE'
+import { useAssetUpdates } from './useAssetUpdates'
 
 export function useDuplicates(contentHash: string): UseDuplicatesResult {
   const [duplicates, setDuplicates] = useState<Asset[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { subscribe } = useSSE()
+  const { subscribe } = useAssetUpdates()
   const initialFetchDone = useRef(false)
 
   const fetchDuplicates = useCallback(async () => {
@@ -19,11 +19,7 @@ export function useDuplicates(contentHash: string): UseDuplicatesResult {
     try {
       if (!initialFetchDone.current) setLoading(true)
       setError(null)
-      const res = await fetch(
-        `${getApiBase()}/api/duplicates?hash=${encodeURIComponent(contentHash)}`
-      )
-      if (!res.ok) throw new Error('Failed to fetch duplicates')
-      const data = await res.json()
+      const data = await getTransport().getDuplicates(contentHash)
       setDuplicates(data.duplicates)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')

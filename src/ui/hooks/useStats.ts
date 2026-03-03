@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getApiBase } from '@/ui/lib/api-base'
-import { useSSE } from './useSSE'
+import { getTransport } from '@/ui/lib/transport'
+import { useAssetUpdates } from './useAssetUpdates'
 
 interface Stats {
   total: number
@@ -42,24 +42,22 @@ export function useStats(): UseStatsResult {
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { subscribe } = useSSE()
+  const { subscribe } = useAssetUpdates()
 
   const fetchStats = useCallback(async () => {
     try {
       setError(null)
-      const res = await fetch(`${getApiBase()}/api/stats`)
-      if (!res.ok) throw new Error('Failed to fetch stats')
-      const data = await res.json()
+      const data = await getTransport().getStats()
       setStats({
         total: data.total,
-        images: data.byType.image,
-        videos: data.byType.video,
-        audio: data.byType.audio,
-        documents: data.byType.document,
-        fonts: data.byType.font,
-        data: data.byType.data,
-        text: data.byType.text,
-        other: data.byType.other,
+        images: data.byType.image ?? 0,
+        videos: data.byType.video ?? 0,
+        audio: data.byType.audio ?? 0,
+        documents: data.byType.document ?? 0,
+        fonts: data.byType.font ?? 0,
+        data: data.byType.data ?? 0,
+        text: data.byType.text ?? 0,
+        other: data.byType.other ?? 0,
         unused: data.unused,
         duplicateGroups: data.duplicateGroups ?? 0,
         duplicateFiles: data.duplicateFiles ?? 0,

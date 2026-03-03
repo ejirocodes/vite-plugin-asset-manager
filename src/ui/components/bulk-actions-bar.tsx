@@ -8,7 +8,7 @@ import {
   SquareIcon
 } from '@phosphor-icons/react'
 import { Button } from '@/ui/components/ui/button'
-import { getApiBase } from '@/ui/lib/api-base'
+import { getTransport } from '@/ui/lib/transport'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,23 +61,7 @@ export const BulkActionsBar = memo(function BulkActionsBar({
     setIsDownloading(true)
     try {
       const paths = selectedAssets.map(a => a.path)
-      const response = await fetch(`${getApiBase()}/api/bulk-download`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paths })
-      })
-
-      if (!response.ok) throw new Error('Download failed')
-
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `assets-${Date.now()}.zip`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      await getTransport().bulkDownload(paths)
 
       toast.success(`Downloaded ${selectedCount} asset${selectedCount > 1 ? 's' : ''} as ZIP`)
     } catch {

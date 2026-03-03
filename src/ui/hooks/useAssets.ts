@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { getApiBase } from '@/ui/lib/api-base'
+import { getTransport } from '@/ui/lib/transport'
 import type { AssetGroup, AssetType, UseAssetsResult } from '../types'
-import { useSSE } from './useSSE'
+import { useAssetUpdates } from './useAssetUpdates'
 
 export function useAssets(
   typeFilter?: AssetType | null,
@@ -12,7 +12,7 @@ export function useAssets(
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { subscribe } = useSSE()
+  const { subscribe } = useAssetUpdates()
   const initialFetchDone = useRef(false)
 
   const advancedParamsString = advancedParams?.toString() ?? ''
@@ -26,18 +26,10 @@ export function useAssets(
       if (typeFilter) params.append('type', typeFilter)
       if (unusedFilter) params.append('unused', 'true')
       if (advancedParamsString) {
-        const advancedUrlParams = new URLSearchParams(advancedParamsString)
-        advancedUrlParams.forEach((value, key) => params.append(key, value))
+        new URLSearchParams(advancedParamsString).forEach((v, k) => params.append(k, v))
       }
 
-      const queryString = params.toString()
-      const url = queryString
-        ? `${getApiBase()}/api/assets/grouped?${queryString}`
-        : `${getApiBase()}/api/assets/grouped`
-
-      const res = await fetch(url)
-      if (!res.ok) throw new Error('Failed to fetch assets')
-      const data = await res.json()
+      const data = await getTransport().getGroupedAssets(params)
       setGroups(data.groups)
       setTotal(data.total)
     } catch (err) {

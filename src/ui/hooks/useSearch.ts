@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { getApiBase } from '@/ui/lib/api-base'
+import { getTransport } from '@/ui/lib/transport'
 import type { Asset, UseSearchResult } from '../types'
 
 export function useSearch(advancedParams?: URLSearchParams): UseSearchResult {
@@ -21,13 +21,10 @@ export function useSearch(advancedParams?: URLSearchParams): UseSearchResult {
         const params = new URLSearchParams()
         params.append('q', query)
         if (advancedParamsString) {
-          const advancedUrlParams = new URLSearchParams(advancedParamsString)
-          advancedUrlParams.forEach((value, key) => params.append(key, value))
+          new URLSearchParams(advancedParamsString).forEach((v, k) => params.append(k, v))
         }
 
-        const res = await fetch(`${getApiBase()}/api/search?${params.toString()}`)
-        if (!res.ok) throw new Error('Search failed')
-        const data = await res.json()
+        const data = await getTransport().searchAssets(params)
         setResults(data.assets)
       } catch {
         setResults([])

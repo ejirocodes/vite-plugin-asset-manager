@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { toast } from 'sonner'
-import { getApiBase } from '@/ui/lib/api-base'
+import { getTransport } from '@/ui/lib/transport'
 import type { Asset } from '../types'
 
 interface UseBulkOperationsResult {
@@ -15,22 +15,7 @@ export function useBulkOperations(): UseBulkOperationsResult {
     setIsDeleting(true)
     try {
       const paths = assets.map(a => a.path)
-      const response = await fetch(`${getApiBase()}/api/bulk-delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paths })
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Delete failed')
-      }
-
-      const result = (await response.json()) as {
-        deleted: number
-        failed: number
-        errors: string[]
-      }
+      const result = await getTransport().bulkDelete(paths)
 
       if (result.deleted > 0) {
         toast.success(`Deleted ${result.deleted} asset${result.deleted > 1 ? 's' : ''}`)

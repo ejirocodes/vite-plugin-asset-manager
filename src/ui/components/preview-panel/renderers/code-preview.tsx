@@ -1,6 +1,6 @@
 import { memo, useState, useEffect } from 'react'
 import { SpinnerIcon } from '@phosphor-icons/react'
-import { getApiBase } from '@/ui/lib/api-base'
+import { getTransport } from '@/ui/lib/transport'
 import type { Asset } from '@/ui/types'
 
 interface CodePreviewProps {
@@ -22,9 +22,7 @@ export const CodePreview = memo(function CodePreview({ asset }: CodePreviewProps
       setTruncated(false)
 
       try {
-        const response = await fetch(
-          `${getApiBase()}/api/file?path=${encodeURIComponent(asset.path)}`
-        )
+        const response = await fetch(getTransport().getFileUrl(asset.path))
 
         if (!response.ok) {
           throw new Error('Failed to fetch file')
