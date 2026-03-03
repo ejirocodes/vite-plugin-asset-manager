@@ -91,12 +91,13 @@
     "publish": "vsce publish --no-dependencies"
   },
   "dependencies": {
-    "@img/sharp-wasm32": "^0.33.5",
+    "sharp": "^0.33.5",
     "archiver": "^7.0.1",
     "chokidar": "^3.6.0",
     "fast-glob": "^3.3.2"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
     "@types/archiver": "^6.0.3",
     "@types/node": "^22.0.0",
     "@types/vscode": "^1.85.0",

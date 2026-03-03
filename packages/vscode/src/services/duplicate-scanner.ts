@@ -78,7 +78,7 @@ export class DuplicateScanner extends EventEmitter {
       return new Promise((resolve, reject) => {
         const hash = crypto.createHash('md5')
         const stream = fs.createReadStream(absolutePath)
-        stream.on('data', (chunk: Buffer) => hash.update(chunk))
+        stream.on('data', (chunk: Buffer | string) => hash.update(chunk))
         stream.on('end', () => resolve(hash.digest('hex')))
         stream.on('error', reject)
       })

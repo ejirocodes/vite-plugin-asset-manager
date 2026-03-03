@@ -2,10 +2,7 @@ import path from 'path'
 import fs from 'fs/promises'
 import crypto from 'crypto'
 import * as vscode from 'vscode'
-
-// @img/sharp-wasm32 has the same API as sharp but uses WebAssembly — no native binaries needed
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const sharp = require('@img/sharp-wasm32')
+import sharp from 'sharp'
 
 const SUPPORTED = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif', '.tiff'])
 
