@@ -1,0 +1,109 @@
+{
+  "name": "asset-lens",
+  "displayName": "Asset Lens",
+  "description": "Visual asset manager for any project — browse, search, and inspect images, fonts, video, audio, and more.",
+  "version": "0.1.0",
+  "publisher": "asset-lens",
+  "private": true,
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "keywords": ["assets", "images", "fonts", "media", "file manager"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "asset-lens",
+          "title": "Asset Lens",
+          "icon": "assets/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "asset-lens": [
+        {
+          "id": "assetLens.panel",
+          "name": "Asset Lens",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "assetLens.openPanel",
+        "title": "Asset Lens: Open Panel"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "assetLens.openPanel",
+        "key": "alt+shift+a",
+        "mac": "alt+shift+a"
+      }
+    ],
+    "configuration": {
+      "title": "Asset Lens",
+      "properties": {
+        "assetLens.include": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Directories to scan relative to workspace root. Leave empty to scan the entire workspace."
+        },
+        "assetLens.exclude": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [
+            "node_modules",
+            ".git",
+            "dist",
+            "build",
+            "target",
+            ".next",
+            ".nuxt",
+            "coverage",
+            ".cache",
+            "android/build",
+            "ios/build"
+          ],
+          "description": "Directories to exclude from scanning."
+        },
+        "assetLens.thumbnailSize": {
+          "type": "number",
+          "default": 200,
+          "description": "Thumbnail size in pixels (width and height)."
+        },
+        "assetLens.aliases": {
+          "type": "object",
+          "default": { "@/": "src/" },
+          "description": "Path alias mappings for import detection (e.g. { \"@/\": \"src/\" })."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "pnpm run build:webview && pnpm run build:extension",
+    "build:webview": "vite build --config vite.config.webview.ts",
+    "build:extension": "node esbuild.config.mjs",
+    "dev": "node esbuild.config.mjs --watch",
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies"
+  },
+  "dependencies": {
+    "@img/sharp-wasm32": "^0.33.5",
+    "archiver": "^7.0.1",
+    "chokidar": "^3.6.0",
+    "fast-glob": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.3",
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.24.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^6.0.0"
+  }
+}

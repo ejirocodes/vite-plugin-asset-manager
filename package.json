@@ -56,7 +56,10 @@
     "playground:tanstack": "pnpm --filter playground-tanstack dev",
     "playground:nuxt": "pnpm --filter playground-nuxt dev",
     "playground:nextjs": "pnpm --filter playground-nextjs dev",
-    "build:packages": "pnpm --filter @vite-asset-manager/core build && pnpm --filter @vite-asset-manager/nuxt build && pnpm --filter nextjs-asset-manager build"
+    "build:packages": "pnpm --filter @vite-asset-manager/core build && pnpm --filter @vite-asset-manager/nuxt build && pnpm --filter nextjs-asset-manager build",
+    "build:vscode": "pnpm --filter asset-lens run build",
+    "build:vscode:webview": "pnpm --filter asset-lens run build:webview",
+    "build:vscode:extension": "pnpm --filter asset-lens run build:extension"
   },
   "publishConfig": {
     "access": "public"
