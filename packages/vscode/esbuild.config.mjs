@@ -1,9 +1,5 @@
 import esbuild from 'esbuild'
-import { readFileSync, copyFileSync, mkdirSync } from 'fs'
-import { resolve, dirname } from 'path'
-import { fileURLToPath } from 'url'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
 const isWatch = process.argv.includes('--watch')
 
 const ctx = await esbuild.context({
