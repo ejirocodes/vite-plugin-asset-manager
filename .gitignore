@@ -39,3 +39,4 @@ vite-asset-manager-thumbnails/
 playwright-report/
 test-results/
 e2e/.playwright/
+.planning/
