@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./.github/assets/banner.png" alt="Vite Plugin Asset Manager" />
+  <img src="./.github/assets/demo.gif" alt="Vite Plugin Asset Manager Demo" />
 </p>
 
 <h1 align="center">vite-plugin-asset-manager</h1>
