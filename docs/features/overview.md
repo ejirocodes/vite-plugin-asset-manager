@@ -1,3 +1,7 @@
+---
+description: Overview of all Vite Asset Manager features including scanning, thumbnails, duplicate detection, bulk operations, and keyboard navigation.
+---
+
 # Features Overview
 
 Vite Asset Manager provides a comprehensive set of features for managing media assets in your Vite projects.

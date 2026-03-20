@@ -1,3 +1,7 @@
+---
+description: Set up Vite Asset Manager in a Vue + Vite project. Zero-config integration with path alias support.
+---
+
 # Vue
 
 Vite Asset Manager works out of the box with Vue + Vite projects.

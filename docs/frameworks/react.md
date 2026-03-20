@@ -1,3 +1,7 @@
+---
+description: Set up Vite Asset Manager in a React + Vite project. Works out of the box with @vitejs/plugin-react.
+---
+
 # React
 
 Vite Asset Manager works out of the box with React + Vite projects.

@@ -2,6 +2,13 @@ import { defineConfig } from 'vitepress'
 import assetManager from 'vite-plugin-asset-manager'
 
 export default defineConfig({
+  lang: 'en-US',
+  lastUpdated: true,
+
+  sitemap: {
+    hostname: 'https://vite-asset-manager.vercel.app',
+  },
+
   vite: {
     plugins: [
       assetManager({
@@ -19,15 +26,20 @@ export default defineConfig({
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
     ['meta', { name: 'theme-color', content: '#5e6ad2' }],
+    ['meta', { name: 'author', content: 'Ejiro Asiuwhu' }],
+    ['meta', { name: 'keywords', content: 'vite, plugin, asset manager, vite plugin, media assets, image management, thumbnail generation, duplicate detection' }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: 'Vite Asset Manager' }],
-    [
-      'meta',
-      {
-        property: 'og:description',
-        content: 'Visual asset management dashboard for Vite projects',
-      },
-    ],
+    ['meta', { property: 'og:site_name', content: 'Vite Asset Manager' }],
+    ['meta', { property: 'og:title', content: 'Vite Asset Manager - Visual asset management for Vite' }],
+    ['meta', { property: 'og:description', content: 'Discover, catalogue, and manage all media assets in your Vite projects. Real-time dashboard with thumbnail generation, duplicate detection, and framework-agnostic integration.' }],
+    ['meta', { property: 'og:url', content: 'https://vite-asset-manager.vercel.app' }],
+    ['meta', { property: 'og:image', content: 'https://vite-asset-manager.vercel.app/og-image.png' }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: 'Vite Asset Manager' }],
+    ['meta', { name: 'twitter:description', content: 'Visual asset management dashboard for Vite projects' }],
+    ['meta', { name: 'twitter:image', content: 'https://vite-asset-manager.vercel.app/og-image.png' }],
   ],
 
   themeConfig: {

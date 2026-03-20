@@ -1,3 +1,7 @@
+---
+description: Official Nuxt module for Vite Asset Manager with automatic floating icon injection and DevTools integration.
+---
+
 # Nuxt
 
 The `@vite-asset-manager/nuxt` module provides first-class Nuxt 3/4 support with zero configuration.

@@ -1,3 +1,7 @@
+---
+description: Set up Vite Asset Manager with TanStack Start using manual script injection for SSR.
+---
+
 # TanStack Start
 
 TanStack Start uses SSR, which means the floating icon must be manually injected into your root component.

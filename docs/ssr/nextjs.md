@@ -1,3 +1,7 @@
+---
+description: Official Next.js integration for Vite Asset Manager with App Router API route handler and client component.
+---
+
 # Next.js
 
 The `nextjs-asset-manager` package provides first-class Next.js 14+ support with App Router integration.

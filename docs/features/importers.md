@@ -1,3 +1,7 @@
+---
+description: Track which source files import each asset. Detect ES imports, dynamic imports, require, CSS url(), and HTML attributes.
+---
+
 # Importer Detection
 
 The plugin tracks which source files import each asset, helping you understand asset usage across your codebase.

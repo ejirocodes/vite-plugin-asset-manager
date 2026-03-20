@@ -1,3 +1,7 @@
+---
+description: Row-based virtual scrolling with @tanstack/react-virtual for smooth performance with hundreds of assets.
+---
+
 # Virtual Scrolling
 
 The dashboard uses [@tanstack/react-virtual](https://tanstack.com/virtual/latest) for row-based virtualization, ensuring smooth performance with any number of assets.
