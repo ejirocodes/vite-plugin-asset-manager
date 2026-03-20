@@ -19,6 +19,7 @@
 </p>
 
 <p align="center">
+  <a href="https://vite-assets.vercel.app">Documentation</a> •
   <a href="#installation">Installation</a> •
   <a href="#usage">Usage</a> •
   <a href="#features">Features</a> •
@@ -91,9 +92,9 @@ Start your dev server and access the Asset Manager in three ways:
 | Svelte | ✅ | Fully automatic |
 | Solid | ✅ | Fully automatic |
 | Qwik | ✅ | Fully automatic |
-| **Nuxt 3/4** | ✅ | [Official module](#nuxt-module) |
-| **Next.js 14+** | ✅ | [Official package](#nextjs-integration) |
-| **TanStack Start** | ✅ | [Manual setup required](./docs/SSR_INTEGRATION.md#tanstack-start-setup) ([playground](./playgrounds/tanstack/)) |
+| **Nuxt 3/4** | ✅ | [Official module](https://vite-assets.vercel.app/ssr/nuxt) |
+| **Next.js 14+** | ✅ | [Official package](https://vite-assets.vercel.app/ssr/nextjs) |
+| **TanStack Start** | ✅ | [Manual setup](https://vite-assets.vercel.app/ssr/tanstack-start) ([playground](./playgrounds/tanstack/)) |
 
 ### Nuxt Module
 
@@ -108,7 +109,7 @@ export default defineNuxtConfig({
 })
 ```
 
-Zero-config with automatic floating icon injection, Nuxt DevTools integration, and Nuxt 3/4 support. See the **[full Nuxt documentation](https://www.npmjs.com/package/@vite-asset-manager/nuxt)** for all options.
+Zero-config with automatic floating icon injection, Nuxt DevTools integration, and Nuxt 3/4 support. See the **[full Nuxt documentation](https://vite-assets.vercel.app/ssr/nuxt)** for all options.
 
 ### Next.js Integration
 
@@ -123,11 +124,11 @@ const { GET, POST } = createHandler()
 export { GET, POST }
 ```
 
-Three-step setup: wrap config, add route handler, add client component. See the **[full Next.js documentation](https://www.npmjs.com/package/nextjs-asset-manager)** for all options.
+Three-step setup: wrap config, add route handler, add client component. See the **[full Next.js documentation](https://vite-assets.vercel.app/ssr/nextjs)** for all options.
 
 ### Other SSR Frameworks
 
-For TanStack Start, Remix, SvelteKit, and Solid Start, manual script injection is required. See the **[SSR Integration Guide](./docs/SSR_INTEGRATION.md)** for setup instructions.
+For TanStack Start, Remix, SvelteKit, and Solid Start, manual script injection is required. See the **[SSR Integration Guide](https://vite-assets.vercel.app/ssr/tanstack-start)** for setup instructions.
 
 ## Configuration
 
