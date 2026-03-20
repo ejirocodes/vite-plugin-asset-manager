@@ -18,7 +18,7 @@ export default defineConfig({
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
-    ['meta', { name: 'theme-color', content: '#646cff' }],
+    ['meta', { name: 'theme-color', content: '#d97b06' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'Vite Asset Manager' }],
     [
@@ -132,7 +132,7 @@ export default defineConfig({
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024-present Ejiro Asiuwhu',
+      copyright: 'Copyright © 2026-present <a href="https://www.linkedin.com/in/ejirocodes" target="_blank">Ejiro Asiuwhu</a>',
     },
 
     search: {
