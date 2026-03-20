@@ -16,6 +16,9 @@ export default defineConfig({
         floatingIcon: false,
       }),
     ],
+    css: {
+      postcss: {},
+    },
   },
 
   title: 'Vite Asset Manager',
