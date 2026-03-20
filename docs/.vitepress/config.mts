@@ -6,7 +6,7 @@ export default defineConfig({
   lastUpdated: true,
 
   sitemap: {
-    hostname: 'https://vite-asset-manager.vercel.app',
+    hostname: 'https://vite-assets.vercel.app',
   },
 
   vite: {
@@ -35,14 +35,14 @@ export default defineConfig({
     ['meta', { property: 'og:site_name', content: 'Vite Asset Manager' }],
     ['meta', { property: 'og:title', content: 'Vite Asset Manager - Visual asset management for Vite' }],
     ['meta', { property: 'og:description', content: 'Discover, catalogue, and manage all media assets in your Vite projects. Real-time dashboard with thumbnail generation, duplicate detection, and framework-agnostic integration.' }],
-    ['meta', { property: 'og:url', content: 'https://vite-asset-manager.vercel.app' }],
-    ['meta', { property: 'og:image', content: 'https://vite-asset-manager.vercel.app/og-image.png' }],
+    ['meta', { property: 'og:url', content: 'https://vite-assets.vercel.app' }],
+    ['meta', { property: 'og:image', content: 'https://vite-assets.vercel.app/og-image.png' }],
     ['meta', { property: 'og:image:width', content: '1200' }],
     ['meta', { property: 'og:image:height', content: '630' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: 'Vite Asset Manager' }],
     ['meta', { name: 'twitter:description', content: 'Visual asset management dashboard for Vite projects' }],
-    ['meta', { name: 'twitter:image', content: 'https://vite-asset-manager.vercel.app/og-image.png' }],
+    ['meta', { name: 'twitter:image', content: 'https://vite-assets.vercel.app/og-image.png' }],
   ],
 
   themeConfig: {
