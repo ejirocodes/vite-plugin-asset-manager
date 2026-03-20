@@ -83,7 +83,7 @@ onMounted(() => {
             </div>
             <div class="frame-overlay">
               <a href="/guide/getting-started" class="overlay-link">
-                Install to see the live dashboard &rarr;
+                Try the live dashboard &rarr;
               </a>
             </div>
           </template>
