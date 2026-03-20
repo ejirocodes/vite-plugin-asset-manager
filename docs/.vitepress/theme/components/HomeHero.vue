@@ -304,7 +304,7 @@ function copy() {
 
 .dim { color: var(--vp-c-text-3); }
 .kw { color: var(--vp-c-brand-1); }
-.str { color: #2a9d8f; }
+.str { color: #3a9e75; }
 
-.dark .str { color: #5cc8ba; }
+.dark .str { color: #6bc49f; }
 </style>
