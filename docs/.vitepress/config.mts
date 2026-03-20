@@ -4,8 +4,10 @@ export default defineConfig({
   title: 'Vite Asset Manager',
   description: 'Visual asset management dashboard for Vite projects',
   cleanUrls: true,
+  srcExclude: ['SSR_INTEGRATION.md'],
 
   head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
     ['meta', { name: 'theme-color', content: '#646cff' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'Vite Asset Manager' }],
