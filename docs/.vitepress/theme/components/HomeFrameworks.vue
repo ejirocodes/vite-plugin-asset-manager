@@ -85,7 +85,7 @@ const official = [
 .compat-title {
   font-family: var(--font-display);
   font-size: 26px;
-  font-weight: 400;
+  font-weight: 600;
   margin-bottom: 8px;
 }
 

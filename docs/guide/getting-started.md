@@ -75,18 +75,18 @@ The base path is configurable via the `base` option. The default is `/__asset_ma
 
 The dashboard displays all media assets in your project organized by type:
 
-- **Images** — jpg, png, svg, webp, avif, gif, ico
-- **Videos** — mp4, webm, mov, avi
-- **Audio** — mp3, wav, ogg, flac
-- **Fonts** — woff, woff2, ttf, otf, eot
-- **Documents** — pdf, doc, docx, xls, xlsx
-- **Data** — json, xml, csv, yaml, toml
-- **Text** — txt, md, html, css
+- **Images** - jpg, png, svg, webp, avif, gif, ico
+- **Videos** - mp4, webm, mov, avi
+- **Audio** - mp3, wav, ogg, flac
+- **Fonts** - woff, woff2, ttf, otf, eot
+- **Documents** - pdf, doc, docx, xls, xlsx
+- **Data** - json, xml, csv, yaml, toml
+- **Text** - txt, md, html, css
 
 Each asset card shows a thumbnail preview (for supported image formats), file size, type badge, and import count.
 
 ## Next Steps
 
-- [Configuration](/guide/configuration) — Customize paths, thumbnail size, and more
-- [Framework Guides](/frameworks/vue) — Framework-specific setup instructions
-- [Features](/features/overview) — Explore all dashboard capabilities
+- [Configuration](/guide/configuration) - Customize paths, thumbnail size, and more
+- [Framework Guides](/frameworks/vue) - Framework-specific setup instructions
+- [Features](/features/overview) - Explore all dashboard capabilities

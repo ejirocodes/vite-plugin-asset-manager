@@ -7,7 +7,7 @@ The `nextjs-asset-manager` package provides first-class Next.js 14+ support with
 - API route handler for asset management
 - Client component for floating icon injection
 - Config wrapper to suppress dev server request logging
-- Dev-only — returns 404 in production
+- Dev-only - returns 404 in production
 
 ## Installation
 

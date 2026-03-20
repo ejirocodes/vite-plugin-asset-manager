@@ -33,9 +33,9 @@ assetManager({
 
 Assets with zero importers are marked as "unused" in the dashboard:
 
-- **Badge** — A visual indicator on the asset card
-- **Sidebar filter** — Filter to show only unused assets
-- **Stats** — The sidebar shows the total count of unused assets
+- **Badge** - A visual indicator on the asset card
+- **Sidebar filter** - Filter to show only unused assets
+- **Stats** - The sidebar shows the total count of unused assets
 
 This helps identify assets that can be safely removed to reduce project size.
 

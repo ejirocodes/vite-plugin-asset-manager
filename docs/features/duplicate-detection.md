@@ -15,9 +15,9 @@ Two files are considered duplicates if their content is byte-for-byte identical,
 
 ## Dashboard Integration
 
-- **Badge** — Asset cards show a duplicate count badge when duplicates exist
-- **Preview Panel** — The duplicates section in the preview panel lists all files sharing the same content hash
-- **Stats** — The sidebar shows the total number of duplicate groups and duplicate files
+- **Badge** - Asset cards show a duplicate count badge when duplicates exist
+- **Preview Panel** - The duplicates section in the preview panel lists all files sharing the same content hash
+- **Stats** - The sidebar shows the total number of duplicate groups and duplicate files
 
 ## Finding Duplicates
 

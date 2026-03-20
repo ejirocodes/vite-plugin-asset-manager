@@ -30,9 +30,9 @@ Files are categorized by extension:
 
 When `watch: true` (the default), file changes trigger SSE events that update the dashboard in real-time:
 
-- **File added** — new asset card appears
-- **File modified** — metadata and thumbnail refresh
-- **File deleted** — asset card removed
+- **File added** - new asset card appears
+- **File modified** - metadata and thumbnail refresh
+- **File deleted** - asset card removed
 
 The watcher uses a 100ms debounce to batch rapid changes.
 

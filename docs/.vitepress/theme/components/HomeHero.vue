@@ -28,7 +28,7 @@ function copy() {
         <p class="lead">
           A visual dashboard that discovers every image, font, video,
           and file in your Vite project. See what's used, find duplicates,
-          manage everything — in real time.
+          manage everything - in real time.
         </p>
         <div class="actions">
           <a href="/guide/getting-started" class="btn-primary">
@@ -129,15 +129,16 @@ function copy() {
 .title {
   font-family: var(--font-display);
   font-size: 42px;
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
   color: var(--vp-c-text-1);
   margin-bottom: 20px;
 }
 
 .title em {
-  font-style: italic;
+  font-style: normal;
+  font-weight: 700;
   color: var(--vp-c-brand-1);
 }
 

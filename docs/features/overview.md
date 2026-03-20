@@ -4,7 +4,7 @@ Vite Asset Manager provides a comprehensive set of features for managing media a
 
 ## Asset Discovery
 
-The plugin automatically scans your configured directories and catalogues all media assets by type — images, videos, audio, fonts, documents, data files, and text files. Assets are displayed in a searchable, filterable grid with thumbnail previews.
+The plugin automatically scans your configured directories and catalogues all media assets by type - images, videos, audio, fonts, documents, data files, and text files. Assets are displayed in a searchable, filterable grid with thumbnail previews.
 
 [Learn more about Asset Scanning →](/features/asset-scanning)
 

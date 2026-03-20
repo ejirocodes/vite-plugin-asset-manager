@@ -94,7 +94,7 @@ const features = [
 .feat-label {
   font-family: var(--font-display);
   font-size: 22px;
-  font-weight: 400;
+  font-weight: 600;
   color: var(--vp-c-text-1);
   margin-bottom: 6px;
 }

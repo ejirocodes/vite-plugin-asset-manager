@@ -25,7 +25,7 @@ The grid automatically adapts the number of columns based on viewport width usin
 
 ## Performance
 
-- **Initial render** — Only visible rows are rendered
-- **Scrolling** — Smooth 60fps scrolling with buffer rows preventing flicker
-- **Filtering** — Instant client-side filtering without re-fetching
-- **Memory** — Constant DOM node count regardless of total assets
+- **Initial render** - Only visible rows are rendered
+- **Scrolling** - Smooth 60fps scrolling with buffer rows preventing flicker
+- **Filtering** - Instant client-side filtering without re-fetching
+- **Memory** - Constant DOM node count regardless of total assets

@@ -1,11 +1,57 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-400-normal.woff2');
+@import url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-500-normal.woff2');
+@import url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-600-normal.woff2');
+@import url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-700-normal.woff2');
+@import url('https://cdn.jsdelivr.net/fontsource/fonts/geist-mono@latest/latin-400-normal.woff2');
+
+@font-face {
+  font-family: 'Geist Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/fontsource/fonts/geist-mono@latest/latin-400-normal.woff2') format('woff2');
+}
 
 :root {
   --vp-c-brand-1: #5e6ad2;
   --vp-c-brand-2: #6e79d6;
   --vp-c-brand-3: #8890de;
   --vp-c-brand-soft: rgba(94, 106, 210, 0.08);
-  --font-display: 'Instrument Serif', Georgia, serif;
+  --vp-font-family-base: 'Geist Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --vp-font-family-mono: 'Geist Mono', ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+  --font-display: 'Geist Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .dark {
@@ -13,4 +59,11 @@
   --vp-c-brand-2: #a0a7ea;
   --vp-c-brand-3: #b8bdf0;
   --vp-c-brand-soft: rgba(139, 147, 227, 0.08);
+}
+
+/* Slashed zero in mono contexts */
+code, pre, kbd,
+.vp-code,
+[class*="language-"] {
+  font-feature-settings: 'zero' 1, 'ss01' 1;
 }

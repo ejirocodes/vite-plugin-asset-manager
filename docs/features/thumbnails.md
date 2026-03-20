@@ -19,8 +19,8 @@ SVG files are displayed inline without thumbnail generation. Other file types sh
 
 Thumbnails use a dual-tier cache for optimal performance:
 
-1. **Memory cache** — In-process Map for instant access to recently viewed thumbnails
-2. **Disk cache** — Files stored in `os.tmpdir()` for persistence across server restarts
+1. **Memory cache** - In-process Map for instant access to recently viewed thumbnails
+2. **Disk cache** - Files stored in `os.tmpdir()` for persistence across server restarts
 
 The cache key combines the file path hash, modification time (`mtime`), and file size. When a file changes, the stale thumbnail is automatically invalidated and regenerated on next access.
 

@@ -37,7 +37,7 @@ Start your dev server and the asset manager is ready. A floating icon will appea
 
 ## Path Aliases
 
-If you use the default `@/` alias that maps to `src/`, no extra configuration is needed — the plugin uses `{ '@/': 'src/' }` by default.
+If you use the default `@/` alias that maps to `src/`, no extra configuration is needed - the plugin uses `{ '@/': 'src/' }` by default.
 
 For custom aliases, update the `aliases` option:
 
