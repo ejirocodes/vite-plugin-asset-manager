@@ -1,13 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
 :root {
-  --vp-c-brand-1: #646cff;
-  --vp-c-brand-2: #747bff;
+  --vp-c-brand-1: #5b63ef;
+  --vp-c-brand-2: #6e75f2;
   --vp-c-brand-3: #8b92ff;
-  --vp-c-brand-soft: rgba(100, 108, 255, 0.14);
+  --vp-c-brand-soft: rgba(91, 99, 239, 0.1);
+  --font-display: 'Instrument Serif', Georgia, serif;
 }
 
 .dark {
-  --vp-c-brand-1: #747bff;
-  --vp-c-brand-2: #8b92ff;
-  --vp-c-brand-3: #a5abff;
-  --vp-c-brand-soft: rgba(100, 108, 255, 0.16);
+  --vp-c-brand-1: #8b92ff;
+  --vp-c-brand-2: #a5abff;
+  --vp-c-brand-3: #c4c8ff;
+  --vp-c-brand-soft: rgba(139, 146, 255, 0.1);
 }
