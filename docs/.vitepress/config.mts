@@ -1,6 +1,16 @@
 import { defineConfig } from 'vitepress'
+import assetManager from 'vite-plugin-asset-manager'
 
 export default defineConfig({
+  vite: {
+    plugins: [
+      assetManager({
+        include: ['guide', 'frameworks', 'ssr', 'features', 'public'],
+        floatingIcon: false,
+      }),
+    ],
+  },
+
   title: 'Vite Asset Manager',
   description: 'Visual asset management dashboard for Vite projects',
   cleanUrls: true,
