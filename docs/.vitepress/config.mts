@@ -5,7 +5,7 @@ export default defineConfig({
   vite: {
     plugins: [
       assetManager({
-        include: ['guide', 'frameworks', 'ssr', 'features', 'public'],
+        include: ['public/assets'],
         floatingIcon: false,
       }),
     ],
