@@ -1,3 +1,7 @@
+---
+description: Set up Vite Asset Manager in a plain Vite project without any framework.
+---
+
 # Vanilla
 
 Vite Asset Manager works with plain Vite projects that don't use any framework.

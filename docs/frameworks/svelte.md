@@ -1,3 +1,7 @@
+---
+description: Set up Vite Asset Manager in a Svelte + Vite project with $lib alias support.
+---
+
 # Svelte
 
 Vite Asset Manager works out of the box with Svelte + Vite projects.

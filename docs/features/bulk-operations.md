@@ -1,3 +1,7 @@
+---
+description: Multi-select assets to copy paths, download as ZIP, or bulk delete with Shift/Ctrl+click.
+---
+
 # Bulk Operations
 
 Select multiple assets to perform batch actions like copying paths, downloading as ZIP, or bulk deleting.

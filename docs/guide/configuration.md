@@ -1,3 +1,7 @@
+---
+description: Complete reference for all Vite Asset Manager plugin options including paths, thumbnails, editor integration, and path aliases.
+---
+
 # Configuration
 
 All options are optional. The plugin works out of the box with sensible defaults.

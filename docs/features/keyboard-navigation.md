@@ -1,3 +1,7 @@
+---
+description: Full keyboard navigation with arrow keys, vim-style j/k, and shortcuts for all asset management actions.
+---
+
 # Keyboard Navigation
 
 The asset manager supports full keyboard navigation for efficient asset management without a mouse.

@@ -1,3 +1,7 @@
+---
+description: Content-based MD5 duplicate detection to find redundant assets and reduce bundle size.
+---
+
 # Duplicate Detection
 
 Content-based duplicate detection helps you find redundant assets across your project using MD5 hashing.

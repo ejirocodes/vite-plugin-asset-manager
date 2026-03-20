@@ -1,3 +1,7 @@
+---
+description: Set up Vite Asset Manager in a Solid + Vite project.
+---
+
 # Solid
 
 Vite Asset Manager works out of the box with Solid + Vite projects.

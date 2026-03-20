@@ -1,3 +1,7 @@
+---
+description: Install and configure Vite Asset Manager in under 2 minutes. Works with any Vite-powered project.
+---
+
 # Getting Started
 
 Get up and running with Vite Asset Manager in under 2 minutes.

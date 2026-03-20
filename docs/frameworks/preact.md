@@ -1,3 +1,7 @@
+---
+description: Set up Vite Asset Manager in a Preact + Vite project.
+---
+
 # Preact
 
 Vite Asset Manager works out of the box with Preact + Vite projects.

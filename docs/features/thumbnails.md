@@ -1,3 +1,7 @@
+---
+description: Sharp-powered thumbnail generation with dual-tier memory and disk caching for image asset previews.
+---
+
 # Thumbnails
 
 The plugin uses [Sharp](https://sharp.pixelplumbing.com/) for fast, high-quality thumbnail generation with dual-tier caching.

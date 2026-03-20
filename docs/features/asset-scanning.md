@@ -1,3 +1,7 @@
+---
+description: How Vite Asset Manager discovers and catalogues assets using fast-glob and chokidar with real-time file watching.
+---
+
 # Asset Scanning
 
 The plugin uses [fast-glob](https://github.com/mrmlnc/fast-glob) for initial directory scanning and [chokidar](https://github.com/paulmillr/chokidar) for real-time file watching.

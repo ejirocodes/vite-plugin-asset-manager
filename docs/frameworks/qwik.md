@@ -1,3 +1,7 @@
+---
+description: Set up Vite Asset Manager in a Qwik + Vite project.
+---
+
 # Qwik
 
 Vite Asset Manager works out of the box with Qwik + Vite projects.

@@ -1,3 +1,7 @@
+---
+description: Set up Vite Asset Manager in a Lit + Vite project.
+---
+
 # Lit
 
 Vite Asset Manager works out of the box with Lit + Vite projects.

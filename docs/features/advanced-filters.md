@@ -1,3 +1,7 @@
+---
+description: Filter assets by file size, modification date, and extension with combinable presets.
+---
+
 # Advanced Filters
 
 Filter assets by size, modification date, and file extension to quickly find what you're looking for.
